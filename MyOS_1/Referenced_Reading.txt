@@ -1,0 +1,37 @@
+This project is currently "Duct-Von-Taped" together. I've utilized many references and snippets of code to get it this far.
+It's not my intention to claim all of this work as my own. Rather the OS, in it's entirety, is "mine" in the sense that it
+accomplishes what I want it to (or part of what I want it to, anyway). In this file, I'll attempt to keep track of some of
+the many sources I've used, both for code snippets and referential reading. This is, of course, not an exhaustive list,
+and I may even leave out some of the places I've copied code from. Sorry if I leave your code out! Again, it's not my
+intention to claim code I haven't written as my own, but in the interest of getting my OS up and running as soon as possible,
+it seems silly to rewrite perfectly good code I've found on the net. "No copyright infringement intended."
+
+References:
+Any and all of the OSDev wiki: wiki.osdev.org
+Various Intel manuals (of course)
+reddit.com/r/osdev
+
+Certain OSDev forum posts, like:
+https://forum.osdev.org/viewtopic.php?f=1&t=22708&hilit=higher+half+msvc
+
+I struggled a lot to get GDT working properly with MSVC. (I almost think the OSDev wiki does more harm than good here, but _after_
+you already understand the concept, it is useful).
+Here's some of the GDT references, tutorials, and random tidbits I used:
+http://www.osdever.net/bkerndev/Docs/gdt.htm
+http://www.jamesmolloy.co.uk/tutorial_html/4.-The%20GDT%20and%20IDT.html
+https://forum.osdev.org/viewtopic.php?f=1&t=31835
+https://forum.osdev.org/viewtopic.php?f=1&t=17180  <- very important for using MSVC! This took forever to find!
+
+http://www.jamesmolloy.co.uk/tutorial_html/6.-Paging.html
+
+http://www.brackeen.com/vga/basics.html
+
+http://www.saminiir.com/lets-code-tcp-ip-stack-1-ethernet-arp/
+
+https://en.wikibooks.org/wiki/X86_Disassembly/Windows_Executable_Files
+http://www.brokenthorn.com/Resources/OSDevPE.html
+
+commands I've used to launch QEMU:
+C:\Users\Administrator\Documents\Visual Studio 2015\Projects\MyOS_1\Debug>"c:\Program Files\qemu\qemu-system-x86_64w.exe" -boot n -device e1000,netdev=n1 -netdev user,id=n1,tftp=c:\users\Administrator\.VirtualBox\TFTP
+
+"C:\Program Files\qemu\qemu-system-x86_64w.exe" -device vmware-svga -netdev user,id=u1 -device rtl8139,netdev=u1 -kernel "C:\users\Administrator\Documents\Visual Studio 2015\Projects\MyOS_1\Debug\MyOS_1.dll" -object filter-dump,id=f1,netdev=u1,file="C:\Program Files\qemu\dump.dat"

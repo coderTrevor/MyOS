@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Drivers">
+      <UniqueIdentifier>{aef4f92d-0490-4784-83a7-ce5d7afeb873}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers">
+      <UniqueIdentifier>{5573e8aa-08f2-44cb-8965-1d1eb89e426e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Networking">
+      <UniqueIdentifier>{f0a1bcd7-cae0-4888-9de8-38de4ce790c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Networking">
+      <UniqueIdentifier>{8bb80534-5191-444d-be67-fbeabc68ad9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Interrupts">
+      <UniqueIdentifier>{dba843c7-85e1-4527-a7d4-716f9606cd4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Interrupts">
+      <UniqueIdentifier>{6f466e22-0d41-473a-95bd-519b7936cde2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Executables">
+      <UniqueIdentifier>{a72760d5-c413-440c-939b-e4a0dd52606e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Executables">
+      <UniqueIdentifier>{cad664ef-4e2b-4662-a617-8b2355debae0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="paging.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Console_Serial.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Console_VGA.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="misc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GDT.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Console_Shell.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Interrupts\IDT.c">
+      <Filter>Source Files\Interrupts</Filter>
+    </ClCompile>
+    <ClCompile Include="Interrupts\Interrupts.c">
+      <Filter>Source Files\Interrupts</Filter>
+    </ClCompile>
+    <ClCompile Include="Interrupts\PIC.c">
+      <Filter>Source Files\Interrupts</Filter>
+    </ClCompile>
+    <ClCompile Include="Drivers\Keyboard.c">
+      <Filter>Source Files\Drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="Drivers\PCI_Bus.c">
+      <Filter>Source Files\Drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="Drivers\RTL_8139.c">
+      <Filter>Source Files\Drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="Networking\ARP.c">
+      <Filter>Source Files\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Networking\DHCP.c">
+      <Filter>Source Files\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Networking\Ethernet.c">
+      <Filter>Source Files\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Networking\IPv4.c">
+      <Filter>Source Files\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Networking\TFTP.c">
+      <Filter>Source Files\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Networking\UDP.c">
+      <Filter>Source Files\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Executables\PE32.c">
+      <Filter>Source Files\Executables</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="misc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Console_Serial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Console_VGA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="System_Specific.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="paging.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="multiboot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GDT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Console_Shell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Build_Number.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Interrupts\IDT.h">
+      <Filter>Header Files\Interrupts</Filter>
+    </ClInclude>
+    <ClInclude Include="Interrupts\Interrupts.h">
+      <Filter>Header Files\Interrupts</Filter>
+    </ClInclude>
+    <ClInclude Include="Interrupts\PIC.h">
+      <Filter>Header Files\Interrupts</Filter>
+    </ClInclude>
+    <ClInclude Include="Drivers\Keyboard.h">
+      <Filter>Header Files\Drivers</Filter>
+    </ClInclude>
+    <ClInclude Include="Drivers\PCI_Bus.h">
+      <Filter>Header Files\Drivers</Filter>
+    </ClInclude>
+    <ClInclude Include="Drivers\RTL_8139.h">
+      <Filter>Header Files\Drivers</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking\ARP.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking\DHCP.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking\Ethernet.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking\IPv4.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking\TFTP.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking\UDP.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Executables\PE32.h">
+      <Filter>Header Files\Executables</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Referenced_Reading.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+  </ItemGroup>
+</Project>
