@@ -40,4 +40,6 @@ The code style is very messy and inconsistent. Partly this is because I've copy-
 
 Porting the code to be buildable from a gcc cross-compiler in Linux is probably the next task I'll tackle. I want to make the code portable before the project gets much bigger.
 
+Targetting x64 doesn't work, make sure you build with x86.
+
 If you have come here to learn something, you should know that I'm as amateur as it gets when it comes to OS programming.
