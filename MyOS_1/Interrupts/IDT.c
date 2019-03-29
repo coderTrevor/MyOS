@@ -20,11 +20,14 @@ void IDT_Init(void)
 {
     interrupts_fired = 0;
 
-    // set default exception handlers
+    // set exception handlers
     for (int i = 0; i < 32; ++i)
     {
         Set_IDT_Entry((unsigned long)default_exception_handler, i);
     }
+
+    Set_IDT_Entry((unsigned long)invalid_opcode_handler, 6);
+    Set_IDT_Entry((unsigned long)page_fault_handler, 14);
 
     // set default handlers
     for (int i = 32; i < 256; ++i)

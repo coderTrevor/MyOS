@@ -41,8 +41,57 @@ void _declspec(naked) default_exception_handler(void)
 
     /*_asm
     {
-        popad
-        iretd
+    popad
+    iretd
+    }*/
+}
+
+void _declspec(naked) page_fault_handler(void)
+{
+    //_asm pushad;
+    //__asm cli;
+
+    ++interrupts_fired;
+
+    terminal_writestring("Page fault handler fired.\n");
+    terminal_writestring("System halted.\n");
+
+    __halt();
+
+    /*_asm
+    {
+    popad
+    iretd
+    }*/
+}
+
+void _declspec(naked) invalid_opcode_handler(void)
+{
+    //_asm pushad;
+    //__asm cli;
+
+    ++interrupts_fired;
+
+    uint32_t address;
+
+    __asm
+    {
+        pop [address]
+    }
+    
+    terminal_fill(' ', VGA_COLOR_WHITE, VGA_COLOR_BLUE);
+    terminal_writestring("Invalid opcode handler fired.\nEncountered invalid opcode at ");
+    terminal_print_ulong_hex(address);
+    terminal_writestring(".\nMemory looks like:\n");
+    terminal_dumpHex(address, 256);
+    terminal_writestring("System halted.\n");
+
+    __halt();
+
+    /*_asm
+    {
+    popad
+    iretd
     }*/
 }
 

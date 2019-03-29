@@ -183,8 +183,16 @@ void Shell_Process_command()
     if (strcmp(currentCommand, "crash") == 0)
     {
         terminal_writestring("About to divide-by-zero...\n");
-        int i = 100;
-        i = i / 0;
+        // we have to make the division complicated enough to trick the optimizer
+        int i, j;
+        for (i = 100; i < 200; ++i)
+        {
+            for (j = 0; j >= 0; --j)
+            {
+                terminal_print_int(i / j);
+                terminal_newline();
+            }
+        }
         return;
     }
 

@@ -11,8 +11,8 @@ static const uint16_t VGA_HEIGHT = 25;
 
 uint16_t terminal_row;
 uint16_t terminal_column;
-uint8_t terminal_color;
-uint16_t* terminal_buffer;
+uint8_t terminal_color = (uint8_t)(VGA_COLOR_WHITE | VGA_COLOR_BLUE << 4);
+uint16_t* terminal_buffer = (uint16_t*)0xB8000;
 
 void update_cursor(uint16_t x, uint16_t y)
 {
@@ -96,7 +96,7 @@ void fill_term(char c, uint8_t foreground_color, uint8_t background_color)
     for (size_t y = 0; y < LOCAL_VGA_WIDTH; y++) {
         for (size_t x = 0; x < LOCAL_VGA_WIDTH; x++) {
             const size_t index = y * LOCAL_VGA_WIDTH + x;
-            terminal_buffer[index] = (uint16_t)c | (uint16_t)(localTermColor) << 8;
+            localTermBuffer[index] = (uint16_t)c | (uint16_t)(localTermColor) << 8;
         }
     }
 }

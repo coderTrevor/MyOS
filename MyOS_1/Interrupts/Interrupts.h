@@ -11,3 +11,7 @@ void default_interrupt_handler(void);
 void Interrupts_Init();
 
 void keyboard_interrupt_handler(void);
+
+void page_fault_handler(void);
+
+void invalid_opcode_handler(void);
