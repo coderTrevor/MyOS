@@ -32,7 +32,6 @@ There's not much here beyond what's provided with tutorials like those from the 
 * Some network protocols are minimally implemented, like ARP, IP, UDP, and a DHCP client
 * Filesystem support is only offered through a TFTP client with a hardcoded server IP
 * Can be built with MSVC 2015 (which makes it somewhat rare in the hobby OS world)
-* The paging code triple-faults if optimizations are enabled. I have no idea why that is yet.
 * The OS builds as a .dll file. This file is multiboot-compliant and can be loaded by Qemu with the -kernel option, or you can boot it with GRUB.
 
 ## Other Notes
