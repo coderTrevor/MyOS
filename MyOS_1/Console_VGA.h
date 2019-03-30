@@ -48,6 +48,8 @@ void terminal_dumpHex(uint8_t *data, size_t length);
 
 void terminal_fill(char c, uint8_t foreground, uint8_t background);
 
+void terminal_get_textmode_text(char *dst, uint16_t maxLength);
+
 void terminal_initialize(void);
 
 void terminal_putchar(char c);

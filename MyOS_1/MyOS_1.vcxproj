@@ -123,7 +123,7 @@
       <NoEntryPoint>true</NoEntryPoint>
     </Link>
     <PostBuildEvent>
-      <Command>"C:\Program Files\qemu\qemu-system-x86_64w.exe" -device vmware-svga -netdev user,id=u1,tftp="C:\Users\Administrator\.VirtualBox\TFTP" -device rtl8139,netdev=u1 -kernel "$(TargetPath)"  -object filter-dump,id=f1,netdev=u1,file="C:\Program Files\qemu\dump.dat" &amp;&amp; "C:\Users\Administrator\Documents\Visual Studio 2015\Projects\AutoIncrementBuild\Release\AutoIncrementBuild.exe"</Command>
+      <Command>"C:\Program Files\qemu\qemu-system-x86_64w.exe" -netdev user,id=u1,tftp="C:\Users\Administrator\.VirtualBox\TFTP" -device rtl8139,netdev=u1 -kernel "$(TargetPath)"  -object filter-dump,id=f1,netdev=u1,file="C:\Program Files\qemu\dump.dat" &amp;&amp; "C:\Users\Administrator\Documents\Visual Studio 2015\Projects\AutoIncrementBuild\Release\AutoIncrementBuild.exe"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Launching QEMU</Message>
@@ -269,11 +269,15 @@
     <ClCompile Include="Console_Serial.c" />
     <ClCompile Include="Console_Shell.c" />
     <ClCompile Include="Console_VGA.c" />
+    <ClCompile Include="Drivers\Bochs_VGA.c" />
     <ClCompile Include="Drivers\Keyboard.c" />
     <ClCompile Include="Drivers\PCI_Bus.c" />
     <ClCompile Include="Drivers\RTL_8139.c" />
     <ClCompile Include="Executables\PE32.c" />
     <ClCompile Include="GDT.c" />
+    <ClCompile Include="Graphics\Display_HAL.c" />
+    <ClCompile Include="Graphics\font.c" />
+    <ClCompile Include="Graphics\pf.c" />
     <ClCompile Include="Interrupts\IDT.c" />
     <ClCompile Include="Interrupts\Interrupts.c" />
     <ClCompile Include="Interrupts\PIC.c" />
@@ -296,11 +300,14 @@
     <ClInclude Include="Console_Serial.h" />
     <ClInclude Include="Console_Shell.h" />
     <ClInclude Include="Console_VGA.h" />
+    <ClInclude Include="Drivers\Bochs_VGA.h" />
     <ClInclude Include="Drivers\Keyboard.h" />
     <ClInclude Include="Drivers\PCI_Bus.h" />
     <ClInclude Include="Drivers\RTL_8139.h" />
     <ClInclude Include="Executables\PE32.h" />
     <ClInclude Include="GDT.h" />
+    <ClInclude Include="Graphics\Display_HAL.h" />
+    <ClInclude Include="Graphics\picofont.h" />
     <ClInclude Include="Interrupts\IDT.h" />
     <ClInclude Include="Interrupts\Interrupts.h" />
     <ClInclude Include="Interrupts\PIC.h" />

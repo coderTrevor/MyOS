@@ -6,6 +6,9 @@
 #include "Networking/TFTP.h"
 #include "Networking/IPv4.h"
 #include "Executables/PE32.h"
+#include "Graphics/Display_HAL.h"
+#include "Drivers/Bochs_VGA.h"
+#include "Graphics/picofont.h"
 
 int inputPosition = 0;
 #define COMMAND_HISTORY_SIZE        10
@@ -13,6 +16,10 @@ int inputPosition = 0;
 
 char commandHistory[COMMAND_HISTORY_SIZE][MAX_COMMAND_LENGTH];
 char currentCommand[MAX_COMMAND_LENGTH];
+
+#define MAX_SCREEN_CONTENTS  (80 * 25 + 32)
+char screenContents[MAX_SCREEN_CONTENTS];
+
 
 bool shellEnterPressed = false;
 
@@ -110,6 +117,40 @@ void PrintMemMap()
 void Shell_Process_command()
 {
     char subCommand[MAX_COMMAND_LENGTH];
+
+    if (strcmp(currentCommand, "gfx") == 0)
+    {
+        if (!graphicsPresent)
+        {
+            terminal_writestring("Error: No recognized graphics adapter installed\n");
+            return;
+        }
+
+        // backup text mode screen contents
+        bool wasTextMode = textMode;
+        if (textMode)
+        {
+            terminal_get_textmode_text(screenContents, MAX_SCREEN_CONTENTS);
+        }
+
+        // TODO: Switch to display HAL once that's implemented
+        BGA_SetResolution(800, 600, 32);
+
+        // Fill screen with color so we know it worked
+        GraphicsFillScreen(0, 0, 0);
+        if(debugLevel)
+            GraphicsFillScreen(168, 68, 255);
+
+        // restore screen contents
+        if (wasTextMode)
+        {
+            // restore the text printed to the screen
+            FNT_Render(screenContents);
+            //terminal_writestring(screenContents);
+        }
+
+        return;
+    }
 
     if (strcmp(currentCommand, "mbi") == 0)
     {

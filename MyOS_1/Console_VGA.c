@@ -34,6 +34,47 @@ uint16_t get_cursor_position(void)
     return pos;
 }
 
+// read the contents of the screen and convert them to a string
+void terminal_get_textmode_text(char *dst, uint16_t maxLength)
+{
+    int destPos = 0;
+    int srcPos = 0;
+    uint16_t* source = terminal_buffer;
+
+    // Zero out the destination buffer
+    memset(dst, 0, maxLength);
+
+    //terminal_writestring("Getting screen contents...\n");
+
+    // Copy each row
+    for (int row = 0; row < terminal_row && row <= VGA_HEIGHT && destPos < maxLength; ++row)
+    {
+        /*terminal_writestring("row ");
+        terminal_print_int(row);
+        terminal_newline();*/
+
+        // copy each column of each row
+        for (int col = 0; col < VGA_WIDTH; ++col)
+        {
+            if (destPos > maxLength)
+                return;
+            //terminal_putchar((char) ((source[currentPos]) & 0xFF) );
+            dst[destPos++] = (char)(source[srcPos++] & 0xFF);
+        }
+        // end each row with a newline
+        dst[destPos++] = '\n';
+    }
+
+    // copy the last row
+    if (terminal_row >= VGA_HEIGHT)
+        return;
+
+    for (int col = 0; destPos < maxLength && col < VGA_WIDTH && col < terminal_column; ++destPos, ++col, ++srcPos)
+    {
+        dst[destPos] = source[srcPos];
+    }
+}
+
 void terminal_initialize(void)
 {
     terminal_row = 0;

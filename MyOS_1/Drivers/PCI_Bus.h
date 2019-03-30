@@ -24,6 +24,9 @@
 #define PCI_VENDOR_REALTEK  0x10EC
 #define PCI_DEVICE_RTL_8139 0x8139
 
+#define PCI_VENDOR_QEMU     0x1234
+#define PCI_DEVICE_BGA      0x1111
+
 void PCI_CheckAllBuses(void);
 
 void PCI_CheckDevice(uint8_t bus, uint8_t device);

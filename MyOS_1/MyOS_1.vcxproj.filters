@@ -37,6 +37,12 @@
     <Filter Include="Header Files\Executables">
       <UniqueIdentifier>{cad664ef-4e2b-4662-a617-8b2355debae0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Graphics">
+      <UniqueIdentifier>{ef9dde06-91ce-487e-8bcd-adbe32f74ad7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Graphics">
+      <UniqueIdentifier>{e85c9785-c647-4949-bbb3-936cca74e3a7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="paging.c">
@@ -98,6 +104,18 @@
     </ClCompile>
     <ClCompile Include="Executables\PE32.c">
       <Filter>Source Files\Executables</Filter>
+    </ClCompile>
+    <ClCompile Include="Drivers\Bochs_VGA.c">
+      <Filter>Source Files\Drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\font.c">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\pf.c">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Display_HAL.c">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -166,6 +184,15 @@
     </ClInclude>
     <ClInclude Include="Executables\PE32.h">
       <Filter>Header Files\Executables</Filter>
+    </ClInclude>
+    <ClInclude Include="Drivers\Bochs_VGA.h">
+      <Filter>Header Files\Drivers</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Display_HAL.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\picofont.h">
+      <Filter>Header Files\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

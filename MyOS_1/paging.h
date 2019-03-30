@@ -11,7 +11,7 @@ typedef /*__declspec(align(4096))*/ uint32_t PAGE_TABLE_ENTRY;
 #define PAGE_ENTRY_USER_ACCESSIBLE  2
 #define PAGE_ENTRY_WRITABLE         4
 
-extern uint32_t paging_space[0x4FFF];
+extern uint32_t paging_space[0x5FFF];
 
 typedef uint32_t ULONG_PTR;
 
@@ -21,6 +21,7 @@ inline void Paging_Enable()
     PAGE_TABLE_ENTRY *identityTable;        // for identity mapping the first four megabytes
     PAGE_TABLE_ENTRY *programIdentityTable; // for identity mapping four megabytes starting at 8 megabytes
     PAGE_TABLE_ENTRY *initialKernelTable;   // for mapping the kernel to 0xC000 0000
+    PAGE_TABLE_ENTRY *videoIdentityTable;   // for identity mapping the linear frame buffer (HACK!)
     PAGE_DIRECTORY_ENTRY *pageDirectory = (PAGE_DIRECTORY_ENTRY*)((uint32_t)paging_space - BASE_ADDRESS + LOADBASE);
 
     // Ensure pageDirectory is aligned on a 0x1000-byte boundary
@@ -31,6 +32,7 @@ inline void Paging_Enable()
     identityTable = (PAGE_TABLE_ENTRY *)((uint32_t)pageDirectory + 0x1000);
     programIdentityTable = (PAGE_TABLE_ENTRY *)((uint32_t)pageDirectory + 0x2000);
     initialKernelTable = (PAGE_TABLE_ENTRY *)((uint32_t)pageDirectory + 0x3000);
+    videoIdentityTable = (PAGE_TABLE_ENTRY *)((uint32_t)pageDirectory + 0x4000);
 
     uint32_t i;
 
@@ -66,6 +68,17 @@ inline void Paging_Enable()
 
     // put the kernel page table in the page directory into entry 768, which will map it to 0xC000 0000
     pageDirectory[768] = (PAGE_DIRECTORY_ENTRY)((uint32_t)initialKernelTable | PAGE_ENTRY_PRESENT | PAGE_ENTRY_WRITABLE);
+
+    // TEMPTEMP HACKHACK! - identity map the linear frame buffer, which on my Qemu starts at 0xFD00 0000
+    // TODO: allow the lfb to exist anywhere in memory
+    // Setup identity mapping for the four megabytes starting at 0xFD00 0000
+    for (i = 0; i < 1024; ++i)
+    {
+        videoIdentityTable[i] = (0xFD000000 + i * 0x1000) | PAGE_ENTRY_PRESENT | PAGE_ENTRY_WRITABLE;   // attributes: supervisor level, read/write, present
+    }
+
+    // put the lfb page table in the page directory (0xFD00 0000) 
+    pageDirectory[1012] = (PAGE_DIRECTORY_ENTRY)((uint32_t)videoIdentityTable | PAGE_ENTRY_PRESENT | PAGE_ENTRY_WRITABLE);
 
     // load page directory into cr3
     __writecr3((uint32_t)pageDirectory);
