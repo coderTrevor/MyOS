@@ -5,7 +5,10 @@ Yet another homebrew OS
 
 The name is temporary and will be changed when I feel this project is large enough to warrant a decent name.
 
-I'm mostly just putting this on github so I can put it out of my mind for a while. It's taken me about a month to get it this far and I haven't had time for much else (like school) while I've been obsessing over it.
+I'm mostly just putting this on github so I can put it out of my mind for a while. It's taken me about five weeks to get it this far and I haven't had time for much else (like school) while I've been obsessing over it.
+
+![Screenshot with test image](https://raw.githubusercontent.com/coderTrevor/MyOS/master/Media/Screenshots/MyOS_Graphical1.png "MyOS Screenshot")
+
 
 ## Motivation
 First-things-first: I have no illusions about the fact that nobody will ever use this as their main operating system, or probably even use it at all. In the history of computing, only one hobby OS has ever achieved that, and today, Linux still faces many challenges despite how many contributors it has gathered.
