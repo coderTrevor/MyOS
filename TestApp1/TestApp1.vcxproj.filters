@@ -41,5 +41,20 @@
     <ClCompile Include="TestApp1.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\MyOS_1\Terminal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Graphics\Graphical_Terminal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Graphics\font.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Graphics\picofont.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Graphics\Display_HAL.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

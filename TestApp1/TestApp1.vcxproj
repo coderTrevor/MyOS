@@ -163,7 +163,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\MyOS_1\Console_VGA.c" />
+    <ClCompile Include="..\MyOS_1\Graphics\Display_HAL.c" />
+    <ClCompile Include="..\MyOS_1\Graphics\font.c" />
+    <ClCompile Include="..\MyOS_1\Graphics\Graphical_Terminal.c" />
+    <ClCompile Include="..\MyOS_1\Graphics\picofont.c" />
     <ClCompile Include="..\MyOS_1\misc.c" />
+    <ClCompile Include="..\MyOS_1\Terminal.c" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="TestApp1.c" />
   </ItemGroup>

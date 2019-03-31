@@ -4,6 +4,7 @@
 #include "System_Specific.h"
 #include "Console_VGA.h"
 #include "misc.h"
+#include "Terminal.h"
 
 /* terminal globals */
 static const uint16_t VGA_WIDTH = 80;
@@ -34,7 +35,7 @@ uint16_t get_cursor_position(void)
     return pos;
 }
 
-// read the contents of the screen and convert them to a string
+// Read the contents of the screen and convert it to a string
 void terminal_get_textmode_text(char *dst, uint16_t maxLength)
 {
     int destPos = 0;
@@ -71,11 +72,11 @@ void terminal_get_textmode_text(char *dst, uint16_t maxLength)
 
     for (int col = 0; destPos < maxLength && col < VGA_WIDTH && col < terminal_column; ++destPos, ++col, ++srcPos)
     {
-        dst[destPos] = source[srcPos];
+        dst[destPos] = (char)(source[srcPos] & 0xFF);
     }
 }
 
-void terminal_initialize(void)
+void VGA_terminal_initialize(void)
 {
     terminal_row = 0;
     terminal_column = 0;
@@ -156,25 +157,25 @@ void terminal_fill(char c, uint8_t foreground, uint8_t background)
     }
 }
 
-void terminal_backspace()
+void VGA_terminal_backspace()
 {
     if (terminal_column == 0 && terminal_row == 0)
     {
-        terminal_putentryat(' ', terminal_color, terminal_column, terminal_row);
+        VGA_terminal_putentryat(' ', terminal_color, terminal_column, terminal_row);
         return;
     }
 
     if (terminal_column > 0)
     {
         --terminal_column;
-        terminal_putentryat(' ', terminal_color, terminal_column, terminal_row);
+        VGA_terminal_putentryat(' ', terminal_color, terminal_column, terminal_row);
         update_cursor(terminal_column, terminal_row);
         return;
     }
 
     terminal_column = VGA_WIDTH - 1;
     --terminal_row;
-    terminal_putentryat(' ', terminal_color, terminal_column, terminal_row);
+    VGA_terminal_putentryat(' ', terminal_color, terminal_column, terminal_row);
     update_cursor(terminal_column, terminal_row);
 }
 
@@ -183,7 +184,7 @@ void terminal_setcolor(uint8_t color)
     terminal_color = color;
 }
 
-void terminal_putentryat(char c, uint8_t color, size_t x, size_t y)
+void VGA_terminal_putentryat(char c, uint8_t color, size_t x, size_t y)
 {
     const size_t index = y * VGA_WIDTH + x;
     terminal_buffer[index] = vga_entry(c, color);
@@ -217,7 +218,7 @@ void terminal_scroll_up()
     update_cursor(terminal_column, terminal_row);
 }
 
-void terminal_writestring_top(const char *string, uint16_t column)
+void VGA_terminal_writestring_top(const char *string, uint16_t column)
 {
     uint16_t oldRow = terminal_row;
     uint16_t oldCol = terminal_column;
@@ -236,7 +237,7 @@ void terminal_writestring_top(const char *string, uint16_t column)
     update_cursor(terminal_column, terminal_row);
 }
 
-void terminal_print_int_top(int value, uint16_t column)
+void VGA_terminal_print_int_top(int value, uint16_t column)
 {
     uint16_t oldRow = terminal_row;
     uint16_t oldCol = terminal_column;
@@ -260,11 +261,11 @@ void terminal_newline()
     terminal_putchar('\n');
 }
 
-void terminal_putchar(char c)
+void VGA_terminal_putchar(char c)
 {
     if (c == '\b')
     {
-        terminal_backspace();
+        VGA_terminal_backspace();
         return;
     }
 
@@ -279,7 +280,7 @@ void terminal_putchar(char c)
 
     if (c != '\n' && c != '\r')
     {
-        terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
+        VGA_terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
 
         if (++terminal_column == VGA_WIDTH)
         {
@@ -316,50 +317,6 @@ void terminal_print_byte(int number)
 
     int ones = number % 10;
     terminal_putchar(intToChar(ones));
-
-    update_cursor(terminal_column, terminal_row);
-}
-
-void terminal_print_int(int number)
-{
-    int digits = 1;
-
-    if (number >= 10)
-        digits = 2;
-    if (number >= 100)
-        digits = 3;
-    if (number >= 1000)
-        digits = 4;
-    if (number >= 10000)
-        digits = 5;
-    if (number >= 100000)
-        digits = 6;
-    if (number >= 1000000)
-        digits = 7;
-    if (number >= 10000000)
-        digits = 8;
-    if (number >= 100000000)
-        digits = 9;
-    if (number >= 1000000000)
-        digits = 10;
-
-    for (int i = digits; i > 0; --i)
-    {
-        int currentDigitPlace = 1;
-
-        // calculate current digit position (10^i)
-        for (int j = 1; j < i; j++)
-            currentDigitPlace *= 10;
-
-        // get current digit
-        int digit = number / currentDigitPlace;
-        
-        // print current digit
-        terminal_putchar(intToChar(digit));
-
-        // update number to remove highest digit
-        number = number % currentDigitPlace;
-    }
 
     update_cursor(terminal_column, terminal_row);
 }
@@ -442,19 +399,4 @@ void terminal_print_byte_hex(int value)
     terminal_putchar(int_to_hex(value & 0x0000000F));
 
     update_cursor(terminal_column, terminal_row);
-}
-
-void terminal_write(const char* data, size_t size)
-{
-    for (size_t i = 0; i < size; i++)
-    {
-        terminal_putchar(data[i]);
-    }
-
-    update_cursor(terminal_column, terminal_row);
-}
-
-void terminal_writestring(const char* data)
-{
-    terminal_write(data, strlen(data));
 }

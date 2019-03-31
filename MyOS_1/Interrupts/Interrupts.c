@@ -83,7 +83,7 @@ void _declspec(naked) invalid_opcode_handler(void)
     terminal_writestring("Invalid opcode handler fired.\nEncountered invalid opcode at ");
     terminal_print_ulong_hex(address);
     terminal_writestring(".\nMemory looks like:\n");
-    terminal_dumpHex(address, 256);
+    terminal_dumpHex((uint8_t *)address, 256);
     terminal_writestring("System halted.\n");
 
     __halt();

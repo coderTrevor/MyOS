@@ -1,6 +1,6 @@
 #include "IPv4.h"
 #include "Ethernet.h"
-#include "../Console_VGA.h"
+#include "../Terminal.h"
 #include "UDP.h"
 #include "../misc.h"
 

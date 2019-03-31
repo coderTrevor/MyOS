@@ -13,6 +13,8 @@
 #include "Interrupts/PIC.h"
 #include "Interrupts/Interrupts.h"
 #include "multiboot.h"
+#include "Terminal.h"
+#include "Graphics/Display_HAL.h"
 
 int debugLevel = 0;
 
@@ -52,13 +54,16 @@ void KeStartup()
     fill_term('1', VGA_COLOR_GREEN, VGA_COLOR_BLACK);
 
     // Enable paging support
-    Paging_Enable();
+    Paging_Enable(multibootInfo);
 
     // Fill terminal with 2's. We'll know paging works
     fill_term('2', VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
 
     // Initialize global descriptor table
     GDT_Init();
+
+    // Initialize graphical mode if Grub set one for us
+    GraphicsInitFromGrub(multibootInfo);
 
     // Initialize terminal interface
     terminal_initialize();

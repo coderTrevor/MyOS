@@ -215,7 +215,7 @@
       <NoEntryPoint>true</NoEntryPoint>
     </Link>
     <PostBuildEvent>
-      <Command>"C:\Program Files\qemu\qemu-system-x86_64w.exe" -device vmware-svga -netdev user,id=u1,tftp="C:\Users\Administrator\.VirtualBox\TFTP" -device rtl8139,netdev=u1 -kernel "$(TargetPath)"  -object filter-dump,id=f1,netdev=u1,file="C:\Program Files\qemu\dump.dat" &amp;&amp; "C:\Users\Administrator\Documents\Visual Studio 2015\Projects\AutoIncrementBuild\Release\AutoIncrementBuild.exe"</Command>
+      <Command>"C:\Program Files\qemu\qemu-system-x86_64w.exe" -netdev user,id=u1,tftp="C:\Users\Administrator\.VirtualBox\TFTP" -device rtl8139,netdev=u1 -kernel "$(TargetPath)"  -object filter-dump,id=f1,netdev=u1,file="C:\Program Files\qemu\dump.dat" &amp;&amp; "C:\Users\Administrator\Documents\Visual Studio 2015\Projects\AutoIncrementBuild\Release\AutoIncrementBuild.exe"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Launching QEMU</Message>
@@ -277,7 +277,8 @@
     <ClCompile Include="GDT.c" />
     <ClCompile Include="Graphics\Display_HAL.c" />
     <ClCompile Include="Graphics\font.c" />
-    <ClCompile Include="Graphics\pf.c" />
+    <ClCompile Include="Graphics\Graphical_Terminal.c" />
+    <ClCompile Include="Graphics\picofont.c" />
     <ClCompile Include="Interrupts\IDT.c" />
     <ClCompile Include="Interrupts\Interrupts.c" />
     <ClCompile Include="Interrupts\PIC.c" />
@@ -294,6 +295,7 @@
     <ClCompile Include="Networking\TFTP.c" />
     <ClCompile Include="Networking\UDP.c" />
     <ClCompile Include="paging.c" />
+    <ClCompile Include="Terminal.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Build_Number.h" />
@@ -307,6 +309,7 @@
     <ClInclude Include="Executables\PE32.h" />
     <ClInclude Include="GDT.h" />
     <ClInclude Include="Graphics\Display_HAL.h" />
+    <ClInclude Include="Graphics\Graphical_Terminal.h" />
     <ClInclude Include="Graphics\picofont.h" />
     <ClInclude Include="Interrupts\IDT.h" />
     <ClInclude Include="Interrupts\Interrupts.h" />
@@ -321,6 +324,7 @@
     <ClInclude Include="Networking\UDP.h" />
     <ClInclude Include="paging.h" />
     <ClInclude Include="System_Specific.h" />
+    <ClInclude Include="Terminal.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Referenced_Reading.txt" />

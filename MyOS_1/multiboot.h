@@ -244,7 +244,7 @@ typedef struct _MULTIBOOT_INFO {
     uint32_t depth;
 
 }MULTIBOOT_INFO, *PMULTIBOOT_INFO;
-#pragma pack(pop,1)
+#pragma pack(pop)
 
 struct multiboot_color
 {
@@ -323,14 +323,14 @@ BASE_ADDRESS 0xC0000000
 #define GRAPHICS_MODE                 0
 #define TEXT_MODE                     1
 #define FLIP_MODE                     "Love Em"
-#define MODE_TYPE                     TEXT_MODE
+/*#define MODE_TYPE                     TEXT_MODE
 #define GRAPHICS_WIDTH                80
 #define GRAPHICS_HEIGHT               25
-#define GRAPHICS_DEPTH                0
-/*#define MODE_TYPE                     GRAPHICS_MODE
-#define GRAPHICS_WIDTH                320
-#define GRAPHICS_HEIGHT               200
-#define GRAPHICS_DEPTH                8*/
+#define GRAPHICS_DEPTH                0*/
+#define MODE_TYPE                     GRAPHICS_MODE
+#define GRAPHICS_WIDTH                800
+#define GRAPHICS_HEIGHT               600
+#define GRAPHICS_DEPTH                32
 
 #endif /* ! ASM_FILE */
 

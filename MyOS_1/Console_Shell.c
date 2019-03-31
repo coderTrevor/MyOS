@@ -9,6 +9,8 @@
 #include "Graphics/Display_HAL.h"
 #include "Drivers/Bochs_VGA.h"
 #include "Graphics/picofont.h"
+#include "Graphics/Graphical_Terminal.h"
+#include "Terminal.h"
 
 int inputPosition = 0;
 #define COMMAND_HISTORY_SIZE        10
@@ -141,12 +143,14 @@ void Shell_Process_command()
         if(debugLevel)
             GraphicsFillScreen(168, 68, 255);
 
+        // Initialize graphical terminal
+        GraphicalTerminalInit();
+
         // restore screen contents
         if (wasTextMode)
         {
             // restore the text printed to the screen
-            FNT_Render(screenContents);
-            //terminal_writestring(screenContents);
+            terminal_writestring(screenContents);
         }
 
         return;
@@ -214,6 +218,7 @@ void Shell_Process_command()
         terminal_writestring("debug [on|off]\n");
         terminal_writestring("dir\n");
         terminal_writestring("echo [string]\n");
+        terminal_writestring("gfx\n");
         terminal_writestring("help\n");
         terminal_writestring("mbi\n");
         terminal_writestring("run [programName]\n");
