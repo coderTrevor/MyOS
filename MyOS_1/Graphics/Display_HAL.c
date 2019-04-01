@@ -14,6 +14,25 @@ unsigned int graphicsHeight;
 
 // TODO: Create HAL interface and tie Bochs_VGA into it
 
+// copy an image to the given coordinates on the screen
+// it is the caller's responsibility to ensure the image doesn't go off the screen (for now)
+void GraphicsBlit(unsigned int x, unsigned int y, PIXEL_32BIT *image, uint32_t width, uint32_t height)
+{
+    unsigned int framebufferOffset = ((y * graphicsWidth + x) * sizeof(PIXEL_32BIT));
+    PIXEL_32BIT *currentPixel = (PIXEL_32BIT *)((uint32_t)linearFrameBuffer + framebufferOffset);
+
+    // for every row of pixels
+    for (int h = 0; h < height; ++h)
+    {
+        // copy the current row
+        memcpy((void*)currentPixel, (const void *)image, sizeof(PIXEL_32BIT) * width);
+
+        // advance the pointers
+        currentPixel += graphicsWidth;
+        image += width;
+    }
+}
+
 void GraphicsInitFromGrub(multiboot_info *multibootInfo)
 {
     // If Grub didn't initialize graphics for us, return immediately

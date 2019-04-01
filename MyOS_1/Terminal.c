@@ -105,6 +105,7 @@ void terminal_write(const char* data, size_t size)
     }
 }
 
+// TODO: Fix long strings causing problems somehow
 void terminal_writestring(const char* data)
 {
     terminal_write(data, strlen(data));

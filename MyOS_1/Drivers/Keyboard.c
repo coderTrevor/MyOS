@@ -3,10 +3,12 @@
 #include "../System_Specific.h"
 #include "../Interrupts/PIC.h"
 #include <stdbool.h>
+#include "../Terminal.h"
 
 unsigned char normal_keys_map[256];
 bool left_shift_held;
 bool right_shift_held;
+bool awaitingSpecial = false;
 
 bool key_released(unsigned char scanCode)
 {
@@ -25,13 +27,18 @@ void _declspec(naked) keyboard_interrupt_handler(void)
     // get the scancode and send it on its way
     scan_code = inb(0x60);
 
-    //if (scan_code != 0xE0)
-    keyboard_key_received(scan_code);
-    /*else
+    if(!awaitingSpecial)
     {
-    scan_code = inb(0x60);
-    keyboard_key_received(scan_code);
-    }*/
+        if (scan_code == 0xE0)
+            awaitingSpecial = true;
+        else
+            keyboard_key_received(scan_code);
+    }
+    else
+    {
+        keyboard_special_key_received(scan_code);
+        awaitingSpecial = false;
+    }
 
     PIC_sendEOI(KEYBOARD_INTERRUPT);
 
@@ -210,6 +217,17 @@ void keyboard_key_received(unsigned char scanCode)
 
 void keyboard_special_key_received(unsigned char scanCode)
 {
-    if (scanCode == DEL_PRESSED)
+    switch (scanCode)
+    {
+    case DEL_PRESSED:
         Shell_Backspace_Pressed();
+        break;
+
+    case UP_PRESSED:
+        Shell_Up_Pressed();
+        break;
+
+    default:
+        break;
+    }
 }

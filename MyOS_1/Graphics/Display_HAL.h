@@ -20,6 +20,9 @@ typedef struct PIXEL_32BIT
 } PIXEL_32BIT;
 #pragma pack(pop)
 
+
+void GraphicsBlit(unsigned int x, unsigned int y, PIXEL_32BIT *image, uint32_t width, uint32_t height);
+
 void GraphicsClearLines(unsigned int firstLine, unsigned int lines, PIXEL_32BIT color);
 
 void GraphicsInitFromGrub(multiboot_info *multibootInfo);

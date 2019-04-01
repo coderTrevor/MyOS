@@ -528,6 +528,13 @@ void PCI_DelegateToDriver(uint8_t bus, uint8_t slot, uint8_t function, uint16_t 
             BGA_Init(bus, slot, function);
         return;
     }
+
+    if (vendorID == PCI_VENDOR_VBOX)
+    {
+        if (deviceID == PCI_DEVICE_VBOX_BGA)
+            BGA_Init(bus, slot, function);
+        return;
+    }
 }
 
 void PCI_EnableBusMastering(uint8_t bus, uint8_t slot, uint8_t function)

@@ -11,6 +11,7 @@
 #include "Graphics/picofont.h"
 #include "Graphics/Graphical_Terminal.h"
 #include "Terminal.h"
+#include "Graphics/Bitmap.h"
 
 int inputPosition = 0;
 #define COMMAND_HISTORY_SIZE        10
@@ -22,12 +23,38 @@ char currentCommand[MAX_COMMAND_LENGTH];
 #define MAX_SCREEN_CONTENTS  (80 * 25 + 32)
 char screenContents[MAX_SCREEN_CONTENTS];
 
+// TODO: Improve the way history is indexed; don't overwrite old histories with new ones(?)
+int historyIndex = -1;
+
+// pixel buffer for the show command
+#define MAX_IMAGE_SIZE (256 * 1024)
+PIXEL_32BIT imageBuffer[MAX_IMAGE_SIZE / sizeof(PIXEL_32BIT)];
 
 bool shellEnterPressed = false;
 
 multiboot_info *multibootInfo = NULL;
 
 // functions to manage a basic shell interface
+
+void Shell_Add_Command_To_History(char *command)
+{
+    // if the command is equal to the previous command, don't add it to the history
+    if(historyIndex > 0 && strcmp(command, commandHistory[historyIndex-1]) == 0)
+    {
+        terminal_writestring("ignoring\n");
+        return;
+    }
+
+    if (historyIndex < 0)
+        historyIndex = 0;
+    
+    // copy the command to the command history
+    strncpy(commandHistory[historyIndex], command, MAX_COMMAND_LENGTH);
+
+    // increase history index, wrap around to the beginning if we reach the end
+    if (++historyIndex == COMMAND_HISTORY_SIZE)
+        historyIndex = 0;
+}
 
 void Shell_Erase_Current_Command()
 {
@@ -116,8 +143,15 @@ void PrintMemMap()
 
 #pragma warning(push)                 // disable warning message about divide-by-zero, because we do that intentionally with the crash command
 #pragma warning(disable : 4723)       // (This is to test fault handling, which isn't actually implemented yet)
-void Shell_Process_command()
+void Shell_Process_command(void)
 {
+    if (debugLevel)
+    {
+        terminal_writestring("Processing: ");
+        terminal_writestring(currentCommand);
+        terminal_newline();
+    }
+
     char subCommand[MAX_COMMAND_LENGTH];
 
     if (strcmp(currentCommand, "gfx") == 0)
@@ -218,9 +252,12 @@ void Shell_Process_command()
         terminal_writestring("debug [on|off]\n");
         terminal_writestring("dir\n");
         terminal_writestring("echo [string]\n");
-        terminal_writestring("gfx\n");
+        if(textMode && graphicsPresent)
+            terminal_writestring("gfx\n");
         terminal_writestring("help\n");
         terminal_writestring("mbi\n");
+        if (!textMode)
+            terminal_writestring("show [bitmapName]\n");
         terminal_writestring("run [programName]\n");
         terminal_writestring("ver\n\n");
         return;
@@ -242,12 +279,43 @@ void Shell_Process_command()
         return;
     }
 
+    if (strcmp(currentCommand, "dir") == 0)
+    {
+        // TODO: Improve, use dynamic memory
+#define MAX_DIR_SIZE    2048
+        uint8_t dirBuffer[MAX_DIR_SIZE + 1];
+        memset(dirBuffer, 0, MAX_DIR_SIZE + 1);
+
+        //TFTP_RequestFile(IPv4_PackIP(10,0,2,2), "dir.txt", TFTP_TYPE_BINARY, NIC_MAC);
+        if (!TFTP_GetFile(IPv4_PackIP(10, 0, 2, 2), "dir.txt", dirBuffer, MAX_DIR_SIZE))
+        {
+            terminal_writestring("Error reading dir.txt from server!\n");
+            return;
+        }
+
+        // display the contents of dir.txt
+        terminal_writestring((const char *)dirBuffer);
+
+        return;
+    }
+
+    if (strcmp(currentCommand, "ver") == 0)
+    {
+        terminal_writestring("Build ");
+        terminal_print_int(BUILD_NUMBER);
+        terminal_writestring("\n\n");
+        return;
+    }
+
+    // Commands with parameters:
     memset(subCommand, 0, MAX_COMMAND_LENGTH);
+
+    // Debug command
     strncpy(subCommand, currentCommand, strlen("debug"));
     if (strcmp(subCommand, "debug") == 0)
     {
         memset(subCommand, 0, MAX_COMMAND_LENGTH);
-        strncpy(subCommand, currentCommand + strlen("debug "), MAX_COMMAND_LENGTH);
+        strncpy(subCommand, currentCommand + strlen("debug "), MAX_COMMAND_LENGTH - strlen("debug "));
         if (strcmp(subCommand, "on") == 0)
         {
             debugLevel = 9000;
@@ -266,50 +334,20 @@ void Shell_Process_command()
         return;
     }
 
-    if (strcmp(currentCommand, "dir") == 0)
-    {
-        // TODO: Improve, use dynamic memory
-#define MAX_DIR_SIZE    2048
-        uint8_t dirBuffer[MAX_DIR_SIZE + 1];
-        memset(dirBuffer, 0, MAX_DIR_SIZE + 1);
-
-        //TFTP_RequestFile(IPv4_PackIP(10,0,2,2), "dir.txt", TFTP_TYPE_BINARY, NIC_MAC);
-        if (!TFTP_GetFile(IPv4_PackIP(10, 0, 2, 2), "dir.txt", dirBuffer, MAX_DIR_SIZE))
-        {
-            terminal_writestring("Error reading dir.txt from server!\n");
-            return;
-        }
-
-        // display the contents of dir.txt
-        terminal_writestring((const char *)dirBuffer);
-        
-        return;
-    }
-
-    if (strcmp(currentCommand, "ver") == 0)
-    {
-        terminal_writestring("Build ");
-        terminal_print_int(BUILD_NUMBER);
-        terminal_writestring("\n\n");
-        return;
-    }
-
-    if (currentCommand[0] == 'e' && currentCommand[1] == 'c' && currentCommand[2] == 'h' && currentCommand[3] == 'o')
-    {
-        strncpy(subCommand, currentCommand + 5, MAX_COMMAND_LENGTH - 5);
-        terminal_writestring(subCommand);
-        terminal_putchar('\n');
-        return;
-    }
-
-
-
+    // Run command
     memset(subCommand, 0, MAX_COMMAND_LENGTH);
     strncpy(subCommand, currentCommand, strlen("run"));
     if (strcmp(subCommand, "run") == 0)
     {
         memset(subCommand, 0, MAX_COMMAND_LENGTH);
-        strncpy(subCommand, currentCommand + strlen("run "), MAX_COMMAND_LENGTH);
+        strncpy(subCommand, currentCommand + strlen("run "), MAX_COMMAND_LENGTH - strlen("run "));
+
+        if (strlen(subCommand) == 0)
+        {
+            terminal_writestring("You must specify the name of an executable to run!\n\nUsage: run [Name_Of_File.exe]\n");
+            return;
+        }
+
         terminal_writestring("Ok, I'll run ");
         terminal_writestring(subCommand);
         terminal_newline();
@@ -342,6 +380,51 @@ void Shell_Process_command()
         return;
     }
 
+    // Show command
+    memset(subCommand, 0, MAX_COMMAND_LENGTH);
+    strncpy(subCommand, currentCommand, strlen("show"));
+    if (strcmp(subCommand, "show") == 0)
+    {
+        memset(subCommand, 0, MAX_COMMAND_LENGTH);
+        strncpy(subCommand, currentCommand + strlen("show "), MAX_COMMAND_LENGTH - strlen("show "));
+
+        if (textMode)
+        {
+            if (graphicsPresent)
+                terminal_writestring("You must switch to graphical mode with the \"gfx\" command before seeing a bitmap.\n");
+            else
+                terminal_writestring("Sorry, I don't recognize your display adapter; I can't show you a bitmap.\n");
+            return;
+        }
+
+        if (strlen(subCommand) == 0)
+        {
+            terminal_writestring("You must specify the name of a file to show!\n\nUsage: show [Name_Of_File.bmp]\n");
+            return;
+        }
+
+        uint32_t width, height;
+        if (!Bitmap24Load(subCommand, imageBuffer, MAX_IMAGE_SIZE, &width, &height))
+            return;
+
+        if(!textMode)
+            GraphicsBlit(graphicsWidth - width, graphicsHeight - height, imageBuffer, width, height);
+
+        return;
+    }
+
+    // echo command
+    memset(subCommand, 0, MAX_COMMAND_LENGTH);
+    strncpy(subCommand, currentCommand, strlen("echo"));
+    if (strcmp(subCommand, "echo") == 0)
+    {
+        memset(subCommand, 0, MAX_COMMAND_LENGTH);
+        strncpy(subCommand, currentCommand + strlen("echo "), MAX_COMMAND_LENGTH - strlen("echo "));
+        terminal_writestring(subCommand);
+        terminal_putchar('\n');
+        return;
+    }
+
     terminal_writestring("Sorry, I don't know how to process that input.\n");
 }
 #pragma warning(pop)
@@ -352,8 +435,11 @@ void Shell_Enter_Pressed()
     terminal_putchar('\n');
     
     // Handle current command
-    if(inputPosition)
+    if (inputPosition)
+    {
+        Shell_Add_Command_To_History(currentCommand);
         Shell_Process_command();
+    }
 
     // reset command line
     Shell_Erase_Current_Command();
@@ -397,6 +483,7 @@ void Shell_Entry(multiboot_info *mbInfo)
     multibootInfo = mbInfo;
 
     inputPosition = 0;
+    historyIndex = 0;
 
     terminal_writestring(">");
     // zero out command history
@@ -413,6 +500,40 @@ void Shell_Backspace_Pressed()
         return;
 
     terminal_putchar('\b');
-    currentCommand[inputPosition] = '\0';
-    inputPosition--;
+    currentCommand[--inputPosition] = '\0';
+}
+
+// TODO: Make less clunky
+void Shell_Up_Pressed(void)
+{
+    if (debugLevel)
+    {
+        terminal_writestring("History index: ");
+        terminal_print_int(historyIndex);
+        terminal_newline();
+    }
+
+    // ensure there's some history to look at
+    if (historyIndex <= 0)
+        return;
+
+    // get rid of whatever is typed on the command line
+    Shell_Erase_Current_Command();
+    while (inputPosition > 0)
+    {
+        terminal_putchar('\b');
+        --inputPosition;
+    }
+
+    // replace current command with the previous one in history
+    strncpy(currentCommand, commandHistory[--historyIndex], MAX_COMMAND_LENGTH);
+    inputPosition = strlen(currentCommand);
+    if (debugLevel)
+    {
+        terminal_writestring("inputPosition: ");
+        terminal_print_int(inputPosition);
+        terminal_newline();
+    }
+    
+    terminal_writestring(commandHistory[historyIndex]);
 }

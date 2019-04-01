@@ -72,6 +72,7 @@
 #define RIGHT_SHIFT_RELEASED    0xB6
 
 // "Special" scancodes which are preceded by a 0xE0
+#define UP_PRESSED      0x48
 #define DEL_PRESSED     0x53
 #define DEL_RELEASED    0xD3
 

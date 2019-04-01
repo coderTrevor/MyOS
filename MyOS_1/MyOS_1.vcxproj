@@ -215,7 +215,7 @@
       <NoEntryPoint>true</NoEntryPoint>
     </Link>
     <PostBuildEvent>
-      <Command>"C:\Program Files\qemu\qemu-system-x86_64w.exe" -netdev user,id=u1,tftp="C:\Users\Administrator\.VirtualBox\TFTP" -device rtl8139,netdev=u1 -kernel "$(TargetPath)"  -object filter-dump,id=f1,netdev=u1,file="C:\Program Files\qemu\dump.dat" &amp;&amp; "C:\Users\Administrator\Documents\Visual Studio 2015\Projects\AutoIncrementBuild\Release\AutoIncrementBuild.exe"</Command>
+      <Command>"C:\Program Files\qemu\qemu-system-x86_64w.exe" -netdev user,id=u1,tftp="C:\Users\Administrator\.VirtualBox\TFTP" -device rtl8139,netdev=u1 -kernel "$(TargetPath)"  -object filter-dump,id=f1,netdev=u1,file="C:\Program Files\qemu\dump.dat" -accel hax &amp;&amp; "C:\Users\Administrator\Documents\Visual Studio 2015\Projects\AutoIncrementBuild\Release\AutoIncrementBuild.exe"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Launching QEMU</Message>
@@ -275,6 +275,7 @@
     <ClCompile Include="Drivers\RTL_8139.c" />
     <ClCompile Include="Executables\PE32.c" />
     <ClCompile Include="GDT.c" />
+    <ClCompile Include="Graphics\Bitmap.c" />
     <ClCompile Include="Graphics\Display_HAL.c" />
     <ClCompile Include="Graphics\font.c" />
     <ClCompile Include="Graphics\Graphical_Terminal.c" />
@@ -308,6 +309,7 @@
     <ClInclude Include="Drivers\RTL_8139.h" />
     <ClInclude Include="Executables\PE32.h" />
     <ClInclude Include="GDT.h" />
+    <ClInclude Include="Graphics\Bitmap.h" />
     <ClInclude Include="Graphics\Display_HAL.h" />
     <ClInclude Include="Graphics\Graphical_Terminal.h" />
     <ClInclude Include="Graphics\picofont.h" />

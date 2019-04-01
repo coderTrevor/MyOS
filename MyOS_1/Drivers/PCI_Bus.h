@@ -27,6 +27,9 @@
 #define PCI_VENDOR_QEMU     0x1234
 #define PCI_DEVICE_BGA      0x1111
 
+#define PCI_VENDOR_VBOX     0x80EE
+#define PCI_DEVICE_VBOX_BGA 0xBEEF
+
 void PCI_CheckAllBuses(void);
 
 void PCI_CheckDevice(uint8_t bus, uint8_t device);

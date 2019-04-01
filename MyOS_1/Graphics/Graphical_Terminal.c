@@ -143,22 +143,22 @@ void GraphicalTerminalScrollUp(void)
     graphicalColumn = 0;
     graphicalRow = graphicalMaxRows - 1;
 
+    //memset(scrollBuffer, 0, MAX_X_RES * MAX_Y_RES * 4);
+
     // Read the contents of the screen, but don't copy the first line
     uint32_t bufferSize = graphicsWidth * graphicsHeight * (graphicsBpp / 8);
     uint32_t lineOffset = graphicsWidth * (FNT_FONTHEIGHT + FNT_TOPBOTTOMMARGIN) * (graphicsBpp / 8);
     memcpy(scrollBuffer, (void *)((uint32_t)linearFrameBuffer + lineOffset), bufferSize - lineOffset);
 
-    // Clear the bottom of the screen (or the entire screen)
+    // Clear the bottom two rows of the screen (or the entire screen)
     uint32_t firstLine = graphicalRow * (FNT_FONTHEIGHT + FNT_TOPBOTTOMMARGIN);
-    uint32_t lines = FNT_FONTHEIGHT + FNT_TOPBOTTOMMARGIN;
+    uint32_t lines = (FNT_FONTHEIGHT + FNT_TOPBOTTOMMARGIN) * 2;
+    GraphicsClearLines(firstLine, lines, graphicalBackground);
 
     //GraphicsFillScreen(graphicalBackground.red, graphicalBackground.green, graphicalBackground.blue);
 
     // Copy the buffer back to the screen
     memcpy(linearFrameBuffer, scrollBuffer, bufferSize - lineOffset);
-
-    GraphicsClearLines(firstLine, lines, graphicalBackground);
-
 }
 
 void GraphicalTerminalWritestringTop(const char *string, uint16_t column)

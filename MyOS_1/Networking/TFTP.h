@@ -16,7 +16,7 @@
 
 #define TFTP_PORT                   69
 
-#define TFTP_MAX_FILE_SIZE          (32*1024)
+#define TFTP_MAX_FILE_SIZE          (256*1024)
 
 #define TFTP_MAX_BLOCK_SIZE         512
 
