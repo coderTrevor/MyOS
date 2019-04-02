@@ -15,3 +15,5 @@ void keyboard_interrupt_handler(void);
 void page_fault_handler(void);
 
 void invalid_opcode_handler(void);
+
+void print_string_interrupt_handler(char *str);

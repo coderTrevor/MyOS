@@ -158,6 +158,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\MyOS_1\Console_VGA.h" />
+    <ClInclude Include="..\MyOS_1\Interrupts\System_Calls.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -167,6 +168,7 @@
     <ClCompile Include="..\MyOS_1\Graphics\font.c" />
     <ClCompile Include="..\MyOS_1\Graphics\Graphical_Terminal.c" />
     <ClCompile Include="..\MyOS_1\Graphics\picofont.c" />
+    <ClCompile Include="..\MyOS_1\Interrupts\System_Calls.c" />
     <ClCompile Include="..\MyOS_1\misc.c" />
     <ClCompile Include="..\MyOS_1\Terminal.c" />
     <ClCompile Include="stdafx.cpp" />

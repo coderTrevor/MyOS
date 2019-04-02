@@ -110,3 +110,22 @@ void Interrupts_Init()
     // Initialize the interrupt descriptor table
     IDT_Init();
 }
+
+// TODO: using a pointer like this from user space is considered insecure
+void _declspec(naked) print_string_interrupt_handler(char *str)
+{
+    _asm pushad;
+
+    ++interrupts_fired;
+
+    if (debugLevel)
+        terminal_writestring("syscall interrupt handler fired.\n");
+
+    terminal_writestring(str);
+
+    _asm
+    {
+        popad
+        iretd
+    }
+}

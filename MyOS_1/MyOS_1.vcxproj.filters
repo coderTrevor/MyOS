@@ -126,6 +126,9 @@
     <ClCompile Include="Graphics\Bitmap.c">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Interrupts\System_Calls.c">
+      <Filter>Source Files\Interrupts</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="misc.h">
@@ -211,6 +214,9 @@
     </ClInclude>
     <ClInclude Include="Graphics\Bitmap.h">
       <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Interrupts\System_Calls.h">
+      <Filter>Header Files\Interrupts</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -3,6 +3,7 @@
 #include "IDT.h"
 #include "Interrupts.h"
 #include <intrin.h>
+#include "System_Calls.h"
 
 IDT_ENTRY IDT[256];
 IDT_ptr_struct IDT_ptr;
@@ -37,6 +38,9 @@ void IDT_Init(void)
 
     // set keyboard handler (interrupt 1 is remapped to 33, 0x21)
     Set_IDT_Entry((unsigned long)keyboard_interrupt_handler, HARDWARE_INTERRUPTS_BASE + 1);
+
+    // Set print string handler
+    Set_IDT_Entry((unsigned long)print_string_interrupt_handler, SYSCALL_PRINT);
 
     /* fill the IDT descriptor */
     IDT_ptr.base = (uint32_t)IDT;

@@ -12,6 +12,8 @@
 #include "Graphics/Graphical_Terminal.h"
 #include "Terminal.h"
 #include "Graphics/Bitmap.h"
+#include "Interrupts/System_Calls.h"
+
 
 int inputPosition = 0;
 #define COMMAND_HISTORY_SIZE        10
@@ -153,6 +155,14 @@ void Shell_Process_command(void)
     }
 
     char subCommand[MAX_COMMAND_LENGTH];
+
+    // test system calls
+    if (strcmp(currentCommand, "syscall") == 0)
+    {
+        terminal_writestring("testing syscall\n");
+        SystemCallPrint("test\n");
+        return;
+    }
 
     if (strcmp(currentCommand, "gfx") == 0)
     {
