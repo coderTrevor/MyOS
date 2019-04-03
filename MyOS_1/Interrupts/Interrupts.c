@@ -104,6 +104,9 @@ void Interrupts_Init()
     uint8_t mask = (uint8_t)~0;
     outb(PIC1_DATA, mask);
 
+    // Enable IRQ 0 for the timer
+    IRQ_Enable_Line(0);
+
     // Enable IRQ 1, the keyboard handler
     IRQ_Enable_Line(1);
 

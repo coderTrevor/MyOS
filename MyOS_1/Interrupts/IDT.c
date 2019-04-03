@@ -4,6 +4,7 @@
 #include "Interrupts.h"
 #include <intrin.h>
 #include "System_Calls.h"
+#include "../Timers/PIT.h"
 
 IDT_ENTRY IDT[256];
 IDT_ptr_struct IDT_ptr;
@@ -36,8 +37,11 @@ void IDT_Init(void)
         Set_IDT_Entry((unsigned long)default_interrupt_handler, i);
     }
 
+    // set timer handler
+    Set_IDT_Entry((unsigned long)timer_interrupt_handler, TIMER_INTERRUPT);
+
     // set keyboard handler (interrupt 1 is remapped to 33, 0x21)
-    Set_IDT_Entry((unsigned long)keyboard_interrupt_handler, HARDWARE_INTERRUPTS_BASE + 1);
+    Set_IDT_Entry((unsigned long)keyboard_interrupt_handler, KEYBOARD_INTERRUPT);
 
     // Set print string handler
     Set_IDT_Entry((unsigned long)print_string_interrupt_handler, SYSCALL_PRINT);

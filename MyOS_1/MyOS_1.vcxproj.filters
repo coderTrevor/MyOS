@@ -43,6 +43,12 @@
     <Filter Include="Header Files\Graphics">
       <UniqueIdentifier>{e85c9785-c647-4949-bbb3-936cca74e3a7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Timers">
+      <UniqueIdentifier>{308c2d8d-3bb9-4a82-8dee-6453901d2fd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Timers">
+      <UniqueIdentifier>{6b849dcd-aafd-40a5-a277-79db47765b72}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="paging.c">
@@ -128,6 +134,15 @@
     </ClCompile>
     <ClCompile Include="Interrupts\System_Calls.c">
       <Filter>Source Files\Interrupts</Filter>
+    </ClCompile>
+    <ClCompile Include="Timers\PIT.c">
+      <Filter>Source Files\Timers</Filter>
+    </ClCompile>
+    <ClCompile Include="Timers\System_Clock.c">
+      <Filter>Source Files\Timers</Filter>
+    </ClCompile>
+    <ClCompile Include="CRT.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -217,6 +232,12 @@
     </ClInclude>
     <ClInclude Include="Interrupts\System_Calls.h">
       <Filter>Header Files\Interrupts</Filter>
+    </ClInclude>
+    <ClInclude Include="Timers\PIT.h">
+      <Filter>Header Files\Timers</Filter>
+    </ClInclude>
+    <ClInclude Include="Timers\System_Clock.h">
+      <Filter>Header Files\Timers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,9 @@
 #pragma once
 #include <stdint.h>
+#include <stdbool.h>
 
 extern int debugLevel;
+extern bool showOverlay;
 
 char intToChar(int i);
 

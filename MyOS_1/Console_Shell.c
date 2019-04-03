@@ -13,7 +13,7 @@
 #include "Terminal.h"
 #include "Graphics/Bitmap.h"
 #include "Interrupts/System_Calls.h"
-
+#include "Timers/System_Clock.h"
 
 int inputPosition = 0;
 #define COMMAND_HISTORY_SIZE        10
@@ -43,7 +43,8 @@ void Shell_Add_Command_To_History(char *command)
     // if the command is equal to the previous command, don't add it to the history
     if(historyIndex > 0 && strcmp(command, commandHistory[historyIndex-1]) == 0)
     {
-        terminal_writestring("ignoring\n");
+        if(debugLevel)
+            terminal_writestring("ignoring\n");
         return;
     }
 
@@ -156,6 +157,22 @@ void Shell_Process_command(void)
 
     char subCommand[MAX_COMMAND_LENGTH];
 
+    // test system timer
+    if (strcmp(currentCommand, "uptime") == 0)
+    {
+        int hours, minutes, seconds;
+        TimeGetTimeSinceReset(&hours, &minutes, &seconds);
+        
+        terminal_writestring("System has been running for ");
+        terminal_print_int(hours);
+        terminal_writestring(" hours, ");
+        terminal_print_int(minutes);
+        terminal_writestring(" minutes, and ");
+        terminal_print_int(seconds);
+        terminal_writestring(" seconds.\n");
+        return;
+    }
+
     // test system calls
     if (strcmp(currentCommand, "syscall") == 0)
     {
@@ -266,9 +283,11 @@ void Shell_Process_command(void)
             terminal_writestring("gfx\n");
         terminal_writestring("help\n");
         terminal_writestring("mbi\n");
+        terminal_writestring("overlay [clock|ints|off]\n");
+        terminal_writestring("run [programName]\n");
         if (!textMode)
             terminal_writestring("show [bitmapName]\n");
-        terminal_writestring("run [programName]\n");
+        terminal_writestring("uptime\n");
         terminal_writestring("ver\n\n");
         return;
     }
@@ -432,6 +451,34 @@ void Shell_Process_command(void)
         strncpy(subCommand, currentCommand + strlen("echo "), MAX_COMMAND_LENGTH - strlen("echo "));
         terminal_writestring(subCommand);
         terminal_putchar('\n');
+        return;
+    }
+
+    // overlay command
+    memset(subCommand, 0, MAX_COMMAND_LENGTH);
+    strncpy(subCommand, currentCommand, strlen("overlay"));
+    if (strcmp(subCommand, "overlay") == 0)
+    {
+        memset(subCommand, 0, MAX_COMMAND_LENGTH);
+        strncpy(subCommand, currentCommand + strlen("overlay "), MAX_COMMAND_LENGTH - strlen("overlay "));
+        if (strcmp(subCommand, "clock") == 0)
+        {
+            showOverlay = true;
+            showClock = true;
+            return;
+        }
+        if (strcmp(subCommand, "ints") == 0)
+        {
+            showOverlay = true;
+            showClock = false;
+            return;
+        }
+        if (strcmp(subCommand, "off") == 0)
+        {
+            showOverlay = false;
+            return;
+        }
+        terminal_writestring("Sorry but I don't understand that parameter. Usage:\noverlay [clock|ints|off]\n");
         return;
     }
 

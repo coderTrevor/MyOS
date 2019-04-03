@@ -15,8 +15,10 @@
 #include "multiboot.h"
 #include "Terminal.h"
 #include "Graphics/Display_HAL.h"
+#include "Timers/System_Clock.h"
 
 int debugLevel = 0;
+bool showOverlay = true;
 
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)
@@ -34,6 +36,8 @@ void fill_term(char c, uint8_t foreground_color, uint8_t background_color);
 
 //extern uint32_t paging_space[0x4FFF];
 typedef uint32_t ULONG_PTR;
+
+char timeString[9];
 
 // KeStartup doesn't actually exist in memory where MSVC thinks it does
 // so we can't call any functions or use any globals until we setup paging
@@ -113,9 +117,20 @@ void KeStartupPhase2(multiboot_info *multibootInfo)
         if (shellEnterPressed)
             Shell_Enter_Pressed();
 
-        // Print the number of (non-keyboard) interrupts across the top of the screen
-        terminal_writestring_top("Interrupts: ", 61);
-        terminal_print_int_top(interrupts_fired, 73);
+        if (showOverlay)
+        {
+            if (showClock)
+            {
+                TimeFormatTimeString(timeString);
+                terminal_writestring_top(timeString, 61);
+            }
+            else
+            {
+                // Print the number of (non-keyboard) interrupts across the top of the screen
+                terminal_writestring_top("Interrupts: ", 61);
+                terminal_print_int_top(interrupts_fired, 73);
+            }
+        }
 
         // Just do nothing and wait for an interrupt
         __halt();
