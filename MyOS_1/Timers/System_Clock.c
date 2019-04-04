@@ -19,7 +19,7 @@ bool showClock = true;
 
 void TimeDelayMS(uint64_t milliseconds)
 {
-    uint64_t oldTicks = ticksSinceReset;
+    volatile uint64_t oldTicks = ticksSinceReset;
 
     // figure out how many ticks we need to wait
     uint64_t waitTicks = milliseconds / millisecondsPerTick;
@@ -34,7 +34,7 @@ void TimeDelayMS(uint64_t milliseconds)
     oldTicks = ticksSinceReset;
 
     // wait
-    for (uint64_t ticks = 0; ticks < waitTicks; ++ticks)
+    for (volatile uint64_t ticks = 0; ticks < waitTicks; ++ticks)
         ;
 }
 

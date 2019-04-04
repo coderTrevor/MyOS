@@ -14,6 +14,7 @@
 #include "Graphics/Bitmap.h"
 #include "Interrupts/System_Calls.h"
 #include "Timers/System_Clock.h"
+#include "Drivers/Sound_Blaster_16.h"
 
 int inputPosition = 0;
 #define COMMAND_HISTORY_SIZE        10
@@ -156,6 +157,13 @@ void Shell_Process_command(void)
     }
 
     char subCommand[MAX_COMMAND_LENGTH];
+
+    // test SB16 Init
+    if (strcmp(currentCommand, "sb16") == 0)
+    {
+        SB16_Init();
+        return;
+    }
 
     // test system timer
     if (strcmp(currentCommand, "uptime") == 0)

@@ -16,6 +16,7 @@
 #include "Terminal.h"
 #include "Graphics/Display_HAL.h"
 #include "Timers/System_Clock.h"
+#include "Drivers/Sound_Blaster_16.h"
 
 int debugLevel = 0;
 bool showOverlay = true;

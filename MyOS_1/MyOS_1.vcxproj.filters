@@ -144,6 +144,9 @@
     <ClCompile Include="CRT.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Drivers\Sound_Blaster_16.c">
+      <Filter>Source Files\Drivers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="misc.h">
@@ -238,6 +241,9 @@
     </ClInclude>
     <ClInclude Include="Timers\System_Clock.h">
       <Filter>Header Files\Timers</Filter>
+    </ClInclude>
+    <ClInclude Include="Drivers\Sound_Blaster_16.h">
+      <Filter>Header Files\Drivers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

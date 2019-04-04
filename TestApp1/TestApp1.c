@@ -10,7 +10,7 @@ int main()
 {
     //terminal_resume();
     //terminal_writestring("Hello World from an .exe!\n");
-    SystemCallPrint("Hello World from an .exe!\n");
+    SystemCallPrint("Hello World from an .exe using a system call!\n");
     return 0;
 }
 

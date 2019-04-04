@@ -276,6 +276,7 @@
     <ClCompile Include="Drivers\Keyboard.c" />
     <ClCompile Include="Drivers\PCI_Bus.c" />
     <ClCompile Include="Drivers\RTL_8139.c" />
+    <ClCompile Include="Drivers\Sound_Blaster_16.c" />
     <ClCompile Include="Executables\PE32.c" />
     <ClCompile Include="GDT.c" />
     <ClCompile Include="Graphics\Bitmap.c" />
@@ -313,6 +314,7 @@
     <ClInclude Include="Drivers\Keyboard.h" />
     <ClInclude Include="Drivers\PCI_Bus.h" />
     <ClInclude Include="Drivers\RTL_8139.h" />
+    <ClInclude Include="Drivers\Sound_Blaster_16.h" />
     <ClInclude Include="Executables\PE32.h" />
     <ClInclude Include="GDT.h" />
     <ClInclude Include="Graphics\Bitmap.h" />

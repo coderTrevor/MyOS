@@ -135,6 +135,12 @@
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "$(TargetDir)$(TargetFileName)" C:\Users\Administrator\.VirtualBox\TFTP\$(TargetFileName)</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copying testapp1.exe to TFTP directory</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -154,23 +160,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\MyOS_1\Console_VGA.h" />
     <ClInclude Include="..\MyOS_1\Interrupts\System_Calls.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\MyOS_1\Console_VGA.c" />
-    <ClCompile Include="..\MyOS_1\Graphics\Display_HAL.c" />
-    <ClCompile Include="..\MyOS_1\Graphics\font.c" />
-    <ClCompile Include="..\MyOS_1\Graphics\Graphical_Terminal.c" />
-    <ClCompile Include="..\MyOS_1\Graphics\picofont.c" />
     <ClCompile Include="..\MyOS_1\Interrupts\System_Calls.c" />
     <ClCompile Include="..\MyOS_1\misc.c" />
-    <ClCompile Include="..\MyOS_1\Terminal.c" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="TestApp1.c" />
   </ItemGroup>
