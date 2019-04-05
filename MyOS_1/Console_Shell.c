@@ -14,7 +14,9 @@
 #include "Graphics/Bitmap.h"
 #include "Interrupts/System_Calls.h"
 #include "Timers/System_Clock.h"
+#include "Timers/PIT.h"
 #include "Drivers/Sound_Blaster_16.h"
+#include "File Formats/VOC.h"
 
 int inputPosition = 0;
 #define COMMAND_HISTORY_SIZE        10
@@ -157,6 +159,32 @@ void Shell_Process_command(void)
     }
 
     char subCommand[MAX_COMMAND_LENGTH];
+
+    // Test VOC playback
+    if (strcmp(currentCommand, "play") == 0)
+    {
+        PlaySound(1);
+        return;
+    }
+    if (strcmp(currentCommand, "play2") == 0)
+    {
+        PlaySound(2);
+        return;
+    }
+
+    // test changing timer resolution
+    if (strcmp(currentCommand, "highspeed") == 0)
+    {
+        PIT_Set_Interval(100);
+        return;
+    }
+
+    // test VOC parsing
+    if (strcmp(currentCommand, "voc") == 0)
+    {
+        OpenAndReadVOCs();
+        return;
+    }
 
     // test SB16 Init
     if (strcmp(currentCommand, "sb16") == 0)

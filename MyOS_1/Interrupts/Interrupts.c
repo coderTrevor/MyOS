@@ -37,7 +37,8 @@ void _declspec(naked) default_exception_handler(void)
     terminal_writestring("Default exception handler fired.\n");
     terminal_writestring("System halted.\n");
 
-    __halt();
+    for(;;)
+        __halt();
 
     /*_asm
     {
@@ -56,7 +57,8 @@ void _declspec(naked) page_fault_handler(void)
     terminal_writestring("Page fault handler fired.\n");
     terminal_writestring("System halted.\n");
 
-    __halt();
+    for(;;)
+        __halt();
 
     /*_asm
     {
@@ -86,7 +88,8 @@ void _declspec(naked) invalid_opcode_handler(void)
     terminal_dumpHex((uint8_t *)address, 256);
     terminal_writestring("System halted.\n");
 
-    __halt();
+    for(;;)
+        __halt();
 
     /*_asm
     {

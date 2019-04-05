@@ -2,17 +2,17 @@
 #include <stdbool.h>
 #include "../misc.h"
 
-// system clock defaults to one "tick" (IRQ0 firing) at a rate of 18.222052535125229077580940745266 hz
+// system clock defaults to one "tick" (IRQ0 firing) at a rate of about 18.207 hz
 uint64_t ticksSinceReset = 0;
 
 // These values are approximate. They will need to be updated if we change the PIT's divider
 // If we need more accuracy it may be desirable to convert some of these to fixed point or floating point,
 // but my OS doesn't need accurate timing as of right now.
-uint64_t nanosecondsPerTick = 54878718;
-uint64_t microsecondsPerTick = 54879;
+uint64_t nanosecondsPerTick = 54925416;
+uint64_t microsecondsPerTick = 54925;
 uint64_t millisecondsPerTick = 55;
-uint64_t ticksPerHour = 65599;
-uint64_t ticksPerMinute = 1093;
+uint64_t ticksPerHour = 65543;
+uint64_t ticksPerMinute = 1092;
 uint64_t ticksPerSecond = 18;
 
 bool showClock = true;

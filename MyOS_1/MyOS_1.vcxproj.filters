@@ -49,6 +49,12 @@
     <Filter Include="Header Files\Timers">
       <UniqueIdentifier>{6b849dcd-aafd-40a5-a277-79db47765b72}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\File Formats">
+      <UniqueIdentifier>{f72e23fd-6333-44a9-953b-fdfa18361569}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\File Formats">
+      <UniqueIdentifier>{2870707c-d522-47d5-87ee-3f1e9d4a5693}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="paging.c">
@@ -147,6 +153,9 @@
     <ClCompile Include="Drivers\Sound_Blaster_16.c">
       <Filter>Source Files\Drivers</Filter>
     </ClCompile>
+    <ClCompile Include="File Formats\VOC.c">
+      <Filter>Source Files\File Formats</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="misc.h">
@@ -244,6 +253,9 @@
     </ClInclude>
     <ClInclude Include="Drivers\Sound_Blaster_16.h">
       <Filter>Header Files\Drivers</Filter>
+    </ClInclude>
+    <ClInclude Include="File Formats\VOC.h">
+      <Filter>Header Files\File Formats</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

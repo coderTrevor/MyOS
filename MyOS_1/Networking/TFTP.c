@@ -5,8 +5,8 @@
 
 // TODO: Support multiple transactions
 uint16_t transactionID;
-bool transferInProgress = false;
-bool transferError = false;
+volatile bool transferInProgress = false;
+volatile bool transferError = false;
 
 // TODO: Support dynamic memory allocation, when we have implemented it
 uint8_t tftpFile[TFTP_MAX_FILE_SIZE];
@@ -24,6 +24,7 @@ bool TFTP_TransactionComplete()
 // return true on success
 // will block until the file is transacted
 // TODO: Implement timeout, error-checking
+// TODO: Fix hanging if an invalid serverIP is given
 bool TFTP_GetFile(uint32_t serverIP, char *filename, uint8_t *destinationBuffer, uint32_t maxFileSize)
 {
     if (!NIC_Present)

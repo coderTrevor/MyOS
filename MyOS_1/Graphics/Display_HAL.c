@@ -22,7 +22,7 @@ void GraphicsBlit(unsigned int x, unsigned int y, PIXEL_32BIT *image, uint32_t w
     PIXEL_32BIT *currentPixel = (PIXEL_32BIT *)((uint32_t)linearFrameBuffer + framebufferOffset);
 
     // for every row of pixels
-    for (int h = 0; h < height; ++h)
+    for (size_t h = 0; h < height; ++h)
     {
         // copy the current row
         memcpy((void*)currentPixel, (const void *)image, sizeof(PIXEL_32BIT) * width);

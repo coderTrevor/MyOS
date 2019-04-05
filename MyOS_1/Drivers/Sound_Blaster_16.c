@@ -8,6 +8,7 @@ bool sb16Present = false;
 uint16_t sb16BaseAddress = 0x220;
 uint8_t sb16VersionMajor;
 uint8_t sb16VersionMinor;
+uint8_t sb16IRQ = 5;    // TODO: provide some way to configure the SB16 IRQ
 
 bool SB16_Reset(void)
 {
@@ -55,7 +56,7 @@ void SB16_Init(void)
 
     if (!sb16Present)
     {
-        terminal_writestring("No SoundBlaster 16 driver was found.\n");
+        terminal_writestring("No SoundBlaster 16 device was found.\n");
         return;
     }
 

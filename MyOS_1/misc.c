@@ -53,6 +53,21 @@ char * __cdecl strncpy(char *destination, const char *source, size_t num)
     return destination;
 }
 
+#pragma function(memcmp)
+int __cdecl memcmp(const void *ptr1, const void *ptr2, size_t num)
+{
+    uint8_t *p1 = (uint8_t *)ptr1;
+    uint8_t *p2 = (uint8_t *)ptr2;
+
+    for (size_t i = 0; i < num; ++i)
+    {
+        if (p1[i] != p2[i])
+            return p2[i] - p1[i];
+    }
+
+    return 0;
+}
+
 #pragma function(memcpy)
 void * __cdecl memcpy(void *dest, const void *src, size_t count)
 {
