@@ -64,18 +64,6 @@ void _declspec(naked) timer_interrupt_handler(void)
 {
     _disable();
     _asm pushad;
-    
-    // TEMPTEMP
-    if (playSound)
-    {
-        // we've been requested to play a sound, so send it to the sb16
-        SB16_Write(0x10);
-        Sound_Struct *sound = &sounds[soundIndex];
-        SB16_Write(sound->data[sound->position++]);
-        
-        if (sound->position > sound->Length)
-            playSound = false;
-    }
 
     //++interrupts_fired;
     ++ticksSinceReset;

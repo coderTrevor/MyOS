@@ -6,6 +6,7 @@
 #include "../misc.h"
 #include "../Timers/PIT.h"
 #include "../Timers/System_Clock.h"
+#include "../Drivers/Sound_Blaster_16.h"
 
 // Globals
 // TEMPTEMP HACKHACK
@@ -22,12 +23,14 @@ extern bool playSound;
 
 // Functions
 
-void ReadSubBlockTypeNew(VOC_Block_Type_New *subBlock, uint32_t blockLength)
+void ReadSubBlockTypeNew(VOC_Block_Type_New *subBlock, uint32_t blockLength, int index)
 {
     uint32_t dataLength = blockLength - sizeof(VOC_Block_Type_New);
     uint8_t *dataPtr = (uint8_t *)((uint32_t)subBlock + sizeof(VOC_Block_Type_New));
 
     terminal_writestring("  sub-block is ");
+    terminal_print_int(dataLength);
+    terminal_writestring(" byte, ");
     terminal_print_int(subBlock->bitsPerSample);
     terminal_writestring("-bit, ");
     terminal_print_int(subBlock->channel);
@@ -61,12 +64,13 @@ void ReadSubBlockTypeNew(VOC_Block_Type_New *subBlock, uint32_t blockLength)
     terminal_writestring(" hz.\n");
 
     // TEMPTEMP
-    memset(sounds[soundIndex].data, 0, MAX_VOC_SIZE);
-    memcpy(sounds[soundIndex].data, dataPtr, dataLength);
-    sounds[soundIndex++].Length = dataLength;
+    memset(sounds[index].data, 0, MAX_VOC_SIZE);
+    memcpy(sounds[index].data, dataPtr, dataLength);
+    sounds[index].Length = dataLength;
+    //soundIndex++;
 }
 
-bool ReadVOC(VOC_Header *vocData)
+bool ReadVOC(VOC_Header *vocData, int index)
 {
     if (memcmp(vocData->magicString, VOC_MAGIC, strlen(VOC_MAGIC) - 1) != 0)
     {
@@ -125,7 +129,7 @@ bool ReadVOC(VOC_Header *vocData)
         {
             case BLOCK_TYPE_NEW_BLOCK:
                 blockNew = (VOC_Block_Type_New *)((uint32_t)currentBlock + SUB_BLOCK_HEADER_SIZE);
-                ReadSubBlockTypeNew(blockNew, blockSize);
+                ReadSubBlockTypeNew(blockNew, blockSize, index++);
                 break;
             default:
                 terminal_writestring("Don't know how to read sub-block type ");
@@ -156,7 +160,7 @@ void OpenAndReadVOCs(void)
         return;
     }
 
-    if (!ReadVOC((VOC_Header *)vocFile1))
+    if (!ReadVOC((VOC_Header *)vocFile1, 0))
         return;
 
     if (!OpenVOC("ISFXEND.VOC", vocFile2, MAX_VOC_SIZE))
@@ -166,7 +170,7 @@ void OpenAndReadVOCs(void)
         return;
     }
 
-    if (!ReadVOC((VOC_Header *)vocFile2))
+    if (!ReadVOC((VOC_Header *)vocFile2, 1))
         return;
 
     vocsLoaded = true;
@@ -177,16 +181,22 @@ void PlaySound(int index)
     if (!vocsLoaded)
         OpenAndReadVOCs();
     
-    SB16_Write(0xD1); //turn speaker on if its off
+    SB16_Write(0xD1); // turn speaker on if it's off
 
     soundIndex = index;
 
-    SetupTimerForPlayback();
+    //SetupTimerForPlayback();
 
     sounds[index].position = 0;
     soundIndex = index;
 
     playSound = true;
+
+    terminal_writestring("About to play ");
+    terminal_print_int(sounds[index].Length);
+    terminal_writestring(" byte sample\n");
+
+    SB16_Play(sounds[index].data, sounds[index].Length, 11025);
 }
 
 void SetupTimerForPlayback(void)

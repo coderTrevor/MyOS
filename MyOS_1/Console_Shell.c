@@ -17,6 +17,7 @@
 #include "Timers/PIT.h"
 #include "Drivers/Sound_Blaster_16.h"
 #include "File Formats/VOC.h"
+#include "Drivers/ISA_DMA.h"
 
 int inputPosition = 0;
 #define COMMAND_HISTORY_SIZE        10
@@ -160,15 +161,23 @@ void Shell_Process_command(void)
 
     char subCommand[MAX_COMMAND_LENGTH];
 
+
+    // Test ISA DMA stuff
+    if (strcmp(currentCommand, "dma") == 0)
+    {
+        DMA_InitBuffer();
+        return;
+    }
+
     // Test VOC playback
     if (strcmp(currentCommand, "play") == 0)
     {
-        PlaySound(1);
+        PlaySound(0);
         return;
     }
     if (strcmp(currentCommand, "play2") == 0)
     {
-        PlaySound(2);
+        PlaySound(1);
         return;
     }
 

@@ -156,6 +156,9 @@
     <ClCompile Include="File Formats\VOC.c">
       <Filter>Source Files\File Formats</Filter>
     </ClCompile>
+    <ClCompile Include="Drivers\ISA_DMA.c">
+      <Filter>Source Files\Drivers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="misc.h">
@@ -256,6 +259,9 @@
     </ClInclude>
     <ClInclude Include="File Formats\VOC.h">
       <Filter>Header Files\File Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="Drivers\ISA_DMA.h">
+      <Filter>Header Files\Drivers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

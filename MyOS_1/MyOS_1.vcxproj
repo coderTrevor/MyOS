@@ -215,7 +215,7 @@
       <NoEntryPoint>true</NoEntryPoint>
     </Link>
     <PostBuildEvent>
-      <Command>"C:\Program Files\qemu\qemu-system-x86_64w.exe" -soundhw sb16,adlib -netdev user,id=u1,tftp="C:\Users\Administrator\.VirtualBox\TFTP" -device rtl8139,netdev=u1 -kernel "$(TargetPath)"  -object filter-dump,id=f1,netdev=u1,file="C:\Program Files\qemu\dump.dat" -accel hax &amp;&amp; "C:\Users\Administrator\Documents\Visual Studio 2015\Projects\AutoIncrementBuild\Release\AutoIncrementBuild.exe"</Command>
+      <Command>"C:\Program Files\qemu\qemu-system-x86_64w.exe" -soundhw sb16 -monitor stdio -netdev user,id=u1,tftp="C:\Users\Administrator\.VirtualBox\TFTP" -device rtl8139,netdev=u1 -kernel "$(TargetPath)"  -object filter-dump,id=f1,netdev=u1,file="C:\Program Files\qemu\dump.dat" -accel hax &amp;&amp; "C:\Users\Administrator\Documents\Visual Studio 2015\Projects\AutoIncrementBuild\Release\AutoIncrementBuild.exe"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Launching QEMU</Message>
@@ -273,6 +273,7 @@
       <CallingConvention Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Cdecl</CallingConvention>
     </ClCompile>
     <ClCompile Include="Drivers\Bochs_VGA.c" />
+    <ClCompile Include="Drivers\ISA_DMA.c" />
     <ClCompile Include="Drivers\Keyboard.c" />
     <ClCompile Include="Drivers\PCI_Bus.c" />
     <ClCompile Include="Drivers\RTL_8139.c" />
@@ -312,6 +313,7 @@
     <ClInclude Include="Console_Shell.h" />
     <ClInclude Include="Console_VGA.h" />
     <ClInclude Include="Drivers\Bochs_VGA.h" />
+    <ClInclude Include="Drivers\ISA_DMA.h" />
     <ClInclude Include="Drivers\Keyboard.h" />
     <ClInclude Include="Drivers\PCI_Bus.h" />
     <ClInclude Include="Drivers\RTL_8139.h" />

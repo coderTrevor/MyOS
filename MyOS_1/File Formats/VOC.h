@@ -58,6 +58,6 @@ void OpenAndReadVOCs(void);
 
 void PlaySound(int index);
 
-bool ReadVOC(VOC_Header *vocData);
+bool ReadVOC(VOC_Header *vocData, int index);
 
 void SetupTimerForPlayback(void);
