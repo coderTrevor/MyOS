@@ -151,29 +151,30 @@ bool OpenVOC(char *fileName, uint8_t *destinationBuffer, uint32_t maxBufferSize)
     return TFTP_GetFile(IPv4_PackIP(10, 0, 2, 2), fileName, destinationBuffer, maxBufferSize);
 }
 
-void OpenAndReadVOCs(void)
+bool OpenAndReadVOCs(void)
 {
     if (!OpenVOC("ISFXMORE.VOC", vocFile1, MAX_VOC_SIZE))
     {
         terminal_writestring("Unable to open ");
         terminal_writestring("ISFXMORE.VOC\n");
-        return;
+        return false;
     }
 
     if (!ReadVOC((VOC_Header *)vocFile1, 0))
-        return;
+        return false;
 
     if (!OpenVOC("ISFXEND.VOC", vocFile2, MAX_VOC_SIZE))
     {
         terminal_writestring("Unable to open ");
         terminal_writestring("ISFXEND.VOC\n");
-        return;
+        return false;
     }
 
     if (!ReadVOC((VOC_Header *)vocFile2, 1))
-        return;
+        return false;
 
     vocsLoaded = true;
+    return true;
 }
 
 void PlaySound(int index)
@@ -181,6 +182,9 @@ void PlaySound(int index)
     if (!vocsLoaded)
         OpenAndReadVOCs();
     
+    if (!vocsLoaded)
+        return;
+
     SB16_Write(0xD1); // turn speaker on if it's off
 
     soundIndex = index;

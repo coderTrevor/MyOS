@@ -46,10 +46,16 @@ bool TFTP_GetFile(uint32_t serverIP, char *filename, uint8_t *destinationBuffer,
     { }
 
     if (transferError)
+    {
+        terminal_writestring("An error occurred with the TFTP transfer\n");
         return false;
+    }
 
     if (tftpFileSize > maxFileSize)
+    {
+        terminal_writestring("File requested exceeds maximum buffer provided\n");
         return false;
+    }
 
     // copy the data
     memcpy(destinationBuffer, tftpFile, tftpFileSize);

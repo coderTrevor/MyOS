@@ -18,6 +18,7 @@
 #include "Drivers/Sound_Blaster_16.h"
 #include "File Formats/VOC.h"
 #include "Drivers/ISA_DMA.h"
+#include "Drivers/AdLib.h"
 
 int inputPosition = 0;
 #define COMMAND_HISTORY_SIZE        10
@@ -161,6 +162,14 @@ void Shell_Process_command(void)
 
     char subCommand[MAX_COMMAND_LENGTH];
 
+
+    // Test Adlib stuff
+    if (strcmp(currentCommand, "adlib") == 0)
+    {
+        if (Adlib_Init())
+            Adlib_Test();
+        return;
+    }
 
     // Test ISA DMA stuff
     if (strcmp(currentCommand, "dma") == 0)

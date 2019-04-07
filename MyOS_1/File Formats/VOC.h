@@ -54,7 +54,7 @@ typedef struct Sound_Struct
 
 
 // Functions
-void OpenAndReadVOCs(void);
+bool OpenAndReadVOCs(void);
 
 void PlaySound(int index);
 

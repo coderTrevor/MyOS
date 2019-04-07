@@ -90,18 +90,19 @@ void SB16_Init(void)
 // TODO: Support various methods of playback - 8/16-bit, mono-stereo, etc...
 void SB16_Play(uint8_t *soundData, uint32_t sampleSize, uint16_t sampleRate)
 {
-    SB16_SetMixerSettings();
+    //SB16_SetMixerSettings();
 
-    terminal_writestring("Playing ");
-    terminal_print_int(sampleSize);
-    terminal_writestring(" byte sample at ");
-    terminal_print_int(sampleRate);
-    terminal_writestring(" hz.\n");
 
     // determine length of sample to send over DMA
     uint32_t sendLength = sampleSize;
-    if (sendLength > DMA_BUFFER_SIZE)
+    if (sendLength > (DMA_BUFFER_SIZE))
         sendLength = DMA_BUFFER_SIZE;
+
+    terminal_writestring("Playing ");
+    terminal_print_int(sendLength);
+    terminal_writestring(" byte sample at ");
+    terminal_print_int(sampleRate);
+    terminal_writestring(" hz.\n");
     
     // Setup the DMA transfer:
     
@@ -113,7 +114,7 @@ void SB16_Play(uint8_t *soundData, uint32_t sampleSize, uint16_t sampleRate)
 
     // Set DMA modes
     DMA_SetMode(sb16_8bitDMAchannel,
-                DMA_MODE_DEMAND_MODE | DMA_MODE_ADDRESS_INC | DMA_MODE_SINGLE_CYCLE | DMA_MODE_TRANSFER_READ);
+                DMA_MODE_SINGLE_MODE | DMA_MODE_ADDRESS_INC | DMA_MODE_SINGLE_CYCLE | DMA_MODE_TRANSFER_READ);
 
     // Clear Flip-Flop
     DMA_ClearFlipFlop(sb16_8bitDMAchannel);
@@ -124,9 +125,9 @@ void SB16_Play(uint8_t *soundData, uint32_t sampleSize, uint16_t sampleRate)
 
     // Copy sound data to our DMA buffer
     memcpy(DMA_Buffer, soundData, sendLength);
-    /*terminal_writestring("buffer: \n");
-    terminal_dumpHex(DMA_Buffer, 1024);
-    terminal_newline();*/
+    terminal_writestring("buffer: \n");
+    terminal_dumpHex(DMA_Buffer, 256);
+    terminal_newline();
 
     // zero out any remaining bytes
     if (sendLength > DMA_BUFFER_SIZE)
@@ -158,8 +159,8 @@ void SB16_Play(uint8_t *soundData, uint32_t sampleSize, uint16_t sampleRate)
     SB16_Write(DSP_XFER_MODE_MONO | DSP_XFER_MODE_UNSIGNED);   // Mono
 
     // Send transfer length to SB16
-    outb(sb16BaseAddress + DSP_WRITE, (sendLength - 1) & 0xFF);
-    outb(sb16BaseAddress + DSP_WRITE, (uint8_t)((sendLength - 1) >> 8));
+    SB16_Write((sendLength - 1) & 0xFF);            // Send low byte
+    SB16_Write((uint8_t)((sendLength - 1) >> 8));   // followed by high byte
 }
 
 uint8_t SB16_Read()
