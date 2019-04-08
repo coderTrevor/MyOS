@@ -11,6 +11,7 @@ typedef /*__declspec(align(4096))*/ uint32_t PAGE_TABLE_ENTRY;
 #define PAGE_ENTRY_PRESENT          1
 #define PAGE_ENTRY_USER_ACCESSIBLE  2
 #define PAGE_ENTRY_WRITABLE         4
+#define DIRECTORY_ENTRY_4MB         0x80
 
 extern uint32_t paging_space[0x5FFF];
 
@@ -59,7 +60,10 @@ inline void Paging_Enable(multiboot_info *multibootInfo)
     }
 
     // put the program page table in the page directory (0x80 0000) 
-    pageDirectory[2] = (PAGE_DIRECTORY_ENTRY)((uint32_t)identityTable | PAGE_ENTRY_PRESENT | PAGE_ENTRY_WRITABLE);
+    pageDirectory[2] = (PAGE_DIRECTORY_ENTRY)((uint32_t)programIdentityTable | PAGE_ENTRY_PRESENT | PAGE_ENTRY_WRITABLE);
+
+    // This would also work for identity mapping. I might switch to doing things this way:
+    //pageDirectory[2] = (PAGE_DIRECTORY_ENTRY)((uint32_t)0x800000 | PAGE_ENTRY_PRESENT | PAGE_ENTRY_WRITABLE | DIRECTORY_ENTRY_4MB);
 
     // Map the kernel (4 megs starting at 0x10 0000) to 0xC000 0000
     for (i = 0; i < 1024; ++i)
@@ -93,6 +97,9 @@ inline void Paging_Enable(multiboot_info *multibootInfo)
 
     // load page directory into cr3
     __writecr3((uint32_t)pageDirectory);
+
+    // enable PSE (4MB pages)
+    __writecr4(__readcr4() | 0x10);
 
     // enable paging!
     __writecr0(__readcr0() | 0x80000000);

@@ -61,8 +61,9 @@ void DMA_InitBuffer()//(multiboot_info *multibootInfo)
     // For now, we'll use the last 64K of 12MB, which we currently identity map and set-aside for applications.
     // No applications built for MyOS are currently big enough that this will be a problem.
     DMA_Buffer = (uint8_t *)(12 * 1024 * 1024 - DMA_BUFFER_SIZE);
-    for (int i = 0; i < DMA_BUFFER_SIZE; ++i)
-        DMA_Buffer[i] = 0;
+    
+    // make sure we can write to the buffer without a page fault
+    memset(DMA_Buffer, 0, DMA_BUFFER_SIZE);
 
     // Ensure the DMA_Buffer doesn't cross the boundary of a 64k "page"
     if (((uint32_t)DMA_Buffer >> 16) != (((uint32_t)DMA_Buffer + DMA_BUFFER_SIZE - 1) >> 16))
@@ -117,6 +118,16 @@ void DMA_SetBuffer(uint8_t channel, uint8_t *buffer)
         default:
             terminal_writestring("TODO: Unsupported channel!\n");
             return;
+    }
+
+    if (debugLevel)
+    {
+        terminal_writestring("\npage: ");
+        terminal_print_byte_hex(page);
+        terminal_writestring("\nlow: ");
+        terminal_print_byte_hex(lowByte);
+        terminal_writestring("\nhigh: ");
+        terminal_print_byte_hex(highByte);
     }
     
     outb(pagePort, page);         // output page number

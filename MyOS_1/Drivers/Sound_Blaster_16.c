@@ -98,17 +98,20 @@ void SB16_Play(uint8_t *soundData, uint32_t sampleSize, uint16_t sampleRate)
     if (sendLength > (DMA_BUFFER_SIZE))
         sendLength = DMA_BUFFER_SIZE;
 
-    terminal_writestring("Playing ");
-    terminal_print_int(sendLength);
-    terminal_writestring(" byte sample at ");
-    terminal_print_int(sampleRate);
-    terminal_writestring(" hz.\n");
-    
+    if (debugLevel)
+    {
+        terminal_writestring("Playing ");
+        terminal_print_int(sendLength);
+        terminal_writestring(" byte sample at ");
+        terminal_print_int(sampleRate);
+        terminal_writestring(" hz.\n");
+    }
+
     // Setup the DMA transfer:
-    
+
     // disable interrupts
-    _disable(); 
-    
+    _disable();
+
     // Disable DMA channel while programming it
     DMA_DisableChannel(sb16_8bitDMAchannel);
 
@@ -125,9 +128,13 @@ void SB16_Play(uint8_t *soundData, uint32_t sampleSize, uint16_t sampleRate)
 
     // Copy sound data to our DMA buffer
     memcpy(DMA_Buffer, soundData, sendLength);
-    terminal_writestring("buffer: \n");
-    terminal_dumpHex(DMA_Buffer, 256);
-    terminal_newline();
+
+    if (debugLevel)
+    {
+        terminal_writestring("buffer: \n");
+        terminal_dumpHex(DMA_Buffer, 256);
+        terminal_newline();
+    }
 
     // zero out any remaining bytes
     if (sendLength > DMA_BUFFER_SIZE)
@@ -156,7 +163,7 @@ void SB16_Play(uint8_t *soundData, uint32_t sampleSize, uint16_t sampleRate)
     SB16_Write(DSP_IO_CMD_8BIT | DSP_IO_CMD_SINGLE_CYCLE | DSP_IO_CMD_OUTPUT | DSP_IO_CMD_FIFO_ON);   // 8-bit, single cycle, FIFO on
 
     // Write the mode byte
-    SB16_Write(DSP_XFER_MODE_MONO | DSP_XFER_MODE_UNSIGNED);   // Mono
+    SB16_Write(DSP_XFER_MODE_MONO | DSP_XFER_MODE_UNSIGNED);   // Mono, unsigned
 
     // Send transfer length to SB16
     SB16_Write((sendLength - 1) & 0xFF);            // Send low byte
