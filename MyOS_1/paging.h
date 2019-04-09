@@ -11,59 +11,48 @@ typedef /*__declspec(align(4096))*/ uint32_t PAGE_TABLE_ENTRY;
 #define PAGE_ENTRY_PRESENT          1
 #define PAGE_ENTRY_USER_ACCESSIBLE  2
 #define PAGE_ENTRY_WRITABLE         4
-#define DIRECTORY_ENTRY_4MB         0x80
 
-extern uint32_t paging_space[0x5FFF];
+#define DIRECTORY_ENTRY_PRESENT          1
+#define DIRECTORY_ENTRY_USER_ACCESSIBLE  2
+#define DIRECTORY_ENTRY_WRITABLE         4
+#define DIRECTORY_ENTRY_4MB              0x80
+
+extern uint32_t paging_space[0x3FFF];
 
 typedef uint32_t ULONG_PTR;
 
+// setup the page directory and page tables and enable paging
 inline void Paging_Enable(multiboot_info *multibootInfo)
 {
-    // setup the page directory and page tables and enable paging
-    PAGE_TABLE_ENTRY *identityTable;        // for identity mapping the first four megabytes
-    PAGE_TABLE_ENTRY *programIdentityTable; // for identity mapping four megabytes starting at 8 megabytes
+    // pageDirectory uses the global paging_space array. Since paging_space is global, the compiler thinks it's located relative to
+    // BASE_ADDRESS, when it's really relative to LOADBASE. We do some math to find the actual address of paging_space.
+    PAGE_DIRECTORY_ENTRY *pageDirectory = (PAGE_DIRECTORY_ENTRY*)((uint32_t)paging_space - BASE_ADDRESS + LOADBASE);
+
+    // The page tables will also use reside in the paging_space global array
     PAGE_TABLE_ENTRY *initialKernelTable;   // for mapping the kernel to 0xC000 0000
     PAGE_TABLE_ENTRY *videoIdentityTable;   // for identity mapping the linear frame buffer (HACK!)
-    PAGE_DIRECTORY_ENTRY *pageDirectory = (PAGE_DIRECTORY_ENTRY*)((uint32_t)paging_space - BASE_ADDRESS + LOADBASE);
 
     // Ensure pageDirectory is aligned on a 0x1000-byte boundary
     if ((ULONG_PTR)pageDirectory % 0x1000 != 0)
         pageDirectory = (PAGE_TABLE_ENTRY*)((ULONG_PTR)pageDirectory - ((ULONG_PTR)pageDirectory % 0x1000) + 0x1000);
 
     // Have the page tables follow pageDirectory in memory
-    identityTable = (PAGE_TABLE_ENTRY *)((uint32_t)pageDirectory + 0x1000);
-    programIdentityTable = (PAGE_TABLE_ENTRY *)((uint32_t)pageDirectory + 0x2000);
-    initialKernelTable = (PAGE_TABLE_ENTRY *)((uint32_t)pageDirectory + 0x3000);
-    videoIdentityTable = (PAGE_TABLE_ENTRY *)((uint32_t)pageDirectory + 0x4000);
+    initialKernelTable = (PAGE_TABLE_ENTRY *)((uint32_t)pageDirectory + 0x1000);
+    videoIdentityTable = (PAGE_TABLE_ENTRY *)((uint32_t)pageDirectory + 0x2000);
 
     uint32_t i;
 
     // Clear out the page directory
     for (i = 0; i < 1024; ++i)
     {
-        pageDirectory[i] = PAGE_ENTRY_USER_ACCESSIBLE | PAGE_ENTRY_WRITABLE;
+        pageDirectory[i] = DIRECTORY_ENTRY_USER_ACCESSIBLE | DIRECTORY_ENTRY_WRITABLE;
     }
 
     // Setup identity mapping for the first four megabytes
-    for (i = 0; i < 1024; ++i)
-    {
-        identityTable[i] = (i * 0x1000) | PAGE_ENTRY_PRESENT | PAGE_ENTRY_WRITABLE;   // attributes: supervisor level, read/write, present
-    }
-
-    // put the first page table in the page directory
-    pageDirectory[0] = (PAGE_DIRECTORY_ENTRY)((uint32_t)identityTable | PAGE_ENTRY_PRESENT | PAGE_ENTRY_WRITABLE);
+    pageDirectory[0] = (PAGE_DIRECTORY_ENTRY)(0x00 | DIRECTORY_ENTRY_PRESENT | DIRECTORY_ENTRY_WRITABLE | DIRECTORY_ENTRY_4MB);
 
     // Setup identity mapping for the four megabytes starting at megabyte 8
-    for (i = 0; i < 1024; ++i)
-    {
-        programIdentityTable[i] = (0x800000 + i * 0x1000) | PAGE_ENTRY_PRESENT | PAGE_ENTRY_WRITABLE;   // attributes: supervisor level, read/write, present
-    }
-
-    // put the program page table in the page directory (0x80 0000) 
-    pageDirectory[2] = (PAGE_DIRECTORY_ENTRY)((uint32_t)programIdentityTable | PAGE_ENTRY_PRESENT | PAGE_ENTRY_WRITABLE);
-
-    // This would also work for identity mapping. I might switch to doing things this way:
-    //pageDirectory[2] = (PAGE_DIRECTORY_ENTRY)((uint32_t)0x800000 | PAGE_ENTRY_PRESENT | PAGE_ENTRY_WRITABLE | DIRECTORY_ENTRY_4MB);
+    pageDirectory[2] = (PAGE_DIRECTORY_ENTRY)((uint32_t)0x800000 | DIRECTORY_ENTRY_PRESENT | DIRECTORY_ENTRY_WRITABLE | DIRECTORY_ENTRY_4MB);
 
     // Map the kernel (4 megs starting at 0x10 0000) to 0xC000 0000
     for (i = 0; i < 1024; ++i)
@@ -72,7 +61,7 @@ inline void Paging_Enable(multiboot_info *multibootInfo)
     }
 
     // put the kernel page table in the page directory into entry 768, which will map it to 0xC000 0000
-    pageDirectory[768] = (PAGE_DIRECTORY_ENTRY)((uint32_t)initialKernelTable | PAGE_ENTRY_PRESENT | PAGE_ENTRY_WRITABLE);
+    pageDirectory[768] = (PAGE_DIRECTORY_ENTRY)((uint32_t)initialKernelTable | DIRECTORY_ENTRY_PRESENT | DIRECTORY_ENTRY_WRITABLE);
 
     // TEMPTEMP HACKHACK! - identity map the linear frame buffer, which on my Qemu starts at 0xFD00 0000
     uint32_t lfbAddress = 0xFD000000;
@@ -93,7 +82,7 @@ inline void Paging_Enable(multiboot_info *multibootInfo)
 
     // put the lfb page table in the page directory
     uint32_t page = lfbAddress / 0x400000;
-    pageDirectory[page] = (PAGE_DIRECTORY_ENTRY)((uint32_t)videoIdentityTable | PAGE_ENTRY_PRESENT | PAGE_ENTRY_WRITABLE);
+    pageDirectory[page] = (PAGE_DIRECTORY_ENTRY)((uint32_t)videoIdentityTable | DIRECTORY_ENTRY_PRESENT | DIRECTORY_ENTRY_WRITABLE);
 
     // load page directory into cr3
     __writecr3((uint32_t)pageDirectory);

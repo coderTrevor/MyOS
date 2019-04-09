@@ -101,6 +101,13 @@ void KeStartupPhase2(multiboot_info *multibootInfo)
     terminal_print_int(BUILD_NUMBER);
     terminal_newline();
 
+    if (debugLevel)
+    {
+        terminal_writestring("LFB address: ");
+        terminal_print_ulong_hex((uint32_t)multibootInfo->framebuffer_addr);
+        terminal_newline();
+    }
+
     // Start Shell
     Shell_Entry(multibootInfo);
 
