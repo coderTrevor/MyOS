@@ -14,7 +14,7 @@ bool Bitmap24Load(char *filename, PIXEL_32BIT *buffer, uint32_t maxBufferSize, u
     memset(rawFileBuffer, 0, maxBufferSize);
 
     // Get the file via TFTP
-    if (!TFTP_GetFile(IPv4_PackIP(10, 0, 2, 2), filename, rawFileBuffer, MAX_BMP_FILESIZE))
+    if (!TFTP_GetFile(IPv4_PackIP(10, 0, 2, 2), filename, rawFileBuffer, MAX_BMP_FILESIZE, NULL))
     {
         terminal_writestring("Unable to open ");
         terminal_writestring(filename);

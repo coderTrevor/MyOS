@@ -282,6 +282,7 @@
     <ClCompile Include="Drivers\PCI_Bus.c" />
     <ClCompile Include="Drivers\RTL_8139.c" />
     <ClCompile Include="Drivers\Sound_Blaster_16.c" />
+    <ClCompile Include="Executables\Batch_Files.c" />
     <ClCompile Include="Executables\PE32.c" />
     <ClCompile Include="File Formats\VOC.c" />
     <ClCompile Include="GDT.c" />
@@ -323,6 +324,7 @@
     <ClInclude Include="Drivers\PCI_Bus.h" />
     <ClInclude Include="Drivers\RTL_8139.h" />
     <ClInclude Include="Drivers\Sound_Blaster_16.h" />
+    <ClInclude Include="Executables\Batch_Files.h" />
     <ClInclude Include="Executables\PE32.h" />
     <ClInclude Include="File Formats\VOC.h" />
     <ClInclude Include="GDT.h" />

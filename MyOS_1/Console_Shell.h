@@ -2,8 +2,10 @@
 #include <stdbool.h>
 #include "multiboot.h"
 
-extern bool shellEnterPressed;
+#define MAX_COMMAND_LENGTH          160
 
+extern bool shellEnterPressed;
+extern char currentCommand[MAX_COMMAND_LENGTH];
 
 void Shell_Backspace_Pressed();
 

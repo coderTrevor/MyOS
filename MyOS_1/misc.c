@@ -9,13 +9,21 @@ char intToChar(int i)
     return ints[i];
 }
 
-#pragma function(strlen)
-size_t __cdecl strlen(const char* str)
+char * __cdecl strchr(char *str, int character)
 {
-    size_t len = 0;
-    while (str[len])
-        len++;
-    return len;
+    char chr = (char)character;
+    int currentPos = 0;
+    
+    // search each character of str for chr
+    while (str[currentPos] != '\0')
+    {
+        if (str[currentPos] == chr)
+            return &str[currentPos];
+
+        ++currentPos;
+    }
+
+    return NULL;
 }
 
 // TODO: fix this
@@ -36,6 +44,16 @@ int __cdecl strcmp(const char *str1, const char *str2)
     return 0;
 }
 
+#pragma function(strlen)
+size_t __cdecl strlen(const char* str)
+{
+    size_t len = 0;
+    while (str[len])
+        len++;
+    return len;
+}
+
+// TODO: Test strncpy(), I'm not sure it's working right with regards to copying the terminator ('\0') (See RunBatch())
 char * __cdecl strncpy(char *destination, const char *source, size_t num)
 {
     size_t pos = 0;
@@ -47,8 +65,13 @@ char * __cdecl strncpy(char *destination, const char *source, size_t num)
         ++pos;
     }
     
-    if (pos < num)
-        *destination = *source;
+    // If source string is less than num characters long, fill the remainder of destination with 0's
+    while (pos < num)
+    {
+        *destination = '\0';
+        ++destination;
+        ++pos;
+    }
 
     return destination;
 }

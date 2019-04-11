@@ -25,8 +25,12 @@ bool TFTP_TransactionComplete()
 // will block until the file is transacted
 // TODO: Implement timeout, error-checking
 // TODO: Fix hanging if an invalid serverIP is given
-bool TFTP_GetFile(uint32_t serverIP, char *filename, uint8_t *destinationBuffer, uint32_t maxFileSize)
+// actualFileSize can be NULL if the caller doesn't care about the size
+bool TFTP_GetFile(uint32_t serverIP, char *filename, uint8_t *destinationBuffer, uint32_t maxFileSize, uint32_t *actualFileSize)
 {
+    if(actualFileSize)
+        *actualFileSize = 0;
+
     if (!NIC_Present)
         return false;
 
@@ -59,6 +63,16 @@ bool TFTP_GetFile(uint32_t serverIP, char *filename, uint8_t *destinationBuffer,
 
     // copy the data
     memcpy(destinationBuffer, tftpFile, tftpFileSize);
+
+    if (debugLevel)
+    {
+        terminal_writestring("TFTP File Size: ");
+        terminal_print_int(tftpFileSize);
+        terminal_newline();
+    }
+
+    if(actualFileSize)
+        *actualFileSize = tftpFileSize;
 
     return true;
 }
@@ -129,10 +143,8 @@ void TFTP_ProcessDataPacket(TFTP_DataHeader *dataPacket, uint16_t sourcePort, ui
     if(debugLevel)
         terminal_writestring("TFTP Data received\n");
 
-    // copy the data to our file
     // Ensure file isn't too big for the buffer we've set aside
-    tftpFileSize += dataSize;
-    if (tftpFileSize > TFTP_MAX_FILE_SIZE)
+    if (tftpFileSize + dataSize > TFTP_MAX_FILE_SIZE)
     {
         terminal_writestring("Error: requested tftp file exceeds buffer!\n");
         transferInProgress = false;
@@ -142,7 +154,7 @@ void TFTP_ProcessDataPacket(TFTP_DataHeader *dataPacket, uint16_t sourcePort, ui
         TFTP_SendAck(dataPacket->blockNumber, transID, sourcePort, sourceMAC);
         return;
     }
-
+    
     // Ensure block number matches expected number
     uint16_t serverBlockNumber = SwapBytes16(dataPacket->blockNumber);
     if (currentBlockNumber != serverBlockNumber)
@@ -160,6 +172,7 @@ void TFTP_ProcessDataPacket(TFTP_DataHeader *dataPacket, uint16_t sourcePort, ui
     // copy received data to the file buffer
     memcpy(nextFilePointer, dataPacket->data, dataSize);
     nextFilePointer += dataSize;
+    tftpFileSize += dataSize;
     ++currentBlockNumber;
     
     // send acknowledgement to the server

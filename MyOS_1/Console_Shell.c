@@ -19,10 +19,10 @@
 #include "File Formats/VOC.h"
 #include "Drivers/ISA_DMA.h"
 #include "Drivers/AdLib.h"
+#include "Executables/Batch_Files.h"
 
 int inputPosition = 0;
 #define COMMAND_HISTORY_SIZE        10
-#define MAX_COMMAND_LENGTH          160
 
 char commandHistory[COMMAND_HISTORY_SIZE][MAX_COMMAND_LENGTH];
 char currentCommand[MAX_COMMAND_LENGTH];
@@ -370,7 +370,7 @@ void Shell_Process_command(void)
         memset(dirBuffer, 0, MAX_DIR_SIZE + 1);
 
         //TFTP_RequestFile(IPv4_PackIP(10,0,2,2), "dir.txt", TFTP_TYPE_BINARY, NIC_MAC);
-        if (!TFTP_GetFile(IPv4_PackIP(10, 0, 2, 2), "dir.txt", dirBuffer, MAX_DIR_SIZE))
+        if (!TFTP_GetFile(IPv4_PackIP(10, 0, 2, 2), "dir.txt", dirBuffer, MAX_DIR_SIZE, NULL))
         {
             terminal_writestring("Error reading dir.txt from server!\n");
             return;
@@ -440,11 +440,12 @@ void Shell_Process_command(void)
         //uint32_t bufferSize = 0x400000;
 
         uint32_t peBufferSize = 10 * 1024;
+        uint32_t peFileSize;
 
         if(debugLevel)
             terminal_dumpHex(peBuffer, 32);
 
-        if (!TFTP_GetFile(IPv4_PackIP(10, 0, 2, 2), subCommand, peBuffer, peBufferSize) )
+        if (!TFTP_GetFile(IPv4_PackIP(10, 0, 2, 2), subCommand, peBuffer, peBufferSize, &peFileSize) )
         {
             terminal_writestring("Error reading ");
             terminal_writestring(subCommand);
@@ -455,8 +456,16 @@ void Shell_Process_command(void)
         if(debugLevel)
             terminal_dumpHex(peBuffer, 32);
 
-        if (!loadAndRunPE(exeBuffer, (DOS_Header*)peBuffer))
-            terminal_writestring("Error running executable\n");
+        // See if a batch file was requested
+        if (IsBatchFile(subCommand))
+        {
+            RunBatch((char *)peBuffer, peFileSize);
+        }
+        else
+        {
+            if (!loadAndRunPE(exeBuffer, (DOS_Header*)peBuffer))
+                terminal_writestring("Error running executable\n");
+        }
 
         terminal_resume();
         terminal_writestring("done!\n");

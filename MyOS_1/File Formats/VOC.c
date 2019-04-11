@@ -148,7 +148,7 @@ bool ReadVOC(VOC_Header *vocData, int index)
 bool OpenVOC(char *fileName, uint8_t *destinationBuffer, uint32_t maxBufferSize)
 {
     // TEMPTEMP: Use tftp to open voc files and use preallocated buffers instead of dynamic memory allocation
-    return TFTP_GetFile(IPv4_PackIP(10, 0, 2, 2), fileName, destinationBuffer, maxBufferSize);
+    return TFTP_GetFile(IPv4_PackIP(10, 0, 2, 2), fileName, destinationBuffer, maxBufferSize, NULL);
 }
 
 bool OpenAndReadVOCs(void)
