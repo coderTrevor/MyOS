@@ -17,7 +17,13 @@ typedef /*__declspec(align(4096))*/ uint32_t PAGE_TABLE_ENTRY;
 #define DIRECTORY_ENTRY_WRITABLE         4
 #define DIRECTORY_ENTRY_4MB              0x80
 
+#define FOUR_MEGABYTES              0x400000
+
 extern uint32_t paging_space[0x3FFF];
+extern uint32_t *pageDir;
+
+extern uint32_t pagingNextAvailableMemory;
+extern uint32_t paging4MPagesAvailable;
 
 typedef uint32_t ULONG_PTR;
 
@@ -92,4 +98,11 @@ inline void Paging_Enable(multiboot_info *multibootInfo)
 
     // enable paging!
     __writecr0(__readcr0() | 0x80000000);
+
+    // save a pointer to pageDirectory
+    pageDir = pageDirectory;
+
+    // determine available pages
+    pagingNextAvailableMemory = FOUR_MEGABYTES * 3; // Next available page will (likely) start at 12 Megs
+    paging4MPagesAvailable = 32; // TODO: Calculate based on the memory map Grub gave us
 }
