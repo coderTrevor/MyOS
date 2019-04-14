@@ -80,6 +80,10 @@ typedef struct TFTP_RequestHeader
 
 #pragma pack(pop, 1)
 
+
+extern bool tftpHideErrors;
+
+
 bool TFTP_GetFile(uint32_t serverIP, char *filename, uint8_t *destinationBuffer, uint32_t maxFileSize, uint32_t *actualFileSize);
 
 uint16_t TFTP_RequestFile(uint32_t serverIP, char *filename, char *transferMode, uint8_t *sourceMAC);

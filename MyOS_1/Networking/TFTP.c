@@ -16,6 +16,8 @@ uint32_t tftpFileSize;
 
 uint32_t tftpServerIP; // TODO, maybe, support more than one server
 
+bool tftpHideErrors = false;
+
 bool TFTP_TransactionComplete()
 {
     return !transferInProgress;
@@ -51,7 +53,8 @@ bool TFTP_GetFile(uint32_t serverIP, char *filename, uint8_t *destinationBuffer,
 
     if (transferError)
     {
-        terminal_writestring("An error occurred with the TFTP transfer\n");
+        if(!tftpHideErrors)
+            terminal_writestring("An error occurred with the TFTP transfer\n");
         return false;
     }
 
@@ -201,9 +204,12 @@ void TFTP_ProcessPacket(TFTP_Header *packet, uint16_t sourcePort, uint16_t desti
     {
         TFTP_ErrorHeader *errorPacket = (TFTP_ErrorHeader *)packet;
 
-        terminal_writestring("TFTP Error packet received: ");
-        terminal_writestring(errorPacket->errorMessage);
-        terminal_newline();
+        if (!tftpHideErrors)
+        {
+            terminal_writestring("TFTP Error packet received: ");
+            terminal_writestring(errorPacket->errorMessage);
+            terminal_newline();
+        }
 
         transferError = true;
         transferInProgress = false;
