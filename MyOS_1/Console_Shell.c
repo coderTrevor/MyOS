@@ -438,9 +438,17 @@ void Shell_Process_command(void)
             terminal_newline();
         }
 
+        // See if a batch file was requested
+        if (IsBatchFile(subCommand))
+        {
+            OpenAndRunBatch(subCommand);
+            if (debugLevel)
+                terminal_writestring("done!\n");
+            return;
+        }
+
         // TEMPTEMP we've hardcoded some memory starting at 0x800000. This was identity mapped when paging was enabled.
         uint8_t *exeBuffer = (uint8_t*)0x800000;
-        //uint32_t bufferSize = 0x400000;
 
         uint32_t peBufferSize = 10 * 1024;
         uint32_t peFileSize;
@@ -448,6 +456,7 @@ void Shell_Process_command(void)
         if(debugLevel)
             terminal_dumpHex(peBuffer, 32);
 
+        // Download the executable
         if (!TFTP_GetFile(IPv4_PackIP(10, 0, 2, 2), subCommand, peBuffer, peBufferSize, &peFileSize) )
         {
             terminal_writestring("Error reading ");
@@ -459,16 +468,9 @@ void Shell_Process_command(void)
         if(debugLevel)
             terminal_dumpHex(peBuffer, 32);
 
-        // See if a batch file was requested
-        if (IsBatchFile(subCommand))
-        {
-            RunBatch((char *)peBuffer, peFileSize);
-        }
-        else
-        {
-            if (!loadAndRunPE(exeBuffer, (DOS_Header*)peBuffer))
-                terminal_writestring("Error running executable\n");
-        }
+        // Run the executable
+        if (!loadAndRunPE(exeBuffer, (DOS_Header*)peBuffer))
+            terminal_writestring("Error running executable\n");
 
         terminal_resume();
 

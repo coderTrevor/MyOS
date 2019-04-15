@@ -4,4 +4,6 @@
 
 bool IsBatchFile(char *filename);
 
+void OpenAndRunBatch(char *batchFileName);
+
 void RunBatch(char *batchFile, size_t fileSize);

@@ -157,35 +157,11 @@ void KeStartupPhase2(multiboot_info *multibootInfo)
 // run autoexec.bat file, if it exists. Don't display error messages if it doesn't
 void Autoexec(void)
 {
-    // TEMPTEMP we've hardcoded some memory starting at 0x800000 for executables. This was identity mapped when paging was enabled.
-    // We start our batch buffer at the 9 meg point, allowing smallish programs to run
-    uint8_t *batchBuffer = (uint8_t*)0x900000;
-    //uint32_t bufferSize = 0x400000;
-
-    uint32_t bufferSize = 10 * 1024;    // 10k should be plenty big enough for a batch file
-    uint32_t batchFileSize;
-
-    if (debugLevel)
-        terminal_dumpHex(batchBuffer, 32);
-
     tftpHideErrors = true;
 
-    if (!TFTP_GetFile(IPv4_PackIP(10, 0, 2, 2), "autoexec.bat", batchBuffer, bufferSize, &batchFileSize))
-    {
-        if(debugLevel)
-            terminal_writestring("autoexec.bat doesn't exist\n");
-
-        tftpHideErrors = false;
-        return;
-    }
+    OpenAndRunBatch("autoexec.bat");
 
     tftpHideErrors = false;
-
-    if (debugLevel)
-        terminal_dumpHex(batchBuffer, 32);
-
-    // See if a batch file was requested
-    RunBatch((char *)batchBuffer, batchFileSize);    
 }
 
 

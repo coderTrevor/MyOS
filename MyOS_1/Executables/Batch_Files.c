@@ -2,6 +2,7 @@
 #include "../Console_Shell.h"
 #include "../misc.h"
 #include "../Terminal.h"
+#include "../Networking/TFTP.h"
 
 // Batch files are just a collection of commands the shell understands.
 // They are similar to shell scripts but they are identified by their .bat extension.
@@ -19,6 +20,37 @@ bool IsBatchFile(char *filename)
         return true;
 
     return false;
+}
+
+// TODO: Add support for running a batch file from a batch file
+void OpenAndRunBatch(char *batchFileName)
+{
+    // TEMPTEMP we've hardcoded some memory starting at 0x800000 for executables. This was identity mapped when paging was enabled.
+    // We start our batch buffer at the 11.5 meg point, allowing smallish programs to run
+    uint8_t *batchBuffer = (uint8_t*)0xB80000;
+
+    uint32_t bufferSize = 10 * 1024;    // 10k should be plenty big enough for a batch file
+    uint32_t batchFileSize;
+
+    if (debugLevel)
+        terminal_dumpHex(batchBuffer, 32);
+
+    if (!TFTP_GetFile(IPv4_PackIP(10, 0, 2, 2), batchFileName, batchBuffer, bufferSize, &batchFileSize))
+    {
+        if (tftpHideErrors && debugLevel)
+        {
+            terminal_writestring(batchFileName);
+            terminal_writestring(" doesn't exist\n");
+        }
+
+        return;
+    }
+
+    if (debugLevel)
+        terminal_dumpHex(batchBuffer, 32);
+
+    // Run the batch file
+    RunBatch((char *)batchBuffer, batchFileSize);
 }
 
 // TODO: Copy batch file to a new string so we can run other executables and batch files from the current batch file
