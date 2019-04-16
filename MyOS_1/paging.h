@@ -27,6 +27,8 @@ extern uint32_t paging4MPagesAvailable;
 
 typedef uint32_t ULONG_PTR;
 
+void *PageAllocator(unsigned int pages, unsigned int *pPagesAllocated);
+
 // setup the page directory and page tables and enable paging
 inline void Paging_Enable(multiboot_info *multibootInfo)
 {

@@ -166,6 +166,7 @@
   <ItemGroup>
     <ClCompile Include="..\MyOS_1\Interrupts\System_Calls.c" />
     <ClCompile Include="..\MyOS_1\misc.c" />
+    <ClCompile Include="..\MyOS_1\paging.c" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="TestApp1.c" />
   </ItemGroup>

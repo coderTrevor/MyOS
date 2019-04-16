@@ -1,5 +1,9 @@
 #include <stdint.h>
 #include "misc.h"
+#include "paging.h"
+
+uint32_t pagedMemoryAvailable = 0;
+uint32_t memoryNextAvailableAddress = 0;
 
 char intToChar(int i)
 {
@@ -74,6 +78,50 @@ char * __cdecl strncpy(char *destination, const char *source, size_t num)
     }
 
     return destination;
+}
+
+void* malloc(size_t size)
+{
+    uint32_t availableAddress = memoryNextAvailableAddress;
+
+    // see if we need to allocate a page
+    if (size > pagedMemoryAvailable)
+    {
+        // TODO: Support dynamic page granularity, not just large pages
+        unsigned int pagesToAllocate = size / FOUR_MEGABYTES;
+
+        // check for remainder from division
+        if (pagesToAllocate * FOUR_MEGABYTES < size)
+            ++pagesToAllocate;
+
+        // Allocate the pages
+        // This will be virtual memory (sort of, we use identity-mapping for now but that's temporary)
+        // So we can guarantee the pages will be allocated in order. (TODO: Now that I think of it, this logic should maybe be in PageAllocator?)
+        /*while (pagesToAllocate)
+        {
+            unsigned int pagesAllocated;
+            PageAllocator(pagesToAllocate, &pagesAllocated);
+            pagesToAllocate -= pagesAllocated;
+        }*/
+
+        unsigned int pagesAllocated;
+        availableAddress = (uint32_t)(PageAllocator(pagesToAllocate, &pagesAllocated));
+        if (!availableAddress)
+            return NULL;
+
+        // TODO: see if the page we allocated follows the previous page
+        // for now, we'll just ignore the old allocated memory
+        pagedMemoryAvailable = pagesAllocated * FOUR_MEGABYTES;
+        pagedMemoryAvailable -= size;
+
+        memoryNextAvailableAddress = availableAddress;
+    }
+
+    pagedMemoryAvailable -= size;
+    availableAddress = memoryNextAvailableAddress;
+    memoryNextAvailableAddress += size;
+
+    return (void *)availableAddress;
 }
 
 #pragma function(memcmp)
