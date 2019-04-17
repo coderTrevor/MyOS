@@ -85,6 +85,10 @@ void* malloc(size_t size)
 {
     uint32_t availableAddress = memoryNextAvailableAddress;
 
+    /*terminal_writestring("Paged memory available: ");
+    terminal_print_int(pagedMemoryAvailable);
+    terminal_newline();*/
+
     // see if we need to allocate a page
     if (size > pagedMemoryAvailable)
     {
@@ -119,10 +123,13 @@ void* malloc(size_t size)
         if (!availableAddress)
             return NULL;
 
+        /*terminal_writestring("Just allocated ");
+        terminal_print_int(pagesAllocated);
+        terminal_writestring(" pages\n");*/
+
         // TODO: see if the page we allocated follows the previous page
         // for now, we'll just ignore the old allocated memory
         pagedMemoryAvailable = pagesAllocated * FOUR_MEGABYTES;
-        pagedMemoryAvailable -= size;
 
         memoryNextAvailableAddress = availableAddress;
     }

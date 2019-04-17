@@ -24,12 +24,11 @@ uint32_t paging4MPagesAvailable;    // number of 4M physical memory pages availa
 // TODO: Make multi-threading safe
 void *PageAllocator(unsigned int pages, unsigned int *pPagesAllocated)
 {
-    // make sure there's some pages available
-    if (paging4MPagesAvailable == 0)
-    {
-        *pPagesAllocated = 0;
+    *pPagesAllocated = 0;
+
+    // make sure there's enough pages available
+    if (paging4MPagesAvailable < pages)
         return NULL;
-    }
 
     void *retVal = (void *)pagingNextAvailableMemory;
 
@@ -54,7 +53,7 @@ void *PageAllocator(unsigned int pages, unsigned int *pPagesAllocated)
         ++nextPage;
         --paging4MPagesAvailable;
         pagingNextAvailableMemory += FOUR_MEGABYTES;
+        ++(*pPagesAllocated);
     }
-
     return retVal;
 }

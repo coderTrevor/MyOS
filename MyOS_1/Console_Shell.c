@@ -150,6 +150,8 @@ void PrintMemMap()
     }
 }
 
+void *malloc(size_t);
+
 #pragma warning(push)                 // disable warning message about divide-by-zero, because we do that intentionally with the crash command
 #pragma warning(disable : 4723)       // (This is to test fault handling)
 void Shell_Process_command(void)
@@ -167,11 +169,16 @@ void Shell_Process_command(void)
     if (strcmp(currentCommand, "mem") == 0)
     {
         // print out some info about free memory
-        uint32_t memFree = paging4MPagesAvailable;
+        uint32_t memFree = paging4MPagesAvailable * 4;
         terminal_print_int(memFree);
         terminal_writestring(" Megabytes available in unallocated pages\n");
 
         uint8_t *block = (uint8_t *)malloc(256);
+        if (!block)
+        {
+            terminal_writestring("Out of available memory.\n");
+            return;
+        }
         for (unsigned int i = 0; i < 256; ++i)
         {
             block[i] = (uint8_t)i;
@@ -191,6 +198,11 @@ void Shell_Process_command(void)
             terminal_writestring("failed\n");
 
         uint16_t *block16 = (uint16_t *)malloc(65536);
+        if (!block16)
+        {
+            terminal_writestring("Out of available memory.\n");
+            return;
+        }
         for (unsigned int i = 0; i < 65536 / sizeof(uint16_t); ++i)
         {
             block16[i] = (uint16_t)i;
@@ -211,6 +223,11 @@ void Shell_Process_command(void)
 
         // now try to allocate an entire page (4 megs)
         uint32_t *block32 = (uint32_t *)malloc(FOUR_MEGABYTES);
+        if (!block32)
+        {
+            terminal_writestring("Out of available memory.\n");
+            return;
+        }
 
         for (unsigned int i = 0; i < FOUR_MEGABYTES / sizeof(uint32_t); ++i)
         {
@@ -231,8 +248,63 @@ void Shell_Process_command(void)
         else
             terminal_writestring("failed\n");
 
+        // Try to allocate 2 pages
+        block32 = (uint32_t *)malloc(FOUR_MEGABYTES * 2);
+        if (!block32)
+        {
+            terminal_writestring("Out of available memory.\n");
+            return;
+        }
+
+        for (unsigned int i = 0; i < FOUR_MEGABYTES * 2 / sizeof(uint32_t); ++i)
+        {
+            block32[i] = i;
+        }
+
+        passed = true;
+
+        for (unsigned int i = 0; i < FOUR_MEGABYTES * 2 / sizeof(uint32_t); ++i)
+        {
+            if (block32[i] != i)
+                passed = false;
+        }
+
+        terminal_writestring("Malloc(8M) test ");
+        if (passed)
+            terminal_writestring("passed\n");
+        else
+            terminal_writestring("failed\n");
+
+        // try to allocate a series of 64k blocks
+        passed = true;
+        for (unsigned int j = 0; j < 64; ++j)
+        {
+            block16 = (uint16_t *)malloc(65536);
+            if (!block16)
+            {
+                terminal_writestring("Out of available memory.\n");
+                return;
+            }
+            for (unsigned int i = 0; i < 65536 / sizeof(uint16_t); ++i)
+            {
+                block16[i] = (uint16_t)i;
+            }
+
+            for (unsigned int i = 0; i < 65536 / sizeof(uint16_t); ++i)
+            {
+                if (block16[i] != (uint16_t)i)
+                    passed = false;
+            }
+        }
+
+        terminal_writestring("Malloc(64K) * 64 test ");
+        if (passed)
+            terminal_writestring("passed\n");
+        else
+            terminal_writestring("failed\n");
+
         // print out some info about free memory
-        memFree = paging4MPagesAvailable;
+        memFree = paging4MPagesAvailable * 4;
         terminal_print_int(memFree);
         terminal_writestring(" Megabytes available in unallocated pages\n");
 
