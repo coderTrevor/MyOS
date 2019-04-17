@@ -34,8 +34,12 @@ void *PageAllocator(unsigned int pages, unsigned int *pPagesAllocated)
     void *retVal = (void *)pagingNextAvailableMemory;
 
     // limit the number of pages to allocate to the number available.
-    if (pages < paging4MPagesAvailable)
+    if (pages > paging4MPagesAvailable)
         pages = paging4MPagesAvailable;
+
+    /*terminal_writestring("Need to allocate ");
+    terminal_print_int(pages);
+    terminal_writestring(" pages.\n");*/
 
     uint32_t nextPage = pagingNextAvailableMemory / FOUR_MEGABYTES;
 

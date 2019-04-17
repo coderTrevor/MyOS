@@ -13,6 +13,9 @@ size_t __cdecl strlen(const char* str);
 int __cdecl strcmp(const char *str1, const char *str2);
 #pragma intrinsic(strcmp)
 
+// TODO: Fix MSVC crying about redefinition
+//void* malloc(size_t size);
+
 int __cdecl memcmp(const void *ptr1, const void *ptr2, size_t num);
 #pragma intrinsic(memcmp)
 

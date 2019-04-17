@@ -20,6 +20,7 @@
 #include "Drivers/ISA_DMA.h"
 #include "Drivers/AdLib.h"
 #include "Executables/Batch_Files.h"
+#include "paging.h"
 
 int inputPosition = 0;
 #define COMMAND_HISTORY_SIZE        10
@@ -150,7 +151,7 @@ void PrintMemMap()
 }
 
 #pragma warning(push)                 // disable warning message about divide-by-zero, because we do that intentionally with the crash command
-#pragma warning(disable : 4723)       // (This is to test fault handling, which isn't actually implemented yet)
+#pragma warning(disable : 4723)       // (This is to test fault handling)
 void Shell_Process_command(void)
 {
     if (debugLevel)
@@ -162,6 +163,81 @@ void Shell_Process_command(void)
 
     char subCommand[MAX_COMMAND_LENGTH];
 
+    // Test memory allocation
+    if (strcmp(currentCommand, "mem") == 0)
+    {
+        // print out some info about free memory
+        uint32_t memFree = paging4MPagesAvailable;
+        terminal_print_int(memFree);
+        terminal_writestring(" Megabytes available in unallocated pages\n");
+
+        uint8_t *block = (uint8_t *)malloc(256);
+        for (unsigned int i = 0; i < 256; ++i)
+        {
+            block[i] = (uint8_t)i;
+        }
+        bool passed = true;
+
+        for (unsigned int i = 0; i < 256; ++i)
+        {
+            if (block[i] != (uint8_t)i)
+                passed = false;
+        }
+
+        terminal_writestring("Malloc(256) test ");
+        if (passed)
+            terminal_writestring("passed\n");
+        else
+            terminal_writestring("failed\n");
+
+        uint16_t *block16 = (uint16_t *)malloc(65536);
+        for (unsigned int i = 0; i < 65536 / sizeof(uint16_t); ++i)
+        {
+            block16[i] = (uint16_t)i;
+        }
+        passed = true;
+
+        for (unsigned int i = 0; i < 65536 / sizeof(uint16_t); ++i)
+        {
+            if (block16[i] != (uint16_t)i)
+                passed = false;
+        }
+
+        terminal_writestring("Malloc(64K) test ");
+        if (passed)
+            terminal_writestring("passed\n");
+        else
+            terminal_writestring("failed\n");
+
+        // now try to allocate an entire page (4 megs)
+        uint32_t *block32 = (uint32_t *)malloc(FOUR_MEGABYTES);
+
+        for (unsigned int i = 0; i < FOUR_MEGABYTES / sizeof(uint32_t); ++i)
+        {
+            block32[i] = i;
+        }
+
+        passed = true;
+
+        for (unsigned int i = 0; i < FOUR_MEGABYTES / sizeof(uint32_t); ++i)
+        {
+            if (block32[i] != i)
+                passed = false;
+        }
+
+        terminal_writestring("Malloc(4M) test ");
+        if (passed)
+            terminal_writestring("passed\n");
+        else
+            terminal_writestring("failed\n");
+
+        // print out some info about free memory
+        memFree = paging4MPagesAvailable;
+        terminal_print_int(memFree);
+        terminal_writestring(" Megabytes available in unallocated pages\n");
+
+        return;
+    }
 
     // Test Adlib stuff
     if (strcmp(currentCommand, "adlib") == 0)

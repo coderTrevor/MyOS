@@ -3,6 +3,7 @@
 #include "../misc.h"
 #include "../Terminal.h"
 #include "../Networking/TFTP.h"
+#include "../Networking/IPv4.h"
 
 // Batch files are just a collection of commands the shell understands.
 // They are similar to shell scripts but they are identified by their .bat extension.

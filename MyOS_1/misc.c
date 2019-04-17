@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "misc.h"
 #include "paging.h"
+#include "Terminal.h"
 
 uint32_t pagedMemoryAvailable = 0;
 uint32_t memoryNextAvailableAddress = 0;
@@ -90,9 +91,18 @@ void* malloc(size_t size)
         // TODO: Support dynamic page granularity, not just large pages
         unsigned int pagesToAllocate = size / FOUR_MEGABYTES;
 
+        /*terminal_writestring("Need to allocate ");
+        terminal_print_int(pagesToAllocate);
+        terminal_writestring(" pages.\n");*/
+
         // check for remainder from division
         if (pagesToAllocate * FOUR_MEGABYTES < size)
+        {
             ++pagesToAllocate;
+            /*terminal_writestring("...I mean ");
+            terminal_print_int(pagesToAllocate);
+            terminal_writestring(" pages.\n");*/
+        }
 
         // Allocate the pages
         // This will be virtual memory (sort of, we use identity-mapping for now but that's temporary)

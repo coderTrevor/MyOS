@@ -68,7 +68,7 @@ void Adlib_Reset(void)
     terminal_writestring("Resetting Adlib...\n");
 
     // Quick-and-dirty reset: write 0's to all 245 registers
-    for (int reg = 1; reg < 0xF5; ++reg)
+    for (uint8_t reg = 1; reg < 0xF5; ++reg)
     {
         Adlib_Write(reg, 0);
     }
