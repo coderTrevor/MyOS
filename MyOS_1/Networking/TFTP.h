@@ -16,8 +16,6 @@
 
 #define TFTP_PORT                   69
 
-#define TFTP_MAX_FILE_SIZE          (256*1024)
-
 #define TFTP_MAX_BLOCK_SIZE         512
 
 /* Reference taken from RFC 3151(I think?):
@@ -83,8 +81,9 @@ typedef struct TFTP_RequestHeader
 
 extern bool tftpHideErrors;
 
-
 bool TFTP_GetFile(uint32_t serverIP, char *filename, uint8_t *destinationBuffer, uint32_t maxFileSize, uint32_t *actualFileSize);
+
+bool TFTP_GetFileSize(uint32_t serverIP, char *filename, uint32_t *pActualFileSize);
 
 uint16_t TFTP_RequestFile(uint32_t serverIP, char *filename, char *transferMode, uint8_t *sourceMAC);
 

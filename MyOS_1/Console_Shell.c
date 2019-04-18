@@ -34,10 +34,6 @@ char screenContents[MAX_SCREEN_CONTENTS];
 // TODO: Improve the way history is indexed; don't overwrite old histories with new ones(?)
 int historyIndex = -1;
 
-// pixel buffer for the show command
-#define MAX_IMAGE_SIZE (256 * 1024)
-PIXEL_32BIT imageBuffer[MAX_IMAGE_SIZE / sizeof(PIXEL_32BIT)];
-
 bool shellEnterPressed = false;
 
 multiboot_info *multibootInfo = NULL;
@@ -517,7 +513,6 @@ void Shell_Process_command(void)
         uint8_t dirBuffer[MAX_DIR_SIZE + 1];
         memset(dirBuffer, 0, MAX_DIR_SIZE + 1);
 
-        //TFTP_RequestFile(IPv4_PackIP(10,0,2,2), "dir.txt", TFTP_TYPE_BINARY, NIC_MAC);
         if (!TFTP_GetFile(IPv4_PackIP(10, 0, 2, 2), "dir.txt", dirBuffer, MAX_DIR_SIZE, NULL))
         {
             terminal_writestring("Error reading dir.txt from server!\n");
@@ -651,12 +646,16 @@ void Shell_Process_command(void)
             return;
         }
 
+        PIXEL_32BIT *imageBuffer;
         uint32_t width, height;
-        if (!Bitmap24Load(subCommand, imageBuffer, MAX_IMAGE_SIZE, &width, &height))
+
+        if (!Bitmap24Load(subCommand, &imageBuffer, &width, &height))
             return;
 
-        if(!textMode)
-            GraphicsBlit(graphicsWidth - width, graphicsHeight - height, imageBuffer, width, height);
+        // Display bitmap at bottom-right corner of the screen
+        GraphicsBlit(graphicsWidth - width, graphicsHeight - height, imageBuffer, width, height);
+
+        // TODO: Free imageBuffer
 
         return;
     }
@@ -698,6 +697,32 @@ void Shell_Process_command(void)
             return;
         }
         terminal_writestring("Sorry but I don't understand that parameter. Usage:\noverlay [clock|ints|off]\n");
+        return;
+    }
+
+    // file size command
+    memset(subCommand, 0, MAX_COMMAND_LENGTH);
+    strncpy(subCommand, currentCommand, strlen("size"));
+    if (strcmp(subCommand, "size") == 0)
+    {
+        memset(subCommand, 0, MAX_COMMAND_LENGTH);
+        strncpy(subCommand, currentCommand + strlen("size "), MAX_COMMAND_LENGTH - strlen("size "));
+
+        uint32_t fileSize = 0;
+
+        if (!TFTP_GetFileSize(IPv4_PackIP(10, 0, 2, 2), subCommand, &fileSize))
+        {
+            terminal_writestring("Couldn't get size of ");
+            terminal_writestring(subCommand);
+            terminal_newline();
+            return;
+        }
+
+        terminal_writestring(subCommand);
+        terminal_writestring(" is ");
+        terminal_print_int(fileSize);
+        terminal_writestring(" bytes\n");
+        
         return;
     }
 

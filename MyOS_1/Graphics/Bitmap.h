@@ -28,4 +28,4 @@ typedef struct BMP_Header
 } BMP_Header;
 #pragma pack(pop)
 
-bool Bitmap24Load(char *filename, PIXEL_32BIT *buffer, uint32_t maxBufferSize, uint32_t *width, uint32_t *height);
+bool Bitmap24Load(char *filename, PIXEL_32BIT **ppBuffer, uint32_t *width, uint32_t *height);

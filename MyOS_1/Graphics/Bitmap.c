@@ -5,16 +5,38 @@
 #include "../misc.h"
 #include "../Networking/IPv4.h"
 
-#define MAX_BMP_FILESIZE (256 * 1024)
-uint8_t rawFileBuffer[MAX_BMP_FILESIZE];
+//#define MAX_BMP_FILESIZE (256 * 1024)
+//uint8_t rawFileBuffer[MAX_BMP_FILESIZE];
+
+void *malloc(size_t);
 
 // returns true on success
-bool Bitmap24Load(char *filename, PIXEL_32BIT *buffer, uint32_t maxBufferSize, uint32_t *width, uint32_t *height)
+// *ppBuffer will have the address of an allocated buffer containing the image on success, NULL otherwise.
+// Caller must free *ppBuffer.
+bool Bitmap24Load(char *filename, PIXEL_32BIT **ppBuffer, uint32_t *width, uint32_t *height)
 {
-    memset(rawFileBuffer, 0, maxBufferSize);
+    *ppBuffer = NULL;
+
+    // Get the size of the image file
+    uint32_t fileSize;
+    if (!TFTP_GetFileSize(IPv4_PackIP(10, 0, 2, 2), filename, &fileSize))
+    {
+        terminal_writestring("Failed to determine size of ");
+        terminal_writestring(filename);
+        terminal_newline();
+        return false;
+    }
+
+    // Allocate a buffer for the bitmap file
+    uint8_t *rawFileBuffer = malloc(fileSize);
+    if (!rawFileBuffer)
+    {
+        terminal_writestring("Not enough memory to open bitmap file\n");
+        return false;
+    }
 
     // Get the file via TFTP
-    if (!TFTP_GetFile(IPv4_PackIP(10, 0, 2, 2), filename, rawFileBuffer, MAX_BMP_FILESIZE, NULL))
+    if (!TFTP_GetFile(IPv4_PackIP(10, 0, 2, 2), filename, rawFileBuffer, fileSize, NULL))
     {
         terminal_writestring("Unable to open ");
         terminal_writestring(filename);
@@ -52,6 +74,8 @@ bool Bitmap24Load(char *filename, PIXEL_32BIT *buffer, uint32_t maxBufferSize, u
         terminal_writestring("Image appears to be ");
         terminal_print_int(bmpHeader->dibHeader.bpp);
         terminal_writestring("-bit.\n");
+
+        // TODO: Free rawFileBuffer
         return false;
     }
 
@@ -59,6 +83,7 @@ bool Bitmap24Load(char *filename, PIXEL_32BIT *buffer, uint32_t maxBufferSize, u
     if (bmpHeader->dibHeader.compressionType != BITMAP_COMPRESSION_BI_RGB)
     {
         terminal_writestring("I'm sorry but this image is compressed; I don't know how to display it.\n");
+        // TODO: Free rawFileBuffer
         return false;
     }
 
@@ -74,6 +99,16 @@ bool Bitmap24Load(char *filename, PIXEL_32BIT *buffer, uint32_t maxBufferSize, u
         terminal_print_int(*height);
         terminal_writestring(" x 24\n");
     }
+
+    // Allocate image buffer
+    PIXEL_32BIT *buffer = malloc((*width) * (*height) * sizeof(PIXEL_32BIT));
+    if (!buffer)
+    {
+        terminal_writestring("Not enough memory to store bitmap image\n");
+        // TODO: Free rawFileBuffer
+        return false;
+    }
+    *ppBuffer = buffer;
 
     uint8_t *pixelData = (uint8_t*)((uint32_t)bmpHeader + pixelDataOffset);
     PIXEL_32BIT *currentPixel = buffer;
@@ -100,5 +135,6 @@ bool Bitmap24Load(char *filename, PIXEL_32BIT *buffer, uint32_t maxBufferSize, u
         pixelData -= (*width * BITMAP_BYTES_PER_24BPP * 2);
     }
 
+    // TODO: Free rawFileBuffer
     return true;
 }
