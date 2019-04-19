@@ -124,4 +124,7 @@ void RunBatch(char *batchFile, size_t fileSize)
         if (batchFile[currentPosition] == '\r')
             currentPosition++;
     }
+
+    // clear current command
+    memset(currentCommand, 0, MAX_COMMAND_LENGTH);
 }
