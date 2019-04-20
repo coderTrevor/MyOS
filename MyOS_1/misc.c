@@ -6,6 +6,39 @@
 uint32_t pagedMemoryAvailable = 0;
 uint32_t memoryNextAvailableAddress = 0;
 
+ALLOCATION_ARRAY allocationArray = { 0 };
+unsigned int nextAllocationSlot = 0;
+
+void free(void *ptr)
+{
+    // TODO: Implement free() properly
+    bool found = false;
+    for (size_t i = 0; i < nextAllocationSlot; ++i)
+    {
+        if (allocationArray.address[i] == (uint32_t)ptr)
+        {
+            if (allocationArray.inUse[i])
+            {
+                allocationArray.inUse[i] = false;
+                found = true;
+            }
+            else
+            {
+                terminal_writestring("free() called to free already-freed pointer, ");
+                terminal_print_ulong_hex((uint32_t)ptr);
+                terminal_newline();
+            }
+        }
+    }
+
+    if (!found)
+    {
+        terminal_writestring("free() called with invalid pointer: ");
+        terminal_print_ulong_hex((uint32_t)ptr);
+        terminal_newline();
+    }
+}
+
 char intToChar(int i)
 {
     char *ints = "0123456789";
@@ -83,6 +116,12 @@ char * __cdecl strncpy(char *destination, const char *source, size_t num)
 
 void* malloc(size_t size)
 {
+    if (nextAllocationSlot >= MAX_ALLOCATIONS)
+    {
+        terminal_writestring("Maximum memory allocations exceeded!\n");
+        return NULL;
+    }
+
     uint32_t availableAddress = memoryNextAvailableAddress;
 
     /*terminal_writestring("Paged memory available: ");
@@ -137,6 +176,11 @@ void* malloc(size_t size)
     pagedMemoryAvailable -= size;
     availableAddress = memoryNextAvailableAddress;
     memoryNextAvailableAddress += size;
+
+    // Keep track of the memory in our allocations array
+    allocationArray.address[nextAllocationSlot] = availableAddress;
+    allocationArray.size[nextAllocationSlot] = size;
+    allocationArray.inUse[nextAllocationSlot++] = true;
 
     return (void *)availableAddress;
 }

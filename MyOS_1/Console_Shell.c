@@ -161,6 +161,29 @@ void Shell_Process_command(void)
 
     char subCommand[MAX_COMMAND_LENGTH];
 
+    // Print info about memory allocations
+    if (strcmp(currentCommand, "allocations") == 0)
+    {
+        terminal_writestring("Memory allocations:\n");
+        bool some = false;
+
+        for (size_t i = 0; i < nextAllocationSlot; ++i)
+        {
+            if (allocationArray.inUse[i])
+            {
+                terminal_print_ulong_hex(allocationArray.address[i]);
+                terminal_writestring(": ");
+                terminal_print_int(allocationArray.size[i]);
+                terminal_writestring(" bytes\n");
+                some = true;
+            }
+        }
+
+        if (!some)
+            terminal_writestring("none\n");
+        return;
+    }
+
     // Test memory allocation
     if (strcmp(currentCommand, "mem") == 0)
     {
@@ -303,6 +326,8 @@ void Shell_Process_command(void)
         memFree = paging4MPagesAvailable * 4;
         terminal_print_int(memFree);
         terminal_writestring(" Megabytes available in unallocated pages\n");
+
+        // TODO: free() all allocated memory
 
         return;
     }
@@ -655,7 +680,7 @@ void Shell_Process_command(void)
         // Display bitmap at bottom-right corner of the screen
         GraphicsBlit(graphicsWidth - width, graphicsHeight - height, imageBuffer, width, height);
 
-        // TODO: Free imageBuffer
+        free(imageBuffer);
 
         return;
     }

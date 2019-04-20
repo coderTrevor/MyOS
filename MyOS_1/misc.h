@@ -2,8 +2,26 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define MAX_ALLOCATIONS   2048
+// Struct-of-arrays for memory allocation
+// TODO: Make more dynamic
+// TEMPTEMP: This is super-inefficient and mostly just a placeholder until something better is required
+// NOTE: At this point, freed memory is never reclaimed
+typedef struct ALLOCATION_ARRAY
+{
+    uint32_t    address[MAX_ALLOCATIONS];
+    uint32_t    size[MAX_ALLOCATIONS];
+    bool        inUse[MAX_ALLOCATIONS];
+} ALLOCATION_ARRAY;
+
+extern ALLOCATION_ARRAY allocationArray;
+extern unsigned int nextAllocationSlot;
+
 extern int debugLevel;
 extern bool showOverlay;
+
+// TODO: Fix MSVC crying about redefinition
+//void free(void *ptr);
 
 char intToChar(int i);
 

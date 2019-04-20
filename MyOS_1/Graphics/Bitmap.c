@@ -41,6 +41,9 @@ bool Bitmap24Load(char *filename, PIXEL_32BIT **ppBuffer, uint32_t *width, uint3
         terminal_writestring("Unable to open ");
         terminal_writestring(filename);
         terminal_newline();
+
+        free(rawFileBuffer);
+
         return false;
     }
 
@@ -58,6 +61,9 @@ bool Bitmap24Load(char *filename, PIXEL_32BIT **ppBuffer, uint32_t *width, uint3
             terminal_newline();
             terminal_dumpHex((uint8_t *)bmpHeader, 64);
         }
+
+        free(rawFileBuffer);
+
         return false;
     }
     
@@ -75,7 +81,8 @@ bool Bitmap24Load(char *filename, PIXEL_32BIT **ppBuffer, uint32_t *width, uint3
         terminal_print_int(bmpHeader->dibHeader.bpp);
         terminal_writestring("-bit.\n");
 
-        // TODO: Free rawFileBuffer
+        free(rawFileBuffer);
+
         return false;
     }
 
@@ -83,7 +90,9 @@ bool Bitmap24Load(char *filename, PIXEL_32BIT **ppBuffer, uint32_t *width, uint3
     if (bmpHeader->dibHeader.compressionType != BITMAP_COMPRESSION_BI_RGB)
     {
         terminal_writestring("I'm sorry but this image is compressed; I don't know how to display it.\n");
-        // TODO: Free rawFileBuffer
+        
+        free(rawFileBuffer);
+
         return false;
     }
 
@@ -105,7 +114,9 @@ bool Bitmap24Load(char *filename, PIXEL_32BIT **ppBuffer, uint32_t *width, uint3
     if (!buffer)
     {
         terminal_writestring("Not enough memory to store bitmap image\n");
-        // TODO: Free rawFileBuffer
+        
+        free(rawFileBuffer);
+
         return false;
     }
     *ppBuffer = buffer;
@@ -135,6 +146,7 @@ bool Bitmap24Load(char *filename, PIXEL_32BIT **ppBuffer, uint32_t *width, uint3
         pixelData -= (*width * BITMAP_BYTES_PER_24BPP * 2);
     }
 
-    // TODO: Free rawFileBuffer
+    free(rawFileBuffer);
+
     return true;
 }
