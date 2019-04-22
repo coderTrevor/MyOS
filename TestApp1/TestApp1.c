@@ -8,9 +8,10 @@
 
 int main()
 {
-    //terminal_resume();
-    //terminal_writestring("Hello World from an .exe!\n");
-    SystemCallPrint("Hello World from an .exe using a system call!\n");
+    printf("Hello World from an .exe using a system call and printf()!\n");
+
+    // TODO: This is broken:
+    //printf("Hello World from an .exe using a system call %s!\n", " and printf()");
     return 0;
 }
 

@@ -147,6 +147,7 @@ void PrintMemMap()
 }
 
 void *malloc(size_t);
+void free(void *ptr);
 
 #pragma warning(push)                 // disable warning message about divide-by-zero, because we do that intentionally with the crash command
 #pragma warning(disable : 4723)       // (This is to test fault handling)

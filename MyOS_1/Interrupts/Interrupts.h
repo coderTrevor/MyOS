@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdarg.h>
+
 #define HARDWARE_INTERRUPTS_BASE     0x20
 
 extern unsigned long interrupts_fired;
@@ -17,3 +19,5 @@ void page_fault_handler(void);
 void invalid_opcode_handler(void);
 
 void print_string_interrupt_handler(char *str);
+
+void printf_interrupt_handler(char *fmt, va_list va);

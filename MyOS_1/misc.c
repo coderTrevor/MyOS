@@ -2,6 +2,8 @@
 #include "misc.h"
 #include "paging.h"
 #include "Terminal.h"
+#include "printf.h"
+#include "Interrupts\System_Calls.h"
 
 uint32_t pagedMemoryAvailable = 0;
 uint32_t memoryNextAvailableAddress = 0;
@@ -24,18 +26,20 @@ void free(void *ptr)
             }
             else
             {
-                terminal_writestring("free() called to free already-freed pointer, ");
+                /*terminal_writestring("free() called to free already-freed pointer, ");
                 terminal_print_ulong_hex((uint32_t)ptr);
-                terminal_newline();
+                terminal_newline();*/
+                printf("free() called to free already-freed pointer, %lX\n");
             }
         }
     }
 
     if (!found)
     {
-        terminal_writestring("free() called with invalid pointer: ");
+        /*terminal_writestring("free() called with invalid pointer: ");
         terminal_print_ulong_hex((uint32_t)ptr);
-        terminal_newline();
+        terminal_newline();*/
+        printf("free() called with invalid pointer: %lX\n");
     }
 }
 
@@ -118,7 +122,7 @@ void* malloc(size_t size)
 {
     if (nextAllocationSlot >= MAX_ALLOCATIONS)
     {
-        terminal_writestring("Maximum memory allocations exceeded!\n");
+        printf("Maximum memory allocations exceeded!\n");
         return NULL;
     }
 

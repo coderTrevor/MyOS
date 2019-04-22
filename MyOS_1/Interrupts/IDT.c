@@ -46,6 +46,9 @@ void IDT_Init(void)
     // Set print string handler
     Set_IDT_Entry((unsigned long)print_string_interrupt_handler, SYSCALL_PRINT);
 
+    // Set printf handler
+    Set_IDT_Entry((unsigned long)printf_interrupt_handler, SYSCALL_PRINTF);
+
     /* fill the IDT descriptor */
     IDT_ptr.base = (uint32_t)IDT;
     IDT_ptr.size = (sizeof(IDT_ENTRY) * 256);

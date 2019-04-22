@@ -7,6 +7,7 @@
 #include "../System_Specific.h"
 #include "../misc.h"
 #include "../Console_VGA.h"
+#include "../printf.h"
 
 unsigned long interrupts_fired;
 
@@ -128,6 +129,25 @@ void _declspec(naked) print_string_interrupt_handler(char *str)
         terminal_writestring("syscall interrupt handler fired.\n");
 
     terminal_writestring(str);
+
+    _asm
+    {
+        popad
+        iretd
+    }
+}
+
+// TODO: Develop some mechanism to allow printf_ to return an int
+void _declspec(naked) printf_interrupt_handler(char *fmt, va_list va)
+{
+    _asm pushad;
+
+    ++interrupts_fired;
+
+    if (debugLevel)
+        terminal_writestring("printf interrupt handler fired.\n");
+
+    vprintf_(fmt, va);
 
     _asm
     {

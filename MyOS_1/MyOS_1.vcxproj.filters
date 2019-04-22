@@ -165,6 +165,9 @@
     <ClCompile Include="Executables\Batch_Files.c">
       <Filter>Source Files\Executables</Filter>
     </ClCompile>
+    <ClCompile Include="printf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="misc.h">
@@ -274,6 +277,9 @@
     </ClInclude>
     <ClInclude Include="Executables\Batch_Files.h">
       <Filter>Header Files\Executables</Filter>
+    </ClInclude>
+    <ClInclude Include="printf.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
