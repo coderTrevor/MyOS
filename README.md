@@ -48,11 +48,14 @@ Targetting x64 doesn't work, make sure you build with x86. I haven't removed x64
 If you have come here to learn something, you should know that I'm as amateur as it gets when it comes to OS programming.
 
 ## Acknowledgements
-In addition to CC0 code copied from the [OSDev wiki](https://wiki.osdev.org/Expanded_Main_Page) and [forums](http://forum.osdev.org/) (thanks!) and some public domain code from [BrokenThorn Entertainment](http://www.brokenthorn.com/Resources/OSDevIndex.html) (also thanks!).
-This project utilizes a modified version of [SDL_picofont](http://nurd.se/~noname/?section=sdl_picofont) by Fredrik Hultin with patches from Saul D "KrayZier" Beniquez (thanks also!). The latter is released under GPLv2.
-I also use some code from SDL. CRT.c contains much of the code from the SDL file SDL_stdlib.c, by Sam Lantinga. See CRT.c (or SDL_stdlib.c) for licensing info.
+I would very much like to thank the following individuals and organizations who've made their source code available! This code has found it's way into MyOS:
+* CC0 code copied from the [OSDev wiki](https://wiki.osdev.org/Expanded_Main_Page) and [forums](http://forum.osdev.org/)
+* Some public domain code from [BrokenThorn Entertainment](http://www.brokenthorn.com/Resources/OSDevIndex.html)
+* This project utilizes a modified version of [SDL_picofont](http://nurd.se/~noname/?section=sdl_picofont) by Fredrik Hultin with patches from Saul D "KrayZier" Beniquez, released under GPLv2.
+* I also use some code from [SDL](https://www.libsdl.org/). CRT.c contains much of the code from the SDL file SDL_stdlib.c, by Sam Lantinga. See CRT.c (or SDL_stdlib.c) for licensing info. 
+* Marco Paland's [printf](https://github.com/mpaland) implementation, made available via an MIT license.
 
-MyOS also uses Marco Paland's [printf](https://github.com/mpaland) implementation.
+Thank you all for making this available!
 
 ## Troubleshooting
 If you can't build the source with MSVC, make sure you've selected x86 as the target platform. MSVC selects x64 by default.
