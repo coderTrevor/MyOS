@@ -10,6 +10,8 @@ void default_exception_handler(void);
 
 void default_interrupt_handler(void);
 
+void gpf_exception_handler(void);
+
 void Interrupts_Init();
 
 void keyboard_interrupt_handler(void);

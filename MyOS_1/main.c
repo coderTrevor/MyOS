@@ -20,6 +20,7 @@
 #include "Networking/TFTP.h"
 #include "Executables/Batch_Files.h"
 #include "Networking/IPv4.h"
+#include "Interrupts/System_Calls.h"
 
 int debugLevel = 0;
 bool showOverlay = true;
@@ -99,6 +100,8 @@ void KeStartupPhase2(multiboot_info *multibootInfo)
 
     // Initialize the PCI bus
     PCI_Init();
+
+    printf("Hello %d %d %f\n", 42, 64, 42.0f);
 
     // Execute autoexec.bat (if it exists)
     Autoexec();

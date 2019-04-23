@@ -8,6 +8,7 @@
 #include "../misc.h"
 #include "../Console_VGA.h"
 #include "../printf.h"
+#include "../Terminal.h"
 
 unsigned long interrupts_fired;
 
@@ -38,7 +39,27 @@ void _declspec(naked) default_exception_handler(void)
     terminal_writestring("Default exception handler fired.\n");
     terminal_writestring("System halted.\n");
 
-    for(;;)
+    for (;;)
+        __halt();
+
+    /*_asm
+    {
+    popad
+    iretd
+    }*/
+}
+
+void _declspec(naked) gpf_exception_handler(void)
+{
+    //_asm pushad;
+    //__asm cli;
+
+    ++interrupts_fired;
+
+    terminal_writestring("General Protection Fault handler fired.\n");
+    terminal_writestring("System halted.\n");
+
+    for (;;)
         __halt();
 
     /*_asm
@@ -138,9 +159,25 @@ void _declspec(naked) print_string_interrupt_handler(char *str)
 }
 
 // TODO: Develop some mechanism to allow printf_ to return an int
-void _declspec(naked) printf_interrupt_handler(char *fmt, va_list va)
+// TODO: Investigate why the handler above is able to be implemented so much more simply, while this one needs a bunch of extra assembly to work.
+// TODO: This function is always buggy as in interrupt right now, but the behavior changes between release and debug builds
+void _declspec(naked) printf_interrupt_handler(const char *fmt, va_list va)
 {
-    _asm pushad;
+    _asm 
+    {
+        push ebp
+        mov ebp, esp
+        push ebx
+        push esi
+        push edi
+
+        pushad
+    }
+
+    terminal_print_ulong_hex((uint32_t)fmt);
+    terminal_newline();
+    terminal_print_ulong_hex((uint32_t)va);
+    terminal_newline();
 
     ++interrupts_fired;
 
@@ -149,9 +186,19 @@ void _declspec(naked) printf_interrupt_handler(char *fmt, va_list va)
 
     vprintf_(fmt, va);
 
+    //for (;;)
+    //    __halt();
+    
     _asm
     {
         popad
-        iretd
+    
+        pop edi
+        pop esi
+        pop ebx
+        pop ebp
+
+        retn
+        //iret
     }
 }

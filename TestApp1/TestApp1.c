@@ -11,7 +11,7 @@ int main()
     printf("Hello World from an .exe using a system call and printf()!\n");
 
     // TODO: This is broken:
-    //printf("Hello World from an .exe using a system call %s!\n", " and printf()");
+    //SystemCallPrintf("Hello World from an .exe using a system call %s!\n%s %d\n", " and printf()", "test2", 42);
     return 0;
 }
 

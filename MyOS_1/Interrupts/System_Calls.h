@@ -6,4 +6,4 @@
 void SystemCallPrint(char *str);
 
 #define printf SystemCallPrintf
-int SystemCallPrintf(const char* format, ...);
+int __cdecl SystemCallPrintf(const char* format, ...);

@@ -29,6 +29,7 @@ void IDT_Init(void)
     }
 
     Set_IDT_Entry((unsigned long)invalid_opcode_handler, 6);
+    Set_IDT_Entry((unsigned long)gpf_exception_handler, 13);
     Set_IDT_Entry((unsigned long)page_fault_handler, 14);
 
     // set default handlers
