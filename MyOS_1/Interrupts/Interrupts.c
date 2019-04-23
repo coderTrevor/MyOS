@@ -140,6 +140,8 @@ void Interrupts_Init()
 }
 
 // TODO: using a pointer like this from user space is considered insecure
+// TODO: This isn't actually right: I think we end up printing the msg parameter that is on the stack from the SystemCallPrint() function.
+// In fact, this is probably only working due to "luck." See printf_interrupt_handler below for more details.
 void _declspec(naked) print_string_interrupt_handler(char *str)
 {
     _asm pushad;
@@ -159,8 +161,8 @@ void _declspec(naked) print_string_interrupt_handler(char *str)
 }
 
 // TODO: Develop some mechanism to allow printf_ to return an int
-// TODO: Investigate why the handler above is able to be implemented so much more simply, while this one needs a bunch of extra assembly to work.
-// TODO: This function is always buggy as in interrupt right now, but the behavior changes between release and debug builds
+// NOTE: Because this function is called as an interrupt handler, the parameters will not be on the stack where the compiler will expect them,
+// because of the EFLAGS register that the int instruction pushes on the stack (I think).
 void _declspec(naked) printf_interrupt_handler(const char *fmt, va_list va)
 {
     _asm 
@@ -174,20 +176,31 @@ void _declspec(naked) printf_interrupt_handler(const char *fmt, va_list va)
         pushad
     }
 
-    terminal_print_ulong_hex((uint32_t)fmt);
-    terminal_newline();
-    terminal_print_ulong_hex((uint32_t)va);
-    terminal_newline();
+    // print the addresses of the fmt and va variables (to see if we know where to find them)
+    if (debugLevel)
+    {
+        _asm
+        {
+            push fmt + 8
+            call terminal_print_ulong_hex
+            call terminal_newline
+            push va + 8
+            call terminal_print_ulong_hex
+            call terminal_newline
+        }
+    }
 
     ++interrupts_fired;
 
     if (debugLevel)
         terminal_writestring("printf interrupt handler fired.\n");
-
-    vprintf_(fmt, va);
-
-    //for (;;)
-    //    __halt();
+    
+    _asm
+    {
+        push va + 8
+        push fmt + 8
+        call vprintf_   // call vprintf_(fmt, va), correcting for the stack discrepency
+    }
     
     _asm
     {
@@ -198,7 +211,6 @@ void _declspec(naked) printf_interrupt_handler(const char *fmt, va_list va)
         pop ebx
         pop ebp
 
-        retn
-        //iret
+        iretd
     }
 }

@@ -101,8 +101,6 @@ void KeStartupPhase2(multiboot_info *multibootInfo)
     // Initialize the PCI bus
     PCI_Init();
 
-    printf("Hello %d %d %f\n", 42, 64, 42.0f);
-
     // Execute autoexec.bat (if it exists)
     Autoexec();
 

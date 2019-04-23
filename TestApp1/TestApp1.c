@@ -8,10 +8,8 @@
 
 int main()
 {
-    printf("Hello World from an .exe using a system call and printf()!\n");
+    printf("Hello World from an .exe using a system call%s\nDid you know that the answer to life, the universe, and everything is %d?\n", " and printf()!", 42);
 
-    // TODO: This is broken:
-    //SystemCallPrintf("Hello World from an .exe using a system call %s!\n%s %d\n", " and printf()", "test2", 42);
     return 0;
 }
 
