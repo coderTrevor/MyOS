@@ -15,6 +15,8 @@ char *PCI_GetVendorName(uint16_t vendorID)
             return "Apple Inc.";
         case PCI_VENDOR_REALTEK:
             return "Realtek";
+        case PCI_VENDOR_RED_HAT:
+            return "Red Hat, Inc.";
         case 0x1234:
             return "QEMU";
         case 0x15AD:

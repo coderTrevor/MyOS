@@ -21,6 +21,7 @@
 #include "Executables/Batch_Files.h"
 #include "Networking/IPv4.h"
 #include "Interrupts/System_Calls.h"
+#include "printf.h"
 
 int debugLevel = 0;
 bool showOverlay = true;
@@ -106,9 +107,7 @@ void KeStartupPhase2(multiboot_info *multibootInfo)
 
     // Say Hello
     terminal_writestring("Hello world!\n");
-    terminal_writestring("Welcome to My OS (working title) build ");
-    terminal_print_int(BUILD_NUMBER);
-    terminal_newline();
+    kprintf("Welcome to My OS (working title) build %d\n", BUILD_NUMBER);
 
     if (debugLevel)
     {

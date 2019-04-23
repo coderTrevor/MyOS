@@ -140,33 +140,58 @@ void Interrupts_Init()
 }
 
 // TODO: using a pointer like this from user space is considered insecure
-// TODO: This isn't actually right: I think we end up printing the msg parameter that is on the stack from the SystemCallPrint() function.
-// In fact, this is probably only working due to "luck." See printf_interrupt_handler below for more details.
-void _declspec(naked) print_string_interrupt_handler(char *str)
+// NOTE, TODO: See printf_string_interrupt_handler for explanation of eflags and cs parameters
+void _declspec(naked) print_string_interrupt_handler(int eflags, int cs, char *str)
 {
-    _asm pushad;
+    // supress warning about unused parameters
+    (void)eflags, (void)cs;
+    _asm
+    {
+        // prologue
+        push ebp
+        mov ebp, esp
+        push ebx
+        push esi
+        push edi
+
+        pushad
+    }
 
     ++interrupts_fired;
 
     if (debugLevel)
         terminal_writestring("syscall interrupt handler fired.\n");
 
+    // Write str to the terminal
     terminal_writestring(str);
 
     _asm
     {
         popad
+
+        // epilogue
+        pop edi
+        pop esi
+        pop ebx
+        pop ebp
+
         iretd
     }
 }
 
 // TODO: Develop some mechanism to allow printf_ to return an int
-// NOTE: Because this function is called as an interrupt handler, the parameters will not be on the stack where the compiler will expect them,
-// because of the EFLAGS register that the int instruction pushes on the stack (I think).
-void _declspec(naked) printf_interrupt_handler(const char *fmt, va_list va)
+// NOTE: Because this function is called as an interrupt handler, the parameters will not be on the stack where the compiler would expect them,
+// because of the EFLAGS and CS registers that the int instruction pushes on the stack. Having the eflags and cs as explicit (but unused)
+// parameters in the function definition is, IMHO, an elegant solution to this problem.
+// TODO: This will need to be modified when we have a user-mode
+void _declspec(naked) printf_interrupt_handler(int eflags, int cs, const char *fmt, va_list va)
 {
+    // suppress warnings that eflags and cs aren't used
+    (void)eflags, (void)cs;
+
     _asm 
     {
+        // prologue
         push ebp
         mov ebp, esp
         push ebx
@@ -177,35 +202,32 @@ void _declspec(naked) printf_interrupt_handler(const char *fmt, va_list va)
     }
 
     // print the addresses of the fmt and va variables (to see if we know where to find them)
-    if (debugLevel)
+    /*if (debugLevel)
     {
         _asm
         {
-            push fmt + 8
+            push fmt
             call terminal_print_ulong_hex
             call terminal_newline
-            push va + 8
+            push va
             call terminal_print_ulong_hex
             call terminal_newline
         }
-    }
+    }*/
 
     ++interrupts_fired;
 
     if (debugLevel)
         terminal_writestring("printf interrupt handler fired.\n");
     
-    _asm
-    {
-        push va + 8
-        push fmt + 8
-        call vprintf_   // call vprintf_(fmt, va), correcting for the stack discrepency
-    }
+    // Here's where printf actually happens
+    vprintf_(fmt, va);
     
     _asm
     {
         popad
     
+        // epilogue
         pop edi
         pop esi
         pop ebx

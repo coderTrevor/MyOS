@@ -30,6 +30,9 @@
 #define PCI_VENDOR_VBOX     0x80EE
 #define PCI_DEVICE_VBOX_BGA 0xBEEF
 
+#define PCI_VENDOR_RED_HAT    0x1AF4
+#define PCI_DEVICE_VIRTIO_NET 0X1000
+
 void PCI_CheckAllBuses(void);
 
 void PCI_CheckDevice(uint8_t bus, uint8_t device);

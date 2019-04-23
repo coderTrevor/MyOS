@@ -20,8 +20,6 @@ void SystemCallPrint(char *msg)
 // TODO: return the number of characters printed
 int __cdecl SystemCallPrintf(const char* format, ...)
 {
-    //SystemCallPrint("printf called\n"); // TEMPTEMP: Oddly enough, this prints the "format" argument in release mode
-
     va_list va;
     va_start(va, format);
 
@@ -33,12 +31,12 @@ int __cdecl SystemCallPrintf(const char* format, ...)
     terminal_print_ulong_hex((uint32_t)va);
     terminal_newline();*/
     
-    // TEMPTEMP: calling vprintf_ via a system call isn't working yet, but it needs to be:
+    // Do printf system call
     __asm
     {
-        push[va]               // push va list to the stack
+        push [va]               // push va list to the stack
         push format             // push format argument to the stack
-        int SYSCALL_PRINTF      // call printf_string_interrupt_handler(msg)
+        int SYSCALL_PRINTF      // call printf_string_interrupt_handler(format, va)
         add esp, charPointerSize + va_listSize    // restore value of stack pointer
     }
 

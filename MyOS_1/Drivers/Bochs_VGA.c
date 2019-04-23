@@ -1,5 +1,5 @@
 #include "Bochs_VGA.h"
-#include "../Console_VGA.h"
+#include "../Terminal.h"
 #include "../System_Specific.h"
 #include "../misc.h"
 #include "../Graphics/Display_HAL.h"

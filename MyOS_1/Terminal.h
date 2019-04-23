@@ -4,6 +4,8 @@
 
 void terminal_initialize(void);
 
+void terminal_newline();
+
 void terminal_print_int(int number);
 
 void terminal_print_int_top(int number, uint16_t column);

@@ -70,8 +70,6 @@ void terminal_print_ulonglong_hex(uint64_t value);
 
 void terminal_print_ushort_hex(uint16_t value);
 
-void terminal_newline();
-
 void VGA_terminal_putentryat(char c, uint8_t color, size_t x, size_t y);
 
 void terminal_resume();

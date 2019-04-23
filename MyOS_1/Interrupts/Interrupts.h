@@ -20,6 +20,6 @@ void page_fault_handler(void);
 
 void invalid_opcode_handler(void);
 
-void print_string_interrupt_handler(char *str);
+void print_string_interrupt_handler(int eflags, int cs, char *str);
 
-void printf_interrupt_handler(char *fmt, va_list va);
+void printf_interrupt_handler(int eflags, int cs, const char *fmt, va_list va);
