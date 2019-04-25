@@ -1,5 +1,5 @@
 #include "ARP.h"
-#include "../Console_VGA.h"
+#include "../Terminal.h"
 #include "../misc.h"
 
 // ARP table (Full table TODO)

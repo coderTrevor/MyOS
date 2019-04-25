@@ -5,7 +5,7 @@
 // some code copied or adapted from Linux' driver written by Donald Becker
 // some code copied or adapted from sanos' driver written by Michael Ringgaard
 #include "PCI_Bus.h"
-#include "../Console_VGA.h"
+#include "../Terminal.h"
 #include "../Networking/DHCP.h"
 #include "../System_Specific.h"
 #include "RTL_8139.h"
@@ -59,6 +59,7 @@ void RTL_8139_Init(uint8_t bus, uint8_t slot, uint8_t function)
     }
 
     // Setup an interrupt handler for this device
+    // TODO: Support IRQ sharing
     Set_IDT_Entry((unsigned long)rtl_8139_InterruptHandler, HARDWARE_INTERRUPTS_BASE + rtl8139_IRQ);
 
     // Tell the PIC to enable the NIC's IRQ
@@ -80,7 +81,6 @@ void RTL_8139_Init(uint8_t bus, uint8_t slot, uint8_t function)
     }
 
     // setup the receive buffer
-    //terminal_writestring("\n Rx buffer address: ");
 
     // test rxBuffer access
     // translate buffer to physical address (TODO: Improve in many ways)
@@ -133,17 +133,6 @@ void RTL_8139_Init(uint8_t bus, uint8_t slot, uint8_t function)
 
     terminal_writestring(" - MAC: ");
     EthernetPrintMAC(mac_addr);
-    /*terminal_print_byte_hex(mac_addr[0]);
-    terminal_putchar(':');
-    terminal_print_byte_hex(mac_addr[1]);
-    terminal_putchar(':');
-    terminal_print_byte_hex(mac_addr[2]);
-    terminal_putchar(':');
-    terminal_print_byte_hex(mac_addr[3]);
-    terminal_putchar(':');
-    terminal_print_byte_hex(mac_addr[4]);
-    terminal_putchar(':');
-    terminal_print_byte_hex(mac_addr[5]);*/
 
     terminal_newline();
 
@@ -151,7 +140,7 @@ void RTL_8139_Init(uint8_t bus, uint8_t slot, uint8_t function)
     EthernetRegisterNIC_SendFunction(RTL_8139_SendPacket);
     EthernetRegisterNIC_MAC(mac_addr);
 
-    // TEMPTEMP - everything that follows is temporary / test code:
+    // Request an IP via DHCP
     terminal_writestring("     Requesting IP address via DHCP...\n");
 
     //ARP_Send_Request(IPv4_PackIP(10, 0, 2, 2), mac_addr);

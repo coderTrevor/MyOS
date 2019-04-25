@@ -9,6 +9,7 @@
 //uint8_t rawFileBuffer[MAX_BMP_FILESIZE];
 
 void *malloc(size_t);
+void free(void *ptr);
 
 // returns true on success
 // *ppBuffer will have the address of an allocated buffer containing the image on success, NULL otherwise.

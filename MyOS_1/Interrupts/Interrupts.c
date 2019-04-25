@@ -181,8 +181,8 @@ void _declspec(naked) print_string_interrupt_handler(int eflags, int cs, char *s
 
 // TODO: Develop some mechanism to allow printf_ to return an int
 // NOTE: Because this function is called as an interrupt handler, the parameters will not be on the stack where the compiler would expect them,
-// because of the EFLAGS and CS registers that the int instruction pushes on the stack. Having the eflags and cs as explicit (but unused)
-// parameters in the function definition is, IMHO, an elegant solution to this problem.
+// because of the EFLAGS and CS registers that the int instruction pushes on the stack (I might have reversed the order of them). 
+// Having the eflags and cs as explicit (but unused) parameters in the function definition is, IMHO, an elegant solution to this problem.
 // TODO: This will need to be modified when we have a user-mode
 void _declspec(naked) printf_interrupt_handler(int eflags, int cs, const char *fmt, va_list va)
 {

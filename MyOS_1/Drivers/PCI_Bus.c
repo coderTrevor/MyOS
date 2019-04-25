@@ -1,9 +1,10 @@
 #include "PCI_Bus.h"
 #include <stdint.h>
 #include "../System_Specific.h"
-#include "../Console_VGA.h"
+#include "../Terminal.h"
 #include "RTL_8139.h"
 #include "Bochs_VGA.h"
+#include "Virtio_Net.h"
 
 char *PCI_GetVendorName(uint16_t vendorID)
 {
@@ -535,6 +536,13 @@ void PCI_DelegateToDriver(uint8_t bus, uint8_t slot, uint8_t function, uint16_t 
     {
         if (deviceID == PCI_DEVICE_VBOX_BGA)
             BGA_Init(bus, slot, function);
+        return;
+    }
+
+    if (vendorID == PCI_VENDOR_RED_HAT)
+    {
+        if (deviceID == PCI_DEVICE_VIRTIO_NET)
+            VirtIO_Net_Init(bus, slot, function);
         return;
     }
 }

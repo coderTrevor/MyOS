@@ -168,7 +168,7 @@
     <ClCompile Include="printf.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Drivers\Virtio-Net.c">
+    <ClCompile Include="Drivers\Virtio_Net.c">
       <Filter>Source Files\Drivers</Filter>
     </ClCompile>
   </ItemGroup>
@@ -284,7 +284,7 @@
     <ClInclude Include="printf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Drivers\Virtio-Net.h">
+    <ClInclude Include="Drivers\Virtio_Net.h">
       <Filter>Header Files\Drivers</Filter>
     </ClInclude>
   </ItemGroup>

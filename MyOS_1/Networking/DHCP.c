@@ -3,7 +3,7 @@
 #include "Ethernet.h"
 #include "UDP.h"
 #include "../misc.h"
-#include "../Console_VGA.h"
+#include "../Terminal.h"
 #include "IPv4.h"
 
 void DHCP_Send_Discovery(uint8_t *sourceMAC)

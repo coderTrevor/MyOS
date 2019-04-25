@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include "../misc.h"
 #include "PE32.h"
-#include "../Console_VGA.h"
+#include "../Terminal.h"
 
 // TEMPTEMP - until we have memory allocation, just reserve 10k for an executable
 uint8_t peBuffer[10 * 1024];
