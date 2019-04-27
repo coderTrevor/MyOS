@@ -97,7 +97,8 @@ void EthernetProcessReceivedPacket(Ethernet_Header *packet, uint8_t *ourMAC)
     terminal_newline();*/
     if (packet->etherType == ETHERTYPE_IPv4)
     {
-        //terminal_writestring("    IPv4 packet received.\n");
+        if(debugLevel)
+            terminal_writestring("    IPv4 packet received.\n");
         IPv4_Header *ipHeader = (IPv4_Header *)(packet->data);
         IPv4_ProcessReceivedPacket(ipHeader, ourMAC);
     }

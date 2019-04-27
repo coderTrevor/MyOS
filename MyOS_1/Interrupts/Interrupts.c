@@ -1,4 +1,3 @@
-#include <intrin.h>
 #include <stdint.h>
 #include "../Drivers/Keyboard.h"
 #include "PIC.h"

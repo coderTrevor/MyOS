@@ -51,7 +51,8 @@ void UDP_ProcessReceivedPacket(UDP_Header *packet, uint8_t *sourceMAC)
 
     if (destinationPort == 68)
     {
-        //terminal_writestring("DHCP Packet received\n");
+        if(debugLevel)
+            terminal_writestring("DHCP Packet received\n");
         DHCP_ProcessReply((DHCP_HEADER *)packet->data, sourceMAC);
     }
 

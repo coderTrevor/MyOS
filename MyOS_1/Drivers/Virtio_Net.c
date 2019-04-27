@@ -1,16 +1,13 @@
 #include "Virtio_Net.h"
-#include "../printf.h"
-#include "PCI_Bus.h"
-#include "../Terminal.h"
-#include "../Networking/DHCP.h"
 #include "../System_Specific.h"
+#include "../printf.h"
 #include "../Interrupts/PIC.h"
 #include "../Interrupts/IDT.h"
 #include "../Interrupts/Interrupts.h"
-#include "../misc.h"
-#include "../Networking/ARP.h"
+#include "PCI_Bus.h"
 #include "../Networking/Ethernet.h"
-#include "../multiboot.h"
+#include "../Networking/DHCP.h"
+#include "../misc.h"
 
 // TODO: Support multiple NIC's
 
@@ -23,6 +20,14 @@ uint8_t  vNet_IRQ;
 
 // TEMPTEMP - there should be one MAC for each card that the system may have
 uint8_t mac_addr[6];
+
+virtq receiveQueue;
+virtq transmitQueue;
+virtq controlQueue; // (we don't use this one)
+
+#define RECEIVE_QUEUE_INDEX     0
+#define TRANSMIT_QUEUE_INDEX    1
+#define CONTROL_QUEUE_INDEX     2
 
 inline uint32_t VNet_Read_Register(uint16_t reg)
 {
@@ -66,8 +71,13 @@ static inline uint32_t virtq_size(unsigned int qsz)
         + ALIGN(sizeof(u16) * 3 + sizeof(struct virtq_used_elem)*qsz);
 }*/
 
-uint8_t *VirtIO_Net_Init_Virtqueue(uint16_t index, uint16_t queueSize)
+
+// TODO: Error-checking
+void VirtIO_Net_Allocate_Virtqueue(virtq *virtqueue, uint16_t queueSize)
 {
+    // Zero virtqueue
+    memset(virtqueue, 0, sizeof(virtq));
+
     // determine size of virtqueue in bytes (see 2.4 Virtqueues in virtio spec)
 
     // virtqueues consist of:
@@ -80,33 +90,81 @@ uint8_t *VirtIO_Net_Init_Virtqueue(uint16_t index, uint16_t queueSize)
     // this alignment will be guaranteed.
     uint32_t descriptorTableSize = 16 * queueSize;
 
-    // availableRingSize must always be aligned on a 2-byte boundary, which it always will because descriptorSize will be aligned to 
+    // availableRingSize must always be aligned on a 2-byte boundary, which it always will be because descriptorSize will be aligned to 
     // a 16-byte boundary and its size will be a multiple of 16.
     uint32_t availableRingSize = 2 * queueSize + 6;
 
-    // usedRingSize must be aligned on a 4-byte boundary, which it probably won't be because of the 6 bytes added to availableRingSize
+    // usedRingSize must be aligned on a 4096-byte boundary (because this is a legacy driver), which it probably won't be
     uint32_t availableRingPadding = 0;
-    if (availableRingSize % 4 != 0)
-        availableRingPadding = 4 - (availableRingSize % 4);
+    if ((availableRingSize + descriptorTableSize) % 4096 != 0)
+        availableRingPadding = 4096 - ((availableRingSize + descriptorTableSize) % 4096);
 
     uint32_t usedRingSize = 8 * queueSize + 6;
 
-    uint32_t virtqueueSize = descriptorTableSize + availableRingSize + availableRingPadding + usedRingSize;
+    uint32_t virtqueueByteSize = descriptorTableSize + availableRingSize + availableRingPadding + usedRingSize;
+
+    if(debugLevel)
+        kprintf("\n       virtqueueByteSize: %d", virtqueueByteSize);
 
     // Allocate memory for virtqueue + extra bytes for 4096-byte alignment
-    uint8_t *virtqueue_mem;// TEMPTEMP - why can't the linker find malloc? = malloc(virtqueueSize + 4095);
+    uint8_t *virtqueue_mem = malloc(virtqueueByteSize + 4095);
+    
+    // Zero virtqueue memory
+    memset(virtqueue_mem, 0, virtqueueByteSize + 4095);
 
     // Get a 4096-byte aligned block of memory
-    uint8_t *virtqueue = virtqueue_mem;
-    if ((uint32_t)virtqueue % 4096)
+    //virtq *virtqueue = virtqueue_mem;
+    if ((uint32_t)virtqueue_mem % 4096)
     {
-        virtqueue = (uint8_t*)((uint32_t)virtqueue + 4096 - (uint32_t)virtqueue % 4096);
+        virtqueue_mem = (uint8_t*)((uint32_t)virtqueue_mem + 4096 - (uint32_t)virtqueue_mem % 4096);
     }
 
-    // Zero virtqueue memory
-    memset(virtqueue, 0, virtqueueSize);
+    // setup elements of virtqueue
+    virtqueue->elements = queueSize;
+    // descriptors will point to the first byte of virtqueue_mem
+    virtqueue->descriptors = (virtq_descriptor *)virtqueue_mem;
+    // driverArea (AKA Available Ring) will follow descriptors
+    virtqueue->driverArea = (virtq_driver_area *)((uint32_t)virtqueue_mem + descriptorTableSize);
+    // deviceArea will follow driver area + padding bytes
+    virtqueue->deviceArea = (virtq_device_area *)((uint32_t)virtqueue->driverArea + availableRingSize + availableRingPadding);
 
-    return virtqueue;
+    //return virtqueue;
+}
+
+
+// TODO: Error-checking, etc
+void VirtIO_Net_Init_Virtqueue(virtq *virtqueue, uint16_t queueIndex)
+{
+    int16_t queueSize = -1;
+
+    // access the current queue
+    VNet_Write_Register(REG_QUEUE_SELECT, queueIndex);
+
+    // get the size of the current queue
+    queueSize = (uint16_t)VNet_Read_Register(REG_QUEUE_SIZE);
+
+    if (!queueSize)
+        return;
+
+    if (debugLevel)
+        kprintf("\n      queue %d has %d elements", queueIndex, queueSize);
+
+    // Allocate and initialize the queue
+    VirtIO_Net_Allocate_Virtqueue(virtqueue, queueSize);
+
+    if (debugLevel)
+    {
+        kprintf("\n       queue %d: 0x%X", queueIndex, virtqueue->descriptors);
+        kprintf("         queue size: %d", virtqueue->elements);
+        kprintf("\n       driverArea: 0x%X", virtqueue->driverArea);
+        kprintf("\n       deviceArea: 0x%X", virtqueue->deviceArea);
+    }
+
+    // TODO: Convert virtual address to physical address
+    // (This isn't required now because all addresses are identity mapped)
+
+    // Write address divided by 4096 to address register
+    VNet_Write_Register(REG_QUEUE_ADDRESS, (uint32_t)virtqueue->descriptors / 4096);
 }
 
 void VirtIO_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
@@ -152,8 +210,9 @@ void VirtIO_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
     // Tell the device what features we'll be using
     VNet_Write_Register(REG_GUEST_FEATURES, REQUIRED_FEATURES);
 
+    // We must omit these next steps since we're supporting legacy devices
     // Tell the device the features have been negotiated
-    VNet_Write_Register(REG_DEVICE_STATUS, STATUS_DEVICE_ACKNOWLEDGED | STATUS_DRIVER_LOADED | STATUS_FEATURES_OK);
+    /*VNet_Write_Register(REG_DEVICE_STATUS, STATUS_DEVICE_ACKNOWLEDGED | STATUS_DRIVER_LOADED | STATUS_FEATURES_OK);
 
     // Make sure the device is ok with those features
     if ((VNet_Read_Register(REG_DEVICE_STATUS) & STATUS_FEATURES_OK) != STATUS_FEATURES_OK)
@@ -162,7 +221,8 @@ void VirtIO_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
         terminal_writestring("\n      Failed to negotiate features with device. Aborting.\n");
         VNet_Write_Register(REG_DEVICE_STATUS, STATUS_DEVICE_ERROR);
         return;
-    }
+    }*/
+
     // Perform device-specific setup, including discovery of virtqueues for the device, optional per-bus setup,
     // reading and possibly writing the device’s virtio configuration space, and population of virtqueues.
 
@@ -175,28 +235,13 @@ void VirtIO_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
     EthernetPrintMAC(mac_addr);
 
     // Init virtqueues (see 4.1.5.1.3 of virtio-v1.0-cs04.pdf)
-    uint16_t currentQueue = 0;
-    int queues = 0;
-    int16_t queueSize = -1;
-    while (queueSize != 0)
-    {
-        // access the current queue
-        VNet_Write_Register(REG_QUEUE_SELECT, currentQueue);
+    // Since we don't negotiate VIRTIO_NET_F_MQ, we can expect 3 virtqueues: receive, transmit, and control
+    VirtIO_Net_Init_Virtqueue(&receiveQueue,  0);
+    VirtIO_Net_Init_Virtqueue(&transmitQueue, 1);
+    VirtIO_Net_Init_Virtqueue(&controlQueue,  2);    
 
-        // get the size of the current queue
-        queueSize = (uint16_t)VNet_Read_Register(REG_QUEUE_SIZE);
-
-        if(queueSize && debugLevel)
-            kprintf("\n      queue %d has size %d", currentQueue, queueSize);
-
-        // Allocate and initialize the queue
-        uint8_t *vq = VirtIO_Net_Init_Virtqueue(currentQueue, queueSize);
-        kprintf("\nqueue: %d: %X", currentQueue, vq);
-
-        ++currentQueue;
-    }
-
-    queues = currentQueue - 1;
+    // Setup the receive queue
+    VirtIO_Net_SetupReceiveBuffer();
 
     // Setup an interrupt handler for this device
     // TODO: Check for and support IRQ sharing
@@ -205,23 +250,18 @@ void VirtIO_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
     // Tell the PIC to enable the NIC's IRQ
     IRQ_Enable_Line(vNet_IRQ);
 
-    if(debugLevel)
-        kprintf("\n     Found %d virtqueues", queues);
-
     // Tell the device it's initialized
     VNet_Write_Register(REG_DEVICE_STATUS, STATUS_DRIVER_READY);
-
-    /*
+        
     // Register this NIC with the ethernet subsystem
-    EthernetRegisterNIC_SendFunction(RTL_8139_SendPacket);
+    EthernetRegisterNIC_SendFunction(VirtIO_Net_SendPacket);
     EthernetRegisterNIC_MAC(mac_addr);
 
-    // TEMPTEMP - everything that follows is temporary / test code:
-    terminal_writestring("     Requesting IP address via DHCP...\n");
+    terminal_writestring("\n     Requesting IP address via DHCP...");
 
     //ARP_Send_Request(IPv4_PackIP(10, 0, 2, 2), mac_addr);
     DHCP_Send_Discovery(mac_addr);
-    */
+
     terminal_writestring("\n    virtio-net driver initialized.\n");
 }
 
@@ -232,50 +272,41 @@ void _declspec(naked) VirtIO_Net_InterruptHandler()
     /* do something */
     ++interrupts_fired;
 
-    //if (debugLevel)
+    if (debugLevel)
         terminal_writestring(" --------- virtio-net interrupt fired! -------\n");
 
-    // get the interrupt status
-    /*isr = inw(rtl8139_base_port + RTL_ISR);
+    // Get the interrupt status (This will also reset the isr status register)
+    uint32_t isr;
+    isr = VNet_Read_Register(REG_ISR_STATUS);
 
-    if (isr & ~(RTL_ISR_RX_OK | RTL_ISR_TX_OK))
+    // TODO: Support configuration changes (doubt this will ever happen)
+    if (isr & VIRTIO_ISR_CONFIG_CHANGED)
+        terminal_writestring("TODO: VirtIO-Net configuration has changed\n");
+
+    // Check for used queues
+    if (isr & VIRTIO_ISR_VIRTQ_USED)
     {
-        terminal_writestring("rtl8139 Error: Unhandled ISR (TODO) ");
-        terminal_print_ulong_hex(isr);
-        for (;;)
-            __halt();
+        //terminal_writestring("Virtq used\n");
+
+        // see if the transmit queue has been used
+        while (transmitQueue.deviceArea->index >= transmitQueue.lastUsedIndex + 1)
+        {
+            if(debugLevel)
+                terminal_writestring("Transmit success\n");
+            transmitQueue.lastUsedIndex++;
+        }
+
+        // see if the receive queue has been used
+        if (receiveQueue.deviceArea->index >= receiveQueue.lastUsedIndex + 1)
+        {
+            VirtIO_Net_ReceivePacket();
+            //receiveQueue.lastUsedIndex = receiveQueue.deviceArea->index;
+        }
     }
-    //terminal_print_ulong_hex(isr);
-
-    outw(rtl8139_base_port + RTL_ISR, 0xFFFF);
-
-    // check the status and see if it's a transmit success
-    if (isr & RTL_ISR_TX_OK)
-    {
-        if (debugLevel)
-            terminal_writestring("     Packet sent successfully!\n");
-
-        // clear the interrupt
-        //outw(rtl8139_base_port + RTL_ISR, RTL_TX_OK);
-    }
-
-    // check the status and see if it's a received success
-    if (isr & RTL_ISR_RX_OK)
-    {
-        RTL_8139_ReceivePacket();
-    }
-    */
-    //outw(rtl8139_base_port + RTL_ISR, RTL_RX_OK);
-    /*if (isr & RTL_TX_OK)
-
-    // clear all interrupts
-    outw(rtl8139_base_port + RTL_ISR, 0xFFFF);*/
-    //isr = inw(rtl8139_base_port + RTL_ISR);
-    //terminal_print_ulong_hex(isr);
 
     PIC_sendEOI(HARDWARE_INTERRUPTS_BASE + vNet_IRQ);
 
-    //if (debugLevel)
+    if (debugLevel)
         terminal_writestring(" --------- virtio-net interrupt done! -------\n");
 
     _asm
@@ -283,4 +314,137 @@ void _declspec(naked) VirtIO_Net_InterruptHandler()
         popad
         iretd
     }
+}
+
+void VirtIO_Net_SetupReceiveBuffer()
+{
+    const uint16_t bufferSize = 1526; // as per virtio specs
+
+    // Allocate and add 16 buffers to receive queue
+    for (uint16_t i = 0; i < 16; ++i)
+    {
+        uint8_t *buffer = malloc(bufferSize);
+
+        // Add buffer to the descriptor table
+        receiveQueue.descriptors[i].address = (uint64_t)buffer;
+        receiveQueue.descriptors[i].flags = VIRTQ_DESC_F_DEVICE_WRITE_ONLY;/* | VIRTQ_DESC_F_NEXT;*/
+        receiveQueue.descriptors[i].length = bufferSize;
+        receiveQueue.descriptors[i].next = 0; // i + 1;
+
+        // If this is the last descriptor we'll be using
+        if (i == 15)
+        {
+            receiveQueue.descriptors[i].flags = VIRTQ_DESC_F_DEVICE_WRITE_ONLY;
+            receiveQueue.descriptors[i].next = 0;
+        }
+
+        // Add index of descriptor to the driver ring
+        receiveQueue.driverArea->ringArray[i] = i;
+        receiveQueue.driverArea->index++;
+    }
+
+    VNet_Write_Register(REG_QUEUE_NOTIFY, RECEIVE_QUEUE_INDEX);
+}
+
+void VirtIO_Net_SendPacket(Ethernet_Header *packet, uint16_t dataSize)
+{
+    if(debugLevel)
+        terminal_writestring("VirtIO_Net_SendPacket called\n");
+
+    uint16_t bufferSize = dataSize + sizeof(virtio_net_hdr);
+
+    // Allocate a buffer for the packet & header
+    virtio_net_hdr *netBuffer = malloc(bufferSize);
+
+    // Set parameters of netBuffer
+    memset(netBuffer, 0, sizeof(virtio_net_hdr));
+
+    // Copy packet to buffer
+    memcpy((void*)((uint32_t)netBuffer + sizeof(virtio_net_hdr)), packet, dataSize);
+
+    uint16_t index = transmitQueue.driverArea->index % transmitQueue.elements;
+
+    if(debugLevel)
+        kprintf("transmit queue index: %d\n", index);
+
+    transmitQueue.descriptors[index].address = (uint64_t)netBuffer;
+    transmitQueue.descriptors[index].flags = 0;
+    transmitQueue.descriptors[index].length = bufferSize;
+    transmitQueue.descriptors[index].next = 0;
+
+    transmitQueue.driverArea->ringArray[index] = index;
+
+    transmitQueue.driverArea->index++;
+
+    transmitQueue.driverArea->flags = VIRTQ_AVAIL_F_NO_INTERRUPT;
+
+    /*uint16_t bufferSize = sizeof(virtio_net_hdr);
+
+    // Allocate a buffer for the header
+    virtio_net_hdr *netBuffer = malloc(bufferSize);
+
+    // Set parameters of netBuffer
+    memset(netBuffer, 0, sizeof(virtio_net_hdr));
+
+    uint16_t index = transmitQueue.driverArea->index % transmitQueue.elements;
+    uint16_t index2 = (index + 1) % transmitQueue.elements;
+
+    //if(debugLevel)
+    kprintf("Index %d\n", index);
+    kprintf("Index2 %d\n", index2);
+
+    // net header
+    transmitQueue.descriptors[index].address = (uint64_t)netBuffer;
+    transmitQueue.descriptors[index].flags = VIRTQ_DESC_F_NEXT;
+    transmitQueue.descriptors[index].length = bufferSize;
+    transmitQueue.descriptors[index].next = index2;
+
+    transmitQueue.driverArea->ringArray[index] = index;
+
+    // ethernet packet
+    transmitQueue.descriptors[index2].address = (uint64_t)packet;
+    transmitQueue.descriptors[index2].flags = 0;
+    transmitQueue.descriptors[index2].length = dataSize;
+    transmitQueue.descriptors[index2].next = 0;
+
+    //transmitQueue.driverArea->ringArray[index2] = index2;
+
+    
+    transmitQueue.driverArea->index++;// += 2;*/
+
+    VNet_Write_Register(REG_QUEUE_NOTIFY, TRANSMIT_QUEUE_INDEX);
+}
+
+void VirtIO_Net_ReceivePacket()
+{
+    if (debugLevel)
+        terminal_writestring("     Packet received successfully!\n");
+
+    while (receiveQueue.lastUsedIndex <= receiveQueue.deviceArea->index - 1)
+    {
+        // get index to current descriptor
+        uint16_t index = receiveQueue.deviceArea->ringArray[receiveQueue.lastUsedIndex % receiveQueue.elements].index;
+
+        // get pointer to the beginning of the packet
+        uint32_t *rxBegin = (uint32_t*)(receiveQueue.descriptors[index].address);
+
+        // get packet status (placed at beginning of the packet by NIC)
+        uint32_t rx_status = *rxBegin;
+
+        // get the packet length
+        //uint16_t rx_size = rx_status >> 16;
+
+        // TODO: Check size, status, etc
+        Ethernet_Header *packet = (Ethernet_Header *)((uint32_t)rxBegin + sizeof(virtio_net_hdr));
+
+        EthernetProcessReceivedPacket(packet, mac_addr);
+
+        // place the used descriptor index back in the available ring
+        receiveQueue.driverArea->ringArray[receiveQueue.driverArea->index++] = index;
+
+        receiveQueue.lastUsedIndex++;
+    }
+
+    // notify the device that we've updated the availaible ring index
+    VNet_Write_Register(REG_QUEUE_NOTIFY, RECEIVE_QUEUE_INDEX);
 }

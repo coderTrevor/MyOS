@@ -72,7 +72,8 @@ void IPv4_ProcessReceivedPacket(IPv4_Header *ipHeader, uint8_t *sourceMAC)
 
     if (ipHeader->protocol == IPv4_PROTO_UDP)
     {
-        //terminal_writestring("UDP Packet received\n");
+        if(debugLevel)
+            terminal_writestring("UDP Packet received\n");
         UDP_ProcessReceivedPacket((UDP_Header *)(ipHeader->data), sourceMAC);
     }
 }

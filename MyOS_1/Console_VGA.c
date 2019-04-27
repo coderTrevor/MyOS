@@ -1,5 +1,4 @@
 #include <stdint.h>
-#include <intrin.h>
 #include <stdbool.h>
 #include "System_Specific.h"
 #include "Console_VGA.h"

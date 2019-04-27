@@ -1,5 +1,4 @@
 #include <stdint.h>
-#include <intrin.h>
 #include "Build_Number.h"
 #include "Console_VGA.h"
 #include "Console_Serial.h"

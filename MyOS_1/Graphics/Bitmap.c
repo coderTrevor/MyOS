@@ -5,12 +5,6 @@
 #include "../misc.h"
 #include "../Networking/IPv4.h"
 
-//#define MAX_BMP_FILESIZE (256 * 1024)
-//uint8_t rawFileBuffer[MAX_BMP_FILESIZE];
-
-void *malloc(size_t);
-void free(void *ptr);
-
 // returns true on success
 // *ppBuffer will have the address of an allocated buffer containing the image on success, NULL otherwise.
 // Caller must free *ppBuffer.

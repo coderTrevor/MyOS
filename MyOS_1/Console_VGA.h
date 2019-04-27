@@ -1,9 +1,6 @@
 #pragma once
 #include <stdint.h>
 #include <stdbool.h>
-/*#include <intrin.h>
-#include "misc.h"
-*/
 
 extern uint16_t terminal_row;
 extern uint16_t terminal_column;

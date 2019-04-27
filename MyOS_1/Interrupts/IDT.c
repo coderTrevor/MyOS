@@ -2,7 +2,6 @@
 #include "../Drivers/RTL_8139.h"
 #include "IDT.h"
 #include "Interrupts.h"
-#include <intrin.h>
 #include "System_Calls.h"
 #include "../Timers/PIT.h"
 

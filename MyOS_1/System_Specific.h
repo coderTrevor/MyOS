@@ -1,5 +1,4 @@
 #pragma once
-#include <intrin.h>
 #include <stdint.h>
 
 // Code that's (very) specific to a given compiler / host environment

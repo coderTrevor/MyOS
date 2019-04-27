@@ -1,6 +1,6 @@
 #include "TFTP.h"
 #include "../misc.h"
-#include "../Console_VGA.h"
+#include "../Terminal.h"
 #include "Ethernet.h"
 
 // TODO: Support multiple transactions
