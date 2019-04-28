@@ -88,22 +88,22 @@ void VirtIO_Net_Allocate_Virtqueue(virtq *virtqueue, uint16_t queueSize)
     // Used Ring
     //  - the above structures have alignment requirements we need to ensure we're fulfilling.
 
-    // descriptorTablSize must be aligned on a 16-byte boundary. Since the virtqueue itself must be aligned on a 4096-byte boundary,
+    // descriptor table must be aligned on a 16-byte boundary. Since the virtqueue itself must be aligned on a 4096-byte boundary,
     // this alignment will be guaranteed.
     uint32_t descriptorTableSize = 16 * queueSize;
 
-    // availableRingSize must always be aligned on a 2-byte boundary, which it always will be because descriptorSize will be aligned to 
-    // a 16-byte boundary and its size will be a multiple of 16.
-    uint32_t availableRingSize = 2 * queueSize + 6;
+    // driver area (AKA available ring) must be aligned on a 2-byte boundary, which it always will be because descriptorSize will be aligned to 
+    // a 4096-byte boundary and its size will be a multiple of 16.
+    uint32_t driverAreaSize = 2 * queueSize + 6;
 
-    // usedRingSize must be aligned on a 4096-byte boundary (because this is a legacy driver), which it probably won't be
-    uint32_t availableRingPadding = 0;
-    if ((availableRingSize + descriptorTableSize) % 4096 != 0)
-        availableRingPadding = 4096 - ((availableRingSize + descriptorTableSize) % 4096);
+    // device area (AKA used ring) must be aligned on a 4096-byte boundary (because this is a legacy driver), which it probably won't be
+    uint32_t driverAreaPadding = 0;
+    if ((driverAreaSize + descriptorTableSize) % 4096 != 0)
+        driverAreaPadding = 4096 - ((driverAreaSize + descriptorTableSize) % 4096);
 
-    uint32_t usedRingSize = 8 * queueSize + 6;
+    uint32_t deviceAreaSize = 8 * queueSize + 6;
 
-    uint32_t virtqueueByteSize = descriptorTableSize + availableRingSize + availableRingPadding + usedRingSize;
+    uint32_t virtqueueByteSize = descriptorTableSize + driverAreaSize + driverAreaPadding + deviceAreaSize;
 
     if(debugLevel)
         kprintf("\n       virtqueueByteSize: %d", virtqueueByteSize);
@@ -128,10 +128,9 @@ void VirtIO_Net_Allocate_Virtqueue(virtq *virtqueue, uint16_t queueSize)
     // driverArea (AKA Available Ring) will follow descriptors
     virtqueue->driverArea = (virtq_driver_area *)((uint32_t)virtqueue_mem + descriptorTableSize);
     // deviceArea will follow driver area + padding bytes
-    virtqueue->deviceArea = (virtq_device_area *)((uint32_t)virtqueue->driverArea + availableRingSize + availableRingPadding);
+    virtqueue->deviceArea = (virtq_device_area *)((uint32_t)virtqueue->driverArea + driverAreaSize + driverAreaPadding);
 
     virtqueue->byteSize = virtqueueByteSize;
-    //return virtqueue;
 }
 
 
