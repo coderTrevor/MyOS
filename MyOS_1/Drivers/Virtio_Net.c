@@ -247,7 +247,7 @@ void VirtIO_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
     VirtIO_Net_Init_Virtqueue(&controlQueue,  2);
 
     // Setup the receive queue
-    VirtIO_Net_SetupReceiveBuffer();
+    VirtIO_Net_SetupReceiveBuffers();
 
     // Setup an interrupt handler for this device
     // TODO: Check for and support IRQ sharing
@@ -297,15 +297,15 @@ void _declspec(naked) VirtIO_Net_InterruptHandler()
         //terminal_writestring("Virtq used\n");
 
         // see if the transmit queue has been used
-        while (transmitQueue.deviceArea->index >= transmitQueue.lastUsedIndex + 1)
+        while (transmitQueue.deviceArea->index != transmitQueue.lastDeviceAreaIndex)
         {
             //if(debugLevel)
                 terminal_writestring("Transmit success\n");
-            transmitQueue.lastUsedIndex++;
+            transmitQueue.lastDeviceAreaIndex++;
         }
 
-        // see if the receive queue has been used (TODO: Check for index wrap-around)
-        if (receiveQueue.deviceArea->index >= receiveQueue.lastUsedIndex + 1)
+        // see if the receive queue has been used
+        if (receiveQueue.deviceArea->index != receiveQueue.lastDeviceAreaIndex)
         {
             VirtIO_Net_ReceivePacket();
         }
@@ -323,7 +323,7 @@ void _declspec(naked) VirtIO_Net_InterruptHandler()
     }
 }
 
-void VirtIO_Net_SetupReceiveBuffer()
+void VirtIO_Net_SetupReceiveBuffers()
 {
     const uint16_t bufferSize = 1526; // as per virtio specs
 
@@ -334,21 +334,16 @@ void VirtIO_Net_SetupReceiveBuffer()
 
         // Add buffer to the descriptor table
         receiveQueue.descriptors[i].address = (uint64_t)buffer;
-        receiveQueue.descriptors[i].flags = VIRTQ_DESC_F_DEVICE_WRITE_ONLY;/* | VIRTQ_DESC_F_NEXT;*/
+        receiveQueue.descriptors[i].flags = VIRTQ_DESC_F_DEVICE_WRITE_ONLY;
         receiveQueue.descriptors[i].length = bufferSize;
-        receiveQueue.descriptors[i].next = 0; // i + 1;
-
-        // If this is the last descriptor we'll be using
-        if (i == 15)
-        {
-            receiveQueue.descriptors[i].flags = VIRTQ_DESC_F_DEVICE_WRITE_ONLY;
-            receiveQueue.descriptors[i].next = 0;
-        }
+        receiveQueue.descriptors[i].next = 0;
 
         // Add index of descriptor to the driver ring
-        receiveQueue.driverArea->ringArray[i] = i;
-        receiveQueue.driverArea->index++;
+        receiveQueue.driverArea->ringBuffer[i] = i;
     }
+
+    // Update next available index
+    receiveQueue.driverArea->index = 16;
 
     VNet_Write_Register(REG_QUEUE_NOTIFY, RECEIVE_QUEUE_INDEX);
 }
@@ -381,7 +376,7 @@ void VirtIO_Net_SendPacket(Ethernet_Header *packet, uint16_t dataSize)
     transmitQueue.descriptors[index].length = bufferSize;
     transmitQueue.descriptors[index].next = 0;
 
-    transmitQueue.driverArea->ringArray[index] = index;
+    transmitQueue.driverArea->ringBuffer[index] = index;
 
     transmitQueue.driverArea->index++;
 
@@ -430,7 +425,7 @@ void VirtIO_Net_SendPacket(Ethernet_Header *packet, uint16_t dataSize)
     transmitQueue.descriptors[descIndex2].next = 0;
 
     // Add descriptor chain to the available ring
-    transmitQueue.driverArea->ringArray[index] = descIndex;
+    transmitQueue.driverArea->ringBuffer[index] = descIndex;
 
     // Increase available ring index and notify the device
     transmitQueue.driverArea->index++;
@@ -444,7 +439,7 @@ void VirtIO_Net_ScanRQ()
 {
     kprintf("receive used index: %d\n", receiveQueue.deviceArea->index);
 
-    uint32_t addr = receiveQueue.descriptors;
+    uint32_t addr = (uint32_t)&receiveQueue.descriptors[0];
     uint32_t lastAddr = addr + receiveQueue.byteSize;
     //addr = receiveQueue.driverArea;
 
@@ -454,7 +449,7 @@ void VirtIO_Net_ScanRQ()
     // dump non-zero parts of all 16 receive buffers
     for (int i = 0; i < 16; ++i)
     {
-        addr = receiveQueue.descriptors[i].address;
+        addr = (uint32_t)receiveQueue.descriptors[i].address;
         lastAddr = addr + receiveQueue.descriptors[i].length;
         terminal_dump_nonzero_memory(addr, lastAddr);
     }
@@ -462,25 +457,26 @@ void VirtIO_Net_ScanRQ()
 
 void VirtIO_Net_ReceivePacket()
 {
-    while(receiveQueue.deviceArea->index >= receiveQueue.lastUsedIndex + 1)
+    while(receiveQueue.deviceArea->index != receiveQueue.lastDeviceAreaIndex)
     {
         terminal_writestring("     Packet received successfully!\n");
 
-        // get index to current descriptor
-        uint16_t index = receiveQueue.deviceArea->ringArray[receiveQueue.lastUsedIndex % receiveQueue.elements].index;
+        // Get the index of the current descriptor from the device's ring buffer
+        uint16_t ringBufferIndex = receiveQueue.lastDeviceAreaIndex % receiveQueue.elements;
+        uint16_t descIndex = (uint16_t)receiveQueue.deviceArea->ringBuffer[ringBufferIndex].index;
 
-        // get pointer to the beginning of the buffer
-        uint32_t *rxBegin = (uint32_t*)(receiveQueue.descriptors[index].address);
+        // Get pointer to the beginning of the buffer
+        uint32_t *rxBegin = (uint32_t*)((uint32_t)receiveQueue.descriptors[descIndex].address);
 
-        // TODO: Check size, status, etc
+        // Skip over virtio_net_hdr to get a pointer to the packet
         Ethernet_Header *packet = (Ethernet_Header *)((uint32_t)rxBegin + sizeof(virtio_net_hdr));
 
         EthernetProcessReceivedPacket(packet, mac_addr);
 
-        // place the used descriptor index back in the available ring
-        receiveQueue.driverArea->ringArray[receiveQueue.driverArea->index++] = index;
+        // Place the used descriptor index back in the available ring (driver area)
+        receiveQueue.driverArea->ringBuffer[receiveQueue.driverArea->index++] = descIndex;
 
-        receiveQueue.lastUsedIndex++;
+        receiveQueue.lastDeviceAreaIndex++;
     }
 
     // notify the device that we've updated the availaible ring index

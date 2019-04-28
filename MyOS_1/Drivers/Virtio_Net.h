@@ -91,11 +91,11 @@ typedef struct virtq_driver_area
     uint16_t flags;
     // index indicates where the driver will put the next entry in the ring (wrapping to the beginning of the ring as needed). It's value only ever increases.
     uint16_t index;
-    // ringArray is a ring-buffer that is queue-size elements long. Each entry refers to the head of a descriptor chain.
-    uint16_t ringArray[1];
-    // ringArray will be allocated in-place and take up (2 * (queue size)) bytes
+    // ringBuffer is a ring-buffer that is queue-size elements long. Each entry refers to the head of a descriptor chain.
+    uint16_t ringBuffer[1];
+    // ringBuffer will be allocated in-place and take up (2 * (queue size)) bytes
 
-    // uint16_t used_event would be present after ringArray, but only if VIRTIO_F_EVENT_IDX is negotiated. (we don't use it here)
+    // uint16_t used_event would be present after ringBuffer, but only if VIRTIO_F_EVENT_IDX is negotiated. (we don't use it here)
 } virtq_driver_area, virtq_available_ring;
 
 
@@ -116,10 +116,10 @@ typedef struct virtq_device_area
 {
     uint16_t flags;
     uint16_t index;
-    virtq_device_element ringArray[1];
-    // ringArray will be allocated in-place and take up (4 * (queue size)) bytes. Each element describes a used descriptor, including the index and length.
+    virtq_device_element ringBuffer[1];
+    // ringBuffer will be allocated in-place and take up (4 * (queue size)) bytes. Each element describes a used descriptor, including the index and length.
 
-    // uint16_t avail_event will be present after ringArray. It's only used if VIRTIO_F_EVENT_IDX is negotiated. (we don't use it here)
+    // uint16_t avail_event will be present after ringBuffer. It's only used if VIRTIO_F_EVENT_IDX is negotiated. (we don't use it here)
 } virtq_device_area, virtq_used_ring;
 
 typedef struct virtq
@@ -128,9 +128,10 @@ typedef struct virtq
     virtq_descriptor *descriptors;  // will be an elements-long array of descriptors
     virtq_driver_area *driverArea;  // extra data supplied by the driver to the device. AKA Available Ring
     virtq_device_area *deviceArea;  // extra data supplied by the device to the driver. AKA Used Ring
-    uint16_t nextDescriptor;
-    uint16_t lastUsedIndex;
-    uint16_t byteSize; // for debug
+    uint16_t nextDescriptor;        // index of the next slot in the descriptor table we should use
+    uint16_t lastDeviceAreaIndex;   // the last value of deviceArea->index we've seen. If this value doesn't equal deviceArea->index, 
+                                    // the device has added used descriptors to deviceArea->ringBuffer.
+    uint32_t byteSize; // for debug
 } virtq;
 
 
@@ -168,6 +169,6 @@ void VirtIO_Net_ScanRQ();
 
 void VirtIO_Net_SendPacket(Ethernet_Header *packet, uint16_t dataSize);
 
-void VirtIO_Net_SetupReceiveBuffer();
+void VirtIO_Net_SetupReceiveBuffers();
 
 void VirtIO_Net_ReceivePacket();
