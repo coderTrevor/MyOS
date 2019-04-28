@@ -437,6 +437,10 @@ void VirtIO_Net_SendPacket(Ethernet_Header *packet, uint16_t dataSize)
 // scan receive queue for non-zero data
 void VirtIO_Net_ScanRQ()
 {
+    // check for device failure
+    if (VNet_Read_Register(REG_DEVICE_STATUS) & STATUS_DEVICE_ERROR)
+        terminal_writestring("Virtio-net device has encountered an error!\n");
+
     kprintf("receive used index: %d\n", receiveQueue.deviceArea->index);
 
     uint32_t addr = (uint32_t)&receiveQueue.descriptors[0];
