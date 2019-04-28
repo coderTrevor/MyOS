@@ -41,4 +41,4 @@ bool ARP_GetMAC(uint32_t ip, char *destMAC);
 
 void ARP_RegisterIP(uint32_t ip, char *macAddress);
 
-void ARP_Send_Request(uint32_t targetIP, uint8_t *sourceMAC);
+void ARP_SendRequest(uint32_t targetIP, uint8_t *sourceMAC);

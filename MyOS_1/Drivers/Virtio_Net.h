@@ -95,7 +95,7 @@ typedef struct virtq_driver_area
     uint16_t ringArray[1];
     // ringArray will be allocated in-place and take up (2 * (queue size)) bytes
 
-    // uint16_t used_event will be present after ringArray. It's only used if VIRTIO_F_EVENT_IDX is negotiated. (we don't use it here)
+    // uint16_t used_event would be present after ringArray, but only if VIRTIO_F_EVENT_IDX is negotiated. (we don't use it here)
 } virtq_driver_area, virtq_available_ring;
 
 
@@ -130,6 +130,7 @@ typedef struct virtq
     virtq_device_area *deviceArea;  // extra data supplied by the device to the driver. AKA Used Ring
     uint16_t nextDescriptor;
     uint16_t lastUsedIndex;
+    uint16_t byteSize; // for debug
 } virtq;
 
 
@@ -162,6 +163,8 @@ typedef struct virtio_net_hdr
 void VirtIO_Net_Init(uint8_t bus, uint8_t slot, uint8_t function);
 
 void VirtIO_Net_InterruptHandler();
+
+void VirtIO_Net_ScanRQ();
 
 void VirtIO_Net_SendPacket(Ethernet_Header *packet, uint16_t dataSize);
 

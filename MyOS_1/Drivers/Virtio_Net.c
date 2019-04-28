@@ -8,6 +8,8 @@
 #include "../Networking/Ethernet.h"
 #include "../Networking/DHCP.h"
 #include "../misc.h"
+#include "../Networking/ARP.h"
+#include "../Networking/IPv4.h"
 
 // TODO: Support multiple NIC's
 
@@ -75,7 +77,7 @@ static inline uint32_t virtq_size(unsigned int qsz)
 // TODO: Error-checking
 void VirtIO_Net_Allocate_Virtqueue(virtq *virtqueue, uint16_t queueSize)
 {
-    // Zero virtqueue
+    // Zero virtqueue structure
     memset(virtqueue, 0, sizeof(virtq));
 
     // determine size of virtqueue in bytes (see 2.4 Virtqueues in virtio spec)
@@ -128,6 +130,7 @@ void VirtIO_Net_Allocate_Virtqueue(virtq *virtqueue, uint16_t queueSize)
     // deviceArea will follow driver area + padding bytes
     virtqueue->deviceArea = (virtq_device_area *)((uint32_t)virtqueue->driverArea + availableRingSize + availableRingPadding);
 
+    virtqueue->byteSize = virtqueueByteSize;
     //return virtqueue;
 }
 
@@ -152,7 +155,7 @@ void VirtIO_Net_Init_Virtqueue(virtq *virtqueue, uint16_t queueIndex)
     // Allocate and initialize the queue
     VirtIO_Net_Allocate_Virtqueue(virtqueue, queueSize);
 
-    if (debugLevel)
+    //if (debugLevel)
     {
         kprintf("\n       queue %d: 0x%X", queueIndex, virtqueue->descriptors);
         kprintf("         queue size: %d", virtqueue->elements);
@@ -161,7 +164,7 @@ void VirtIO_Net_Init_Virtqueue(virtq *virtqueue, uint16_t queueIndex)
     }
 
     // TODO: Convert virtual address to physical address
-    // (This isn't required now because all addresses are identity mapped)
+    // (This isn't required now because all addresses malloc returns are identity mapped)
 
     // Write address divided by 4096 to address register
     VNet_Write_Register(REG_QUEUE_ADDRESS, (uint32_t)virtqueue->descriptors / 4096);
@@ -226,6 +229,9 @@ void VirtIO_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
     // Perform device-specific setup, including discovery of virtqueues for the device, optional per-bus setup,
     // reading and possibly writing the device’s virtio configuration space, and population of virtqueues.
 
+    // enable PCI bus mastering
+    PCI_EnableBusMastering(bus, slot, function);
+
     // store the MAC address
     uint16_t macReg = REG_MAC_1;
     for (int i = 0; i < 6; ++i, ++macReg)
@@ -238,7 +244,7 @@ void VirtIO_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
     // Since we don't negotiate VIRTIO_NET_F_MQ, we can expect 3 virtqueues: receive, transmit, and control
     VirtIO_Net_Init_Virtqueue(&receiveQueue,  0);
     VirtIO_Net_Init_Virtqueue(&transmitQueue, 1);
-    VirtIO_Net_Init_Virtqueue(&controlQueue,  2);    
+    VirtIO_Net_Init_Virtqueue(&controlQueue,  2);
 
     // Setup the receive queue
     VirtIO_Net_SetupReceiveBuffer();
@@ -252,14 +258,17 @@ void VirtIO_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
 
     // Tell the device it's initialized
     VNet_Write_Register(REG_DEVICE_STATUS, STATUS_DRIVER_READY);
-        
+
+    // Remind the device that it has receive buffers. Hey VirtualBox! Why aren't you using these?
+    VNet_Write_Register(REG_QUEUE_NOTIFY, RECEIVE_QUEUE_INDEX);
+
     // Register this NIC with the ethernet subsystem
     EthernetRegisterNIC_SendFunction(VirtIO_Net_SendPacket);
     EthernetRegisterNIC_MAC(mac_addr);
 
     terminal_writestring("\n     Requesting IP address via DHCP...");
 
-    //ARP_Send_Request(IPv4_PackIP(10, 0, 2, 2), mac_addr);
+    //ARP_SendRequest(IPv4_PackIP(10, 0, 2, 2), mac_addr);
     DHCP_Send_Discovery(mac_addr);
 
     terminal_writestring("\n    virtio-net driver initialized.\n");
@@ -269,10 +278,9 @@ void _declspec(naked) VirtIO_Net_InterruptHandler()
 {
     _asm pushad;
 
-    /* do something */
     ++interrupts_fired;
 
-    if (debugLevel)
+    //if (debugLevel)
         terminal_writestring(" --------- virtio-net interrupt fired! -------\n");
 
     // Get the interrupt status (This will also reset the isr status register)
@@ -291,16 +299,15 @@ void _declspec(naked) VirtIO_Net_InterruptHandler()
         // see if the transmit queue has been used
         while (transmitQueue.deviceArea->index >= transmitQueue.lastUsedIndex + 1)
         {
-            if(debugLevel)
+            //if(debugLevel)
                 terminal_writestring("Transmit success\n");
             transmitQueue.lastUsedIndex++;
         }
 
-        // see if the receive queue has been used
+        // see if the receive queue has been used (TODO: Check for index wrap-around)
         if (receiveQueue.deviceArea->index >= receiveQueue.lastUsedIndex + 1)
         {
             VirtIO_Net_ReceivePacket();
-            //receiveQueue.lastUsedIndex = receiveQueue.deviceArea->index;
         }
     }
 
@@ -351,7 +358,9 @@ void VirtIO_Net_SendPacket(Ethernet_Header *packet, uint16_t dataSize)
     if(debugLevel)
         terminal_writestring("VirtIO_Net_SendPacket called\n");
 
-    uint16_t bufferSize = dataSize + sizeof(virtio_net_hdr);
+    // This commented-out code sends the entire packet as one descriptor.
+    // This works in Qemu but the packet never gets sent in VirtualBox
+    /*uint16_t bufferSize = dataSize + sizeof(virtio_net_hdr);
 
     // Allocate a buffer for the packet & header
     virtio_net_hdr *netBuffer = malloc(bufferSize);
@@ -376,9 +385,11 @@ void VirtIO_Net_SendPacket(Ethernet_Header *packet, uint16_t dataSize)
 
     transmitQueue.driverArea->index++;
 
-    transmitQueue.driverArea->flags = VIRTQ_AVAIL_F_NO_INTERRUPT;
+    transmitQueue.driverArea->flags = VIRTQ_AVAIL_F_NO_INTERRUPT;*/
 
-    /*uint16_t bufferSize = sizeof(virtio_net_hdr);
+    // Send packet using two descriptor entries. One for net header, another for the packet
+    // This two-descriptor scheme seems to be what Virtualbox expects for some reason.
+   uint16_t bufferSize = sizeof(virtio_net_hdr);
 
     // Allocate a buffer for the header
     virtio_net_hdr *netBuffer = malloc(bufferSize);
@@ -386,53 +397,80 @@ void VirtIO_Net_SendPacket(Ethernet_Header *packet, uint16_t dataSize)
     // Set parameters of netBuffer
     memset(netBuffer, 0, sizeof(virtio_net_hdr));
 
+    // Get indices for the next two descriptors
+    uint16_t descIndex = transmitQueue.nextDescriptor % transmitQueue.elements;
+    uint16_t descIndex2 = (descIndex + 1) % transmitQueue.elements;
+    transmitQueue.nextDescriptor += 2;
+
+    // Get index for the next entry into the available-ring
     uint16_t index = transmitQueue.driverArea->index % transmitQueue.elements;
-    uint16_t index2 = (index + 1) % transmitQueue.elements;
 
-    //if(debugLevel)
-    kprintf("Index %d\n", index);
-    kprintf("Index2 %d\n", index2);
+    if (debugLevel)
+    {
+        kprintf("\ndescIndex %d", descIndex);
+        kprintf("\ndescIndex2 %d", descIndex2);
+        kprintf("\nIndex %d", index);
+    }
 
-    // net header
-    transmitQueue.descriptors[index].address = (uint64_t)netBuffer;
-    transmitQueue.descriptors[index].flags = VIRTQ_DESC_F_NEXT;
-    transmitQueue.descriptors[index].length = bufferSize;
-    transmitQueue.descriptors[index].next = index2;
+    // fill descriptor with net header
+    transmitQueue.descriptors[descIndex].address = (uint64_t)netBuffer;
+    transmitQueue.descriptors[descIndex].flags = VIRTQ_DESC_F_NEXT;
+    transmitQueue.descriptors[descIndex].length = bufferSize;
+    transmitQueue.descriptors[descIndex].next = descIndex2;
 
-    transmitQueue.driverArea->ringArray[index] = index;
+    // copy packet to new buffer, because packetBuffer won't be a physical address
+    uint8_t *packetBuffer = malloc(dataSize);
+    memcpy(packetBuffer, packet, dataSize);
+    // (TODO: malloc returns identity-mapped addresses for now but later we'll need a function to convert virtual to physical)
 
-    // ethernet packet
-    transmitQueue.descriptors[index2].address = (uint64_t)packet;
-    transmitQueue.descriptors[index2].flags = 0;
-    transmitQueue.descriptors[index2].length = dataSize;
-    transmitQueue.descriptors[index2].next = 0;
+    // fill descriptor with ethernet packet
+    transmitQueue.descriptors[descIndex2].address = (uint64_t)packetBuffer;
+    transmitQueue.descriptors[descIndex2].flags = 0;
+    transmitQueue.descriptors[descIndex2].length = dataSize;
+    transmitQueue.descriptors[descIndex2].next = 0;
 
-    //transmitQueue.driverArea->ringArray[index2] = index2;
+    // Add descriptor chain to the available ring
+    transmitQueue.driverArea->ringArray[index] = descIndex;
 
-    
-    transmitQueue.driverArea->index++;// += 2;*/
+    // Increase available ring index and notify the device
+    transmitQueue.driverArea->index++;
 
     VNet_Write_Register(REG_QUEUE_NOTIFY, TRANSMIT_QUEUE_INDEX);
 }
 
+// This function is solely for debugging and trying to understand why VirtualBox won't show me received packets
+// scan receive queue for non-zero data
+void VirtIO_Net_ScanRQ()
+{
+    kprintf("receive used index: %d\n", receiveQueue.deviceArea->index);
+
+    uint32_t addr = receiveQueue.descriptors;
+    uint32_t lastAddr = addr + receiveQueue.byteSize;
+    //addr = receiveQueue.driverArea;
+
+    // dump non-zero parts of virtqueue
+    terminal_dump_nonzero_memory(addr, lastAddr);
+
+    // dump non-zero parts of all 16 receive buffers
+    for (int i = 0; i < 16; ++i)
+    {
+        addr = receiveQueue.descriptors[i].address;
+        lastAddr = addr + receiveQueue.descriptors[i].length;
+        terminal_dump_nonzero_memory(addr, lastAddr);
+    }
+}
+
 void VirtIO_Net_ReceivePacket()
 {
-    if (debugLevel)
+    while(receiveQueue.deviceArea->index >= receiveQueue.lastUsedIndex + 1)
+    {
         terminal_writestring("     Packet received successfully!\n");
 
-    while (receiveQueue.lastUsedIndex <= receiveQueue.deviceArea->index - 1)
-    {
         // get index to current descriptor
         uint16_t index = receiveQueue.deviceArea->ringArray[receiveQueue.lastUsedIndex % receiveQueue.elements].index;
 
-        // get pointer to the beginning of the packet
+        // get pointer to the beginning of the buffer
         uint32_t *rxBegin = (uint32_t*)(receiveQueue.descriptors[index].address);
-
-        // get packet status (placed at beginning of the packet by NIC)
-        uint32_t rx_status = *rxBegin;
-
-        // get the packet length
-        //uint16_t rx_size = rx_status >> 16;
 
         // TODO: Check size, status, etc
         Ethernet_Header *packet = (Ethernet_Header *)((uint32_t)rxBegin + sizeof(virtio_net_hdr));

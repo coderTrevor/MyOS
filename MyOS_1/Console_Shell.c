@@ -21,6 +21,7 @@
 #include "Drivers/AdLib.h"
 #include "Executables/Batch_Files.h"
 #include "paging.h"
+#include "Drivers/Virtio_Net.h"
 
 int inputPosition = 0;
 #define COMMAND_HISTORY_SIZE        10
@@ -161,6 +162,13 @@ void Shell_Process_command(void)
     }
 
     char subCommand[MAX_COMMAND_LENGTH];
+
+    // Check receive queue
+    if (strcmp(currentCommand, "scanrq") == 0)
+    {
+        VirtIO_Net_ScanRQ();
+        return;
+    }
 
     // Print info about memory allocations
     if (strcmp(currentCommand, "allocations") == 0)

@@ -102,7 +102,7 @@ void KeStartupPhase2(multiboot_info *multibootInfo)
     PCI_Init();
 
     // Execute autoexec.bat (if it exists)
-    Autoexec();
+    //Autoexec();
 
     // Say Hello
     terminal_writestring("Hello world!\n");

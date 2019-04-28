@@ -2,6 +2,8 @@
 #include "Console_VGA.h"
 #include "Graphics/Graphical_Terminal.h"
 
+void terminal_dump_nonzero_memory(uint32_t address, uint32_t lastAddress);
+
 void terminal_initialize(void);
 
 void terminal_newline();

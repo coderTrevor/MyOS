@@ -2,6 +2,7 @@
 #include "Graphics/Display_HAL.h"
 #include "Graphics/Graphical_Terminal.h"
 #include "misc.h"
+#include "printf.h"
 
 // Handles an "abstract" terminal
 
@@ -11,6 +12,27 @@ void terminal_backspace()
         VGA_terminal_backspace();
     else
         GraphicalTerminalBackspace();
+}
+
+// Scans a range of memory looking for nonzero values and dumps them to the screen when it finds them
+void terminal_dump_nonzero_memory(uint32_t address, uint32_t lastAddress)
+{
+    for (; address < lastAddress; address += 16)
+    {
+        bool nonZero = false;
+
+        for (int i = 0; i < 16; ++i)
+        {
+            if (*(uint8_t *)(address + i))
+                nonZero = true;
+        }
+
+        if (nonZero)
+        {
+            kprintf("0x%X: ", address);
+            terminal_dumpHex(address, 16);
+        }
+    }
 }
 
 void terminal_initialize(void)

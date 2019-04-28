@@ -120,7 +120,7 @@ void terminal_dumpHex(uint8_t *data, size_t length)
         offset += 8;
         terminal_newline();
     }
-    terminal_newline();
+    //terminal_newline();
 }
 
 // Fills the terminal up with a given character
