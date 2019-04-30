@@ -243,7 +243,7 @@ void VirtIO_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
     // Since we don't negotiate VIRTIO_NET_F_MQ, we can expect 3 virtqueues: receive, transmit, and control
     VirtIO_Net_Init_Virtqueue(&receiveQueue,  0);
     VirtIO_Net_Init_Virtqueue(&transmitQueue, 1);
-    VirtIO_Net_Init_Virtqueue(&controlQueue,  2);
+    //VirtIO_Net_Init_Virtqueue(&controlQueue,  2);
 
     // Setup the receive queue
     VirtIO_Net_SetupReceiveBuffers();
