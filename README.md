@@ -29,7 +29,8 @@ There's not much here beyond what's provided with tutorials like those from the 
 * A do-little command line shell is provided
 * Minimal support for COM1 serial input and output (Currently commented-out)
 * Basic interrupt support, mostly just used by the keyboard and NIC drivers
-* A very minimal RTL 8139 NIC driver (only tested with QEMU)
+* A very minimal RTL 8139 NIC driver (only tested with Qemu)
+* A virtio-net driver (only working in Qemu)
 * Some network protocols are minimally implemented, like ARP, IP, UDP, and a DHCP client
 * Filesystem support is only offered through a TFTP client with a hardcoded server IP
 * Can be built with MSVC 2015 (which makes it somewhat rare in the hobby OS world)
