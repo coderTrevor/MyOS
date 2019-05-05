@@ -2,28 +2,151 @@
 
 #include "e1000.h"
 #include "../Terminal.h"
+#include "PCI_Bus.h"
+#include "../printf.h"
+#include "../System_Specific.h"
+#include "../paging.h"
+#include "../Networking/Ethernet.h"
+#include "../misc.h"
+
+// TODO: Support multiple NIC's
+//uint16_t e1000_base_port;
+uint32_t e1000_mmAddress;
+uint8_t  e1000_IRQ;
+uint8_t  mac_addr[6];
+
+/*bool e1000_Get_IO_Base(uint8_t bus, uint8_t slot, uint8_t function)
+{
+    bool ioAddrFound = false;
+
+    uint32_t barValue = 0;
+    //= PCI_GetBaseAddress0(bus, slot, function);
+
+    // Check each PCI BAR until we find the one with the IO Register Base Address
+    for (uint8_t barOffset = BAR0_OFFSET; barOffset <= BAR5_OFFSET; barOffset += 4)
+    {
+        barValue = PCI_ConfigReadDWord(bus, slot, function, barOffset);
+
+        //kprintf("0x%lX\n", barValue);
+
+        if (barValue & IOBIT)
+        {
+            ioAddrFound = true;
+            break;
+        }
+    }
+
+    if (!ioAddrFound)
+        return false;
+
+    // ignore the lowest three bits of bar to find IO Register Base Address
+    e1000_base_port = barValue & ~7;
+    
+    return true;
+}*/
+
+bool e1000_Get_MMIO(uint8_t bus, uint8_t slot, uint8_t function)
+{
+    // Get value stored in BAR0
+    uint32_t bar0 = PCI_GetBaseAddress0(bus, slot, function);
+
+    // See if we're using MMIO (We should be)
+    if ((bar0 & BAR_MMIO_OR_IO_BIT) == BAR_USING_IO)
+    {
+        terminal_writestring("\n      BAR0 isn't using MMIO. This driver doesn't handle that.\n");
+        return false;
+    }
+
+    e1000_mmAddress = bar0 & BAR_ADDRESS;
+
+    if ((bar0 & BAR_ADDRESS_TYPE) == BAR_64BIT)
+    {
+        // bar1 (upper address) should be 0 since we want to use 32-bit access
+        uint32_t upperAddress = PCI_GetBaseAddress1(bus, slot, function);
+        if (upperAddress != 0)
+        {
+            uint64_t address = (((uint64_t)upperAddress << 4) + e1000_mmAddress);
+            kprintf("\n      64-bit MMIO isn't supported right now. Device is mapped to 0x%llX\n", address);
+            return false;
+        }
+    }
+    else
+    {
+        if ((bar0 & BAR_ADDRESS_TYPE) != BAR_32BIT)
+        {
+            terminal_writestring("\n      Invalid memory address size in BAR0\n");
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void e1000_Get_Mac()
+{
+    // Read the MAC low bytes
+    uint32_t macLow = e1000_Read_Register(REG_MAC_LOW);
+    uint32_t macHigh = e1000_Read_Register(REG_MAC_HIGH);
+    
+    /* We have to swap some bytes around. From the intel manual:
+    For a MAC address of 12 - 34 - 56 - 78 - 90 - AB, words 2:0 load as follows(note that these words are byteswapped) :
+        Word 0 = 3412
+        Word 1 = 7856
+        Word 2 - AB90
+        */
+    uint16_t word0 = SwapBytes16((uint16_t)macLow);
+    uint16_t word1 = SwapBytes16((uint16_t)(macLow >> 16));
+    uint16_t word2 = SwapBytes16((uint16_t)(macHigh));
+
+    if(debugLevel)
+        kprintf("\nword0: %X\nword1: %X\nword2: %x\n", word0, word1, word2);
+
+    memcpy(&mac_addr[0], &word0, 2);
+    memcpy(&mac_addr[2], &word1, 2);
+    memcpy(&mac_addr[4], &word2, 2);
+}
 
 void e1000_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
 {
     (void)bus; (void)slot; (void)function;
-    // get the I/O port
-    //vNet_base_port = PCI_GetBaseAddress0(bus, slot, function) & ~3;
 
-    terminal_writestring("    Initializing e1000 driver...");/*     Base address : ");
-    terminal_print_ushort_hex(vNet_base_port);
+    terminal_writestring("    Initializing e1000 driver...\n");
+        
+    /*if (!e1000_Get_IO_Base(bus, slot, function))
+    {
+        terminal_writestring("     Error: Unable to find IO Register Base Address\n");
+        return;
+    }*/
+
+    if (!e1000_Get_MMIO(bus, slot, function))
+        return;
+
+    kprintf("     MMIO Address: 0x%lX", e1000_mmAddress);
+    //kprintf("     Base Address: 0x%lX", e1000_base_port);
+
+    // Map the MMIO in the page table
+    uint32_t mmioPage = e1000_mmAddress / FOUR_MEGABYTES;
+    pageDir[mmioPage] = ((mmioPage * FOUR_MEGABYTES)
+                         | DIRECTORY_ENTRY_PRESENT | DIRECTORY_ENTRY_USER_ACCESSIBLE | DIRECTORY_ENTRY_WRITABLE | DIRECTORY_ENTRY_4MB);
 
     // get the IRQ
-    vNet_IRQ = PCI_GetInterruptLine(bus, slot, function);
-    kprintf(" - IRQ %d", vNet_IRQ);
+    e1000_IRQ = PCI_GetInterruptLine(bus, slot, function);
+    kprintf(" - IRQ %d", e1000_IRQ);
 
     // make sure an IRQ line is being used
-    if (vNet_IRQ == 0xFF)
+    if (e1000_IRQ == 0xFF)
     {
         terminal_writestring("\n      Can't use I/O APIC interrupts. Aborting.\n");
         return;
     }
 
-    // Reset the virtio-network device
+    // Get the MAC address
+    e1000_Get_Mac();
+    terminal_writestring(" - MAC: ");
+    EthernetPrintMAC(mac_addr);
+
+
+    /*// Reset the virtio-network device
     VNet_Write_Register(REG_DEVICE_STATUS, STATUS_RESET_DEVICE);
 
     // Set the acknowledge status bit
@@ -66,14 +189,6 @@ void e1000_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
     // enable PCI bus mastering
     PCI_EnableBusMastering(bus, slot, function);
 
-    // store the MAC address
-    uint16_t macReg = REG_MAC_1;
-    for (int i = 0; i < 6; ++i, ++macReg)
-        mac_addr[i] = (uint8_t)VNet_Read_Register(macReg);
-
-    terminal_writestring(" - MAC: ");
-    EthernetPrintMAC(mac_addr);
-
     // Init virtqueues (see 4.1.5.1.3 of virtio-v1.0-cs04.pdf)
     // Since we don't negotiate VIRTIO_NET_F_MQ, we can expect 3 virtqueues: receive, transmit, and control
     VirtIO_Net_Init_Virtqueue(&receiveQueue, 0);
@@ -106,4 +221,10 @@ void e1000_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
     DHCP_Send_Discovery(mac_addr);
     */
     terminal_writestring("\n    e1000 driver initialized.\n");
+}
+
+uint32_t e1000_Read_Register(uint32_t regOffset)
+{
+    volatile uint32_t data = *(uint32_t*)(e1000_mmAddress + regOffset);
+    return data;
 }

@@ -30,7 +30,7 @@ void terminal_dump_nonzero_memory(uint32_t address, uint32_t lastAddress)
         if (nonZero)
         {
             kprintf("0x%X: ", address);
-            terminal_dumpHex(address, 16);
+            terminal_dumpHex((uint8_t*)address, 16);
         }
     }
 }
