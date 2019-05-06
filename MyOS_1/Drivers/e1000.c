@@ -8,6 +8,7 @@
 #include "../paging.h"
 #include "../Networking/Ethernet.h"
 #include "../misc.h"
+#include "../Networking/DHCP.h"
 
 // TODO: Support multiple NIC's
 //uint16_t e1000_base_port;
@@ -160,80 +161,25 @@ void e1000_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
 
     e1000_TX_Init();
 
-    /*// Reset the virtio-network device
-    VNet_Write_Register(REG_DEVICE_STATUS, STATUS_RESET_DEVICE);
-
-    // Set the acknowledge status bit
-    VNet_Write_Register(REG_DEVICE_STATUS, STATUS_DEVICE_ACKNOWLEDGED);
-
-    // Set the driver status bit
-    VNet_Write_Register(REG_DEVICE_STATUS, STATUS_DEVICE_ACKNOWLEDGED | STATUS_DRIVER_LOADED);
-
-    // Read the feature bits
-    uint32_t features = VNet_Read_Register(REG_DEVICE_FEATURES);
-
-    // Make sure the features we need are supported
-    if ((features & REQUIRED_FEATURES) != REQUIRED_FEATURES)
-    {
-        // uh-oh
-        terminal_writestring("\n      Required features are not supported by device. Aborting.\n");
-        VNet_Write_Register(REG_DEVICE_STATUS, STATUS_DEVICE_ERROR);
-        return;
-    }
-
-    // Tell the device what features we'll be using
-    VNet_Write_Register(REG_GUEST_FEATURES, REQUIRED_FEATURES);
-
-    // We must omit these next steps since we're supporting legacy devices
-    // Tell the device the features have been negotiated
-    /*VNet_Write_Register(REG_DEVICE_STATUS, STATUS_DEVICE_ACKNOWLEDGED | STATUS_DRIVER_LOADED | STATUS_FEATURES_OK);
-
-    // Make sure the device is ok with those features
-    if ((VNet_Read_Register(REG_DEVICE_STATUS) & STATUS_FEATURES_OK) != STATUS_FEATURES_OK)
-    {
-    // uh-oh
-    terminal_writestring("\n      Failed to negotiate features with device. Aborting.\n");
-    VNet_Write_Register(REG_DEVICE_STATUS, STATUS_DEVICE_ERROR);
-    return;
-    }*/
-    /*
-    // Perform device-specific setup, including discovery of virtqueues for the device, optional per-bus setup,
-    // reading and possibly writing the device’s virtio configuration space, and population of virtqueues.
-
     // enable PCI bus mastering
     PCI_EnableBusMastering(bus, slot, function);
 
-    // Init virtqueues (see 4.1.5.1.3 of virtio-v1.0-cs04.pdf)
-    // Since we don't negotiate VIRTIO_NET_F_MQ, we can expect 3 virtqueues: receive, transmit, and control
-    VirtIO_Net_Init_Virtqueue(&receiveQueue, 0);
-    VirtIO_Net_Init_Virtqueue(&transmitQueue, 1);
-    //VirtIO_Net_Init_Virtqueue(&controlQueue,  2);
-
-    // Setup the receive queue
-    VirtIO_Net_SetupReceiveBuffers();
-
     // Setup an interrupt handler for this device
     // TODO: Check for and support IRQ sharing
-    Set_IDT_Entry((unsigned long)VirtIO_Net_InterruptHandler, HARDWARE_INTERRUPTS_BASE + vNet_IRQ);
+    //Set_IDT_Entry((unsigned long)VirtIO_Net_InterruptHandler, HARDWARE_INTERRUPTS_BASE + vNet_IRQ);
 
     // Tell the PIC to enable the NIC's IRQ
-    IRQ_Enable_Line(vNet_IRQ);
-
-    // Tell the device it's initialized
-    VNet_Write_Register(REG_DEVICE_STATUS, STATUS_DRIVER_READY);
-
-    // Remind the device that it has receive buffers. Hey VirtualBox! Why aren't you using these?
-    VNet_Write_Register(REG_QUEUE_NOTIFY, RECEIVE_QUEUE_INDEX);
+    //IRQ_Enable_Line(vNet_IRQ);
 
     // Register this NIC with the ethernet subsystem
-    EthernetRegisterNIC_SendFunction(VirtIO_Net_SendPacket);
+    EthernetRegisterNIC_SendFunction(e1000_SendPacket);
     EthernetRegisterNIC_MAC(mac_addr);
 
     terminal_writestring("\n     Requesting IP address via DHCP...");
 
     //ARP_SendRequest(IPv4_PackIP(10, 0, 2, 2), mac_addr);
     DHCP_Send_Discovery(mac_addr);
-    */
+    
     terminal_writestring("\n    e1000 driver initialized.\n");
 }
 
@@ -243,18 +189,54 @@ uint32_t e1000_Read_Register(uint32_t regOffset)
     return data;
 }
 
+void e1000_SendPacket(Ethernet_Header *packet, uint16_t dataSize)
+{
+    if (debugLevel)
+        terminal_writestring("e1000_SendPacket called\n");
+
+    // TODO: (maybe) convert packet to a physical address and use it directly
+
+    // Allocate a new buffer for the packet
+    uint8_t *netBuffer = malloc(dataSize);
+
+    // Copy packet to buffer
+    memcpy(netBuffer, packet, dataSize);
+
+    // Determine which transmit descriptor we'll be using from the value of the tail register
+    uint32_t index = e1000_Read_Register(REG_TDT);
+
+    if(debugLevel)
+        kprintf("transmit descriptor index: %d\n", index);
+
+    txDescriptorList[index].bufferAddress = (uint64_t)netBuffer;
+    txDescriptorList[index].checksumOffset = 0;
+    txDescriptorList[index].checksumStart = 0;
+    txDescriptorList[index].command = TDESC_CMD_EOP;
+    txDescriptorList[index].length = dataSize;
+    txDescriptorList[index].special = 0;
+    txDescriptorList[index].status = 0;
+
+    // Increment tail index value
+    index = (index + 1) % TX_DESCRIPTORS;
+
+    e1000_Write_Register(REG_TDT, index);
+}
+
 void e1000_TX_Init()
 {
     // Perform transmit initialization (From the Intel Manual:)
 
     // Allocate memory for the transmit descriptor list (16-byte aligned)
     void *txDescListMemory = malloc(sizeof(TX_DESC_LEGACY) * TX_DESCRIPTORS + 15);
-    
+
     // Ensure the descriptor list is aligned on a 16-byte boundary
     if ((uint32_t)txDescListMemory % 16 != 0)
         txDescriptorList = (TX_DESC_LEGACY *)((uint32_t)txDescListMemory + 16 - ((uint32_t)txDescListMemory % 16));
     else
         txDescriptorList = (TX_DESC_LEGACY *)txDescListMemory;
+
+    // Zero out the descriptor list
+    memset(txDescriptorList, 0, sizeof(TX_DESC_LEGACY) * TX_DESCRIPTORS);
 
     // Program the Transmit Descriptor Base Address TDBAL register with the address of the region
     e1000_Write_Register(REG_TDBAL, (uint32_t)txDescriptorList);
@@ -269,7 +251,7 @@ void e1000_TX_Init()
     e1000_Write_Register(REG_TDLEN, tdLength);
 
     // The Transmit Descriptor Head and Tail (TDH/TDT) registers are initialized (by hardware) to 0b
-    // after a power - on or a software initiated Ethernet controller reset.Software should write 0b to both
+    // after a power - on or a software initiated Ethernet controller reset. Software should write 0b to both
     // these registers to ensure this.
     e1000_Write_Register(REG_TDH, 0);
     e1000_Write_Register(REG_TDT, 0);

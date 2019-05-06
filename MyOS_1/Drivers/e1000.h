@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "../Networking/Ethernet.h"
 
 #define IOADDR  0x00
 #define IODATA  0x04
@@ -83,16 +84,18 @@ typedef struct TX_DESC_LEGACY
 #define TDESC_CMD_INSERT_FCS        2
 #define TDESC_CMD_INSERT_CHECKSUM   4
 #define TDESC_CMD_REPORT_STATUS     8
-#define TDESC_CMD_REPORT_PACKET_SENT    16
+#define TDESC_CMD_REPORT_PACKET_SENT    16  /* used by 82544GC/EI only */
 
 // defines for status bits
 #define TDESC_STATUS_DESCRIPTOR_DONE    1
 
-#define TX_DESCRIPTORS  16
+#define TX_DESCRIPTORS  768
 
 void e1000_Net_Init(uint8_t bus, uint8_t slot, uint8_t function);
 
 uint32_t e1000_Read_Register(uint32_t reg);
+
+void e1000_SendPacket(Ethernet_Header *packet, uint16_t dataSize);
 
 void e1000_TX_Init();
 
