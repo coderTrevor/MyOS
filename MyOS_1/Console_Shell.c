@@ -163,7 +163,14 @@ void Shell_Process_command(void)
 
     char subCommand[MAX_COMMAND_LENGTH];
 
-    // Check receive queue
+    // Display kernel mapping
+    if (strcmp(currentCommand, "base") == 0)
+    {
+        printf("Kernel is mapped to 0x%lX\n", BASE_ADDRESS);
+        return;
+    }
+
+    // Check virtio-net receive queue
     if (strcmp(currentCommand, "scanrq") == 0)
     {
         VirtIO_Net_ScanRQ();

@@ -15,6 +15,8 @@ uint32_t e1000_mmAddress;
 uint8_t  e1000_IRQ;
 uint8_t  mac_addr[6];
 
+TX_DESC_LEGACY *txDescriptorList = 0;
+
 /*bool e1000_Get_IO_Base(uint8_t bus, uint8_t slot, uint8_t function)
 {
     bool ioAddrFound = false;
@@ -94,9 +96,9 @@ void e1000_Get_Mac()
         Word 1 = 7856
         Word 2 - AB90
         */
-    uint16_t word0 = SwapBytes16((uint16_t)macLow);
-    uint16_t word1 = SwapBytes16((uint16_t)(macLow >> 16));
-    uint16_t word2 = SwapBytes16((uint16_t)(macHigh));
+    uint16_t word0 = (uint16_t)macLow;
+    uint16_t word1 = (uint16_t)(macLow >> 16);
+    uint16_t word2 = (uint16_t)macHigh;
 
     if(debugLevel)
         kprintf("\nword0: %X\nword1: %X\nword2: %x\n", word0, word1, word2);
@@ -145,6 +147,18 @@ void e1000_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
     terminal_writestring(" - MAC: ");
     EthernetPrintMAC(mac_addr);
 
+    // Read the control register and set (or unset) the appropriate bits to reset the NIC
+    uint32_t ctrlReg = e1000_Read_Register(REG_CTRL);
+    
+    // Set the link up
+    ctrlReg |= CTRL_SET_LINK_UP | CTRL_AUTO_SPEED_DETECT;
+
+    // Clear the PHY Reset bit
+    ctrlReg &= ~(CTRL_PHY_RESET | CTRL_INVERT_LOSS_OF_SIGNAL);
+
+    e1000_Write_Register(REG_CTRL, ctrlReg);
+
+    e1000_TX_Init();
 
     /*// Reset the virtio-network device
     VNet_Write_Register(REG_DEVICE_STATUS, STATUS_RESET_DEVICE);
@@ -227,4 +241,66 @@ uint32_t e1000_Read_Register(uint32_t regOffset)
 {
     volatile uint32_t data = *(uint32_t*)(e1000_mmAddress + regOffset);
     return data;
+}
+
+void e1000_TX_Init()
+{
+    // Perform transmit initialization (From the Intel Manual:)
+
+    // Allocate memory for the transmit descriptor list (16-byte aligned)
+    void *txDescListMemory = malloc(sizeof(TX_DESC_LEGACY) * TX_DESCRIPTORS + 15);
+    
+    // Ensure the descriptor list is aligned on a 16-byte boundary
+    if ((uint32_t)txDescListMemory % 16 != 0)
+        txDescriptorList = (TX_DESC_LEGACY *)((uint32_t)txDescListMemory + 16 - ((uint32_t)txDescListMemory % 16));
+    else
+        txDescriptorList = (TX_DESC_LEGACY *)txDescListMemory;
+
+    // Program the Transmit Descriptor Base Address TDBAL register with the address of the region
+    e1000_Write_Register(REG_TDBAL, (uint32_t)txDescriptorList);
+
+    // Set the Transmit Descriptor Length (TDLEN) register to the size (in bytes) of the descriptor ring.
+    // This value must be 128 - byte aligned (with 16 descriptors, it will be)
+    uint32_t tdLength = TX_DESCRIPTORS * sizeof(TX_DESC_LEGACY);
+    
+    if (tdLength % 128 != 0)
+        terminal_writestring("Error: TDLEN isn't properly calculated!\n");
+    
+    e1000_Write_Register(REG_TDLEN, tdLength);
+
+    // The Transmit Descriptor Head and Tail (TDH/TDT) registers are initialized (by hardware) to 0b
+    // after a power - on or a software initiated Ethernet controller reset.Software should write 0b to both
+    // these registers to ensure this.
+    e1000_Write_Register(REG_TDH, 0);
+    e1000_Write_Register(REG_TDT, 0);
+
+    /* Initialize the Transmit Control Register (TCTL) for desired operation to include the following:
+        -Set the Enable (TCTL.EN) bit to 1b for normal operation.
+        -Set the Pad Short Packets (TCTL.PSP) bit to 1b.
+        -Configure the Collision Threshold (TCTL.CT) to the desired value. Ethernet standard is 10h.
+This setting only has meaning in half duplex mode.
+        -Configure the Collision Distance (TCTL.COLD) to its expected value. For full duplex
+operation, this value should be set to 40h. For gigabit half duplex, this value should be set to
+200h. For 10/100 half duplex, this value should be set to 40h. */
+
+    // TODO: Pay attention to the duplex mode
+    uint32_t tctl = TCTL_TX_ENABLE | TCTL_PAD_SHORT_PACKET | TCTL_DEFAULT_COLLISION_THRESHOLD;
+    tctl |= TCTL_DEFAULT_COLLISION_DISTANCE | TCTL_RETRANSMIT_ON_LATE_COLLISION;
+    e1000_Write_Register(REG_TCTL, tctl);
+
+    /*  -Program the Transmit IPG (TIPG) register with the following decimal values to get the minimum
+legal Inter Packet Gap:
+            IPGT = 10
+            IPGR1 = 10
+            IPGR2 = 10
+    */
+    
+    // (QEMU seems to ignore this register)
+    e1000_Write_Register(REG_TIPG, TIPG_DEFAULTS);
+}
+
+void e1000_Write_Register(uint32_t regOffset, uint32_t value)
+{
+    volatile uint32_t *ptr = (uint32_t*)(e1000_mmAddress + regOffset);
+    *ptr = value;
 }
