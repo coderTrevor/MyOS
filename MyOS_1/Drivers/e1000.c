@@ -9,14 +9,20 @@
 #include "../Networking/Ethernet.h"
 #include "../misc.h"
 #include "../Networking/DHCP.h"
+#include "../Interrupts/PIC.h"
+#include "../Interrupts/IDT.h"
+#include "../Interrupts/Interrupts.h"
 
 // TODO: Support multiple NIC's
+// TODO: Check for malloc failure
 //uint16_t e1000_base_port;
 uint32_t e1000_mmAddress;
 uint8_t  e1000_IRQ;
 uint8_t  mac_addr[6];
+uint32_t lastReceiveTail = 0;
 
 TX_DESC_LEGACY *txDescriptorList = 0;
+RX_DESCRIPTOR  *rxDescriptorList = 0;
 
 /*bool e1000_Get_IO_Base(uint8_t bus, uint8_t slot, uint8_t function)
 {
@@ -159,6 +165,7 @@ void e1000_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
 
     e1000_Write_Register(REG_CTRL, ctrlReg);
 
+    e1000_RX_Init();
     e1000_TX_Init();
 
     // enable PCI bus mastering
@@ -166,10 +173,10 @@ void e1000_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
 
     // Setup an interrupt handler for this device
     // TODO: Check for and support IRQ sharing
-    //Set_IDT_Entry((unsigned long)VirtIO_Net_InterruptHandler, HARDWARE_INTERRUPTS_BASE + vNet_IRQ);
+    Set_IDT_Entry((unsigned long)e1000_InterruptHandler, HARDWARE_INTERRUPTS_BASE + e1000_IRQ);
 
     // Tell the PIC to enable the NIC's IRQ
-    //IRQ_Enable_Line(vNet_IRQ);
+    IRQ_Enable_Line(e1000_IRQ);
 
     // Register this NIC with the ethernet subsystem
     EthernetRegisterNIC_SendFunction(e1000_SendPacket);
@@ -183,6 +190,62 @@ void e1000_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
     terminal_writestring("\n    e1000 driver initialized.\n");
 }
 
+void _declspec(naked) e1000_InterruptHandler()
+{
+    _asm pushad;
+
+    ++interrupts_fired;
+
+    //if (debugLevel)
+    terminal_writestring(" --------- e1000 interrupt fired! -------\n");
+
+    // Get the interrupt status (This will also reset the isr status register)
+    uint32_t isr;
+    isr = e1000_Read_Register(REG_ICR);
+    //if(debugLevel)
+    kprintf("isr: 0x%lX\n", isr);
+
+    if (isr & IMS_RXT0)
+        e1000_ReceivePacket();
+
+
+    /*
+    // TODO: Support configuration changes (doubt this will ever happen)
+    if (isr & VIRTIO_ISR_CONFIG_CHANGED)
+        terminal_writestring("TODO: VirtIO-Net configuration has changed\n");
+
+    // Check for used queues
+    if (isr & VIRTIO_ISR_VIRTQ_USED)
+    {
+        //terminal_writestring("Virtq used\n");
+
+        // see if the transmit queue has been used
+        while (transmitQueue.deviceArea->index != transmitQueue.lastDeviceAreaIndex)
+        {
+            //if(debugLevel)
+            terminal_writestring("Transmit success\n");
+            transmitQueue.lastDeviceAreaIndex++;
+        }
+
+        // see if the receive queue has been used
+        if (receiveQueue.deviceArea->index != receiveQueue.lastDeviceAreaIndex)
+        {
+            VirtIO_Net_ReceivePacket();
+        }
+    }
+    */
+    PIC_sendEOI(HARDWARE_INTERRUPTS_BASE + e1000_IRQ);
+
+    //if (debugLevel)
+        terminal_writestring(" --------- e1000 net interrupt done! -------\n");
+
+    _asm
+    {
+        popad
+        iretd
+    }
+}
+
 uint32_t e1000_Read_Register(uint32_t regOffset)
 {
     volatile uint32_t data = *(uint32_t*)(e1000_mmAddress + regOffset);
@@ -191,7 +254,7 @@ uint32_t e1000_Read_Register(uint32_t regOffset)
 
 void e1000_SendPacket(Ethernet_Header *packet, uint16_t dataSize)
 {
-    if (debugLevel)
+    //if (debugLevel)
         terminal_writestring("e1000_SendPacket called\n");
 
     // TODO: (maybe) convert packet to a physical address and use it directly
@@ -220,6 +283,83 @@ void e1000_SendPacket(Ethernet_Header *packet, uint16_t dataSize)
     index = (index + 1) % TX_DESCRIPTORS;
 
     e1000_Write_Register(REG_TDT, index);
+
+    terminal_writestring("Packet sent\n");
+}
+
+void e1000_ReceivePacket()
+{
+    //volatile uint32_t tail = e1000_Read_Register(REG_RDT) % RX_DESCRIPTORS;
+    
+    // Read every packet received
+    while (rxDescriptorList[lastReceiveTail].status & RDESC_STATUS_DESCRIPTOR_DONE)
+    {
+        terminal_writestring("while\n");
+        // TODO: Support packets larger than one buffer
+        // Pull the next packet off the queue
+        EthernetProcessReceivedPacket((Ethernet_Header*)(uint32_t)rxDescriptorList[lastReceiveTail].bufferAddress, mac_addr);
+
+        // mark the descriptor as free
+        rxDescriptorList[lastReceiveTail].status = 0;
+
+        // update tail
+        lastReceiveTail = (lastReceiveTail + 1) % RX_DESCRIPTORS;
+        e1000_Write_Register(REG_RDT, lastReceiveTail);
+
+        // Clear the interrupt
+        e1000_Write_Register(REG_ICR, IMS_RXT0);
+    }
+}
+
+void e1000_RX_Init()
+{
+    // The Intel manual says we should read the EEPROM to program the RAL/RAH registers with the MAC address.
+    // In my experience (at least on Qemu and VirtualBox) RAL/RAH already contain the MAC.
+
+    // Zero the multicast table array, MTA0 - MTA127
+    for (int i = 0; i < 128; ++i)
+        e1000_Write_Register(REG_MTA0 + (i * 4), 0);
+
+    // Set interrupt mask
+    e1000_Write_Register(REG_IMS, IMS_LSC | IMS_RXDMT0 | IMS_RXO | IMS_RXSEQ | IMS_RXT0);
+    
+    // Get the length of the descriptor list
+    int descLength = sizeof(RX_DESCRIPTOR) * RX_DESCRIPTORS;
+
+    if (descLength % 128)
+        terminal_writestring("\nError: rx descriptor length imprperly calculated!");
+
+    // Allocate the descriptor list (must be aligned on a 16-bit boundary)
+    RX_DESCRIPTOR *descMemory = malloc(descLength + 15);
+    
+    // ensure the descriptor list is 16-bit aligned
+    if ((uint32_t)descMemory % 16)
+        rxDescriptorList = (RX_DESCRIPTOR *)((uint32_t)descMemory + 16 - ((uint32_t)descMemory % 16));
+    else
+        rxDescriptorList = descMemory;
+
+    // Zero out the descriptor list
+    memset(rxDescriptorList, 0, descLength);
+
+    // Write the address of the list to RDBA
+    e1000_Write_Register(REG_RDBAH, 0);
+    e1000_Write_Register(REG_RDBAL, (uint32_t)rxDescriptorList);
+
+    e1000_Write_Register(REG_RDLEN, descLength);
+
+    // Initialize descriptor list and allocate receive buffers
+    for (int i = 0; i < RX_DESCRIPTORS; ++i)
+    {
+        // allocate 1k buffer for each descriptor (we only use tftp and dhcp, so this size will accomodate every packet we receive)
+        rxDescriptorList[i].bufferAddress = (uint64_t)malloc(1024);
+    }
+
+    e1000_Write_Register(REG_RDH, 0);
+    e1000_Write_Register(REG_RDT, RX_DESCRIPTORS);
+
+    // Enable reception, 1024-byte packets
+    e1000_Write_Register(REG_RCTL, RCTL_RX_ENABLE | RCTL_BROADCAST_ACCEPT | RCTL_BUFFER_SIZE_1024);
+
 }
 
 void e1000_TX_Init()

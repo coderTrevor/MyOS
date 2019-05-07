@@ -20,16 +20,30 @@
 #define REG_FCAH        0x2C
 #define REG_FCT         0x30
 #define REG_VET         0x38
+// ...
+#define REG_ICR         0xC0
+#define REG_IMS         0xD0
+#define REG_IMC         0xD8
+#define REG_RCTL        0x100
+// ...
 #define REG_FCTTV       0x170
 // ...
 #define REG_TCTL        0x400
 #define REG_TIPG        0x410
+// ...
+#define REG_RDBAL       0x2800
+#define REG_RDBAH       0x2804
+#define REG_RDLEN       0x2808
+#define REG_RDH         0x2810
+#define REG_RDT         0x2818
 // ...
 #define REG_TDBAL       0x3800
 #define REG_TDBAH       0x3804
 #define REG_TDLEN       0x3808
 #define REG_TDH         0x3810
 #define REG_TDT         0x3818
+// ...
+#define REG_MTA0        0x5200  /* 128 registers */
 // ...
 #define REG_MAC_LOW     0x5400  /* AKA Receive Address Low(n), RAL(8*n)  */
 #define REG_MAC_HIGH    0x5404  /* AKA Receive Address High(n), RAH(8*n) */
@@ -56,6 +70,19 @@
 #define CTRL_FORCE_SPEED            0x800
 #define CTRL_FORCE_DUPLEX           0x1000
 #define CTRL_PHY_RESET              0x80000000
+
+// defines for IMS register
+#define IMS_TXQE                0x02
+#define IMS_LSC                 0x04
+#define IMS_RXSEQ               0x08
+#define IMS_RXDMT0              0x10
+#define IMS_RXO                 0x40
+#define IMS_RXT0                0x80
+
+// defines for RCTL reg
+#define RCTL_RX_ENABLE                      2
+#define RCTL_BROADCAST_ACCEPT               0x8000
+#define RCTL_BUFFER_SIZE_1024               0x10000
 
 // defines for TCTL register
 #define TCTL_TX_ENABLE                      2
@@ -91,11 +118,33 @@ typedef struct TX_DESC_LEGACY
 
 #define TX_DESCRIPTORS  768
 
+typedef struct RX_DESCRIPTOR
+{
+    uint64_t bufferAddress;
+    uint16_t length;
+    uint16_t packetChecksum;
+    uint8_t  status;
+    uint8_t  errors;
+    uint16_t special;
+} RX_DESCRIPTOR;
+
+// defines for receive status bits
+#define RDESC_STATUS_EOP                2
+#define RDESC_STATUS_DESCRIPTOR_DONE    1
+
+#define RX_DESCRIPTORS  384
+
 void e1000_Net_Init(uint8_t bus, uint8_t slot, uint8_t function);
+
+void e1000_InterruptHandler();
 
 uint32_t e1000_Read_Register(uint32_t reg);
 
 void e1000_SendPacket(Ethernet_Header *packet, uint16_t dataSize);
+
+void e1000_ReceivePacket();
+
+void e1000_RX_Init();
 
 void e1000_TX_Init();
 
