@@ -118,6 +118,8 @@ typedef struct TX_DESC_LEGACY
 
 #define TX_DESCRIPTORS  768
 
+#define MAX_TX_PACKET   1024    /* We only use TFTP and DHCP, so a packet will never exceed this size */
+
 typedef struct RX_DESCRIPTOR
 {
     uint64_t bufferAddress;

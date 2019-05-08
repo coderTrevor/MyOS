@@ -182,12 +182,12 @@ void e1000_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
     EthernetRegisterNIC_SendFunction(e1000_SendPacket);
     EthernetRegisterNIC_MAC(mac_addr);
 
-    terminal_writestring("\n     Requesting IP address via DHCP...");
+    terminal_writestring("\n     Requesting IP address via DHCP...\n");
 
     //ARP_SendRequest(IPv4_PackIP(10, 0, 2, 2), mac_addr);
     DHCP_Send_Discovery(mac_addr);
     
-    terminal_writestring("\n    e1000 driver initialized.\n");
+    terminal_writestring("    e1000 driver initialized.\n");
 }
 
 void _declspec(naked) e1000_InterruptHandler()
@@ -196,47 +196,24 @@ void _declspec(naked) e1000_InterruptHandler()
 
     ++interrupts_fired;
 
-    //if (debugLevel)
-    terminal_writestring(" --------- e1000 interrupt fired! -------\n");
+    if (debugLevel)
+        terminal_writestring(" --------- e1000 interrupt fired! -------\n");
 
     // Get the interrupt status (This will also reset the isr status register)
     uint32_t isr;
     isr = e1000_Read_Register(REG_ICR);
-    //if(debugLevel)
-    kprintf("isr: 0x%lX\n", isr);
+    
+    if(debugLevel)
+        kprintf("isr: 0x%lX\n", isr);
 
     if (isr & IMS_RXT0)
         e1000_ReceivePacket();
 
+    //e1000_Read_Register(REG_ICR);
 
-    /*
-    // TODO: Support configuration changes (doubt this will ever happen)
-    if (isr & VIRTIO_ISR_CONFIG_CHANGED)
-        terminal_writestring("TODO: VirtIO-Net configuration has changed\n");
-
-    // Check for used queues
-    if (isr & VIRTIO_ISR_VIRTQ_USED)
-    {
-        //terminal_writestring("Virtq used\n");
-
-        // see if the transmit queue has been used
-        while (transmitQueue.deviceArea->index != transmitQueue.lastDeviceAreaIndex)
-        {
-            //if(debugLevel)
-            terminal_writestring("Transmit success\n");
-            transmitQueue.lastDeviceAreaIndex++;
-        }
-
-        // see if the receive queue has been used
-        if (receiveQueue.deviceArea->index != receiveQueue.lastDeviceAreaIndex)
-        {
-            VirtIO_Net_ReceivePacket();
-        }
-    }
-    */
     PIC_sendEOI(HARDWARE_INTERRUPTS_BASE + e1000_IRQ);
 
-    //if (debugLevel)
+    if (debugLevel)
         terminal_writestring(" --------- e1000 net interrupt done! -------\n");
 
     _asm
@@ -254,16 +231,14 @@ uint32_t e1000_Read_Register(uint32_t regOffset)
 
 void e1000_SendPacket(Ethernet_Header *packet, uint16_t dataSize)
 {
-    //if (debugLevel)
+    if (dataSize > MAX_TX_PACKET)
+    {
+        kprintf("TODO: Sending packet larger than %d bytes is unsupported\n", MAX_TX_PACKET);
+        return;
+    }
+
+    if (debugLevel)
         terminal_writestring("e1000_SendPacket called\n");
-
-    // TODO: (maybe) convert packet to a physical address and use it directly
-
-    // Allocate a new buffer for the packet
-    uint8_t *netBuffer = malloc(dataSize);
-
-    // Copy packet to buffer
-    memcpy(netBuffer, packet, dataSize);
 
     // Determine which transmit descriptor we'll be using from the value of the tail register
     uint32_t index = e1000_Read_Register(REG_TDT);
@@ -271,7 +246,15 @@ void e1000_SendPacket(Ethernet_Header *packet, uint16_t dataSize)
     if(debugLevel)
         kprintf("transmit descriptor index: %d\n", index);
 
-    txDescriptorList[index].bufferAddress = (uint64_t)netBuffer;
+    // TODO: (maybe) convert packet to a physical address and use it directly
+
+    // Find the buffer we pre-allocated for the current descriptor
+    uint8_t *netBuffer = (uint8_t *)(uint32_t)txDescriptorList[index].bufferAddress;
+
+    // Copy packet to buffer
+    memcpy(netBuffer, packet, dataSize);
+
+    //txDescriptorList[index].bufferAddress = (uint64_t)netBuffer;
     txDescriptorList[index].checksumOffset = 0;
     txDescriptorList[index].checksumStart = 0;
     txDescriptorList[index].command = TDESC_CMD_EOP;
@@ -283,18 +266,21 @@ void e1000_SendPacket(Ethernet_Header *packet, uint16_t dataSize)
     index = (index + 1) % TX_DESCRIPTORS;
 
     e1000_Write_Register(REG_TDT, index);
-
-    terminal_writestring("Packet sent\n");
+    
+    if(debugLevel)
+        terminal_writestring("Packet sent\n");
 }
 
 void e1000_ReceivePacket()
 {
-    //volatile uint32_t tail = e1000_Read_Register(REG_RDT) % RX_DESCRIPTORS;
+    volatile uint32_t tail = e1000_Read_Register(REG_RDT);// % RX_DESCRIPTORS;
     
+    if(debugLevel)
+        kprintf("tail %d", tail);
+
     // Read every packet received
     while (rxDescriptorList[lastReceiveTail].status & RDESC_STATUS_DESCRIPTOR_DONE)
     {
-        terminal_writestring("while\n");
         // TODO: Support packets larger than one buffer
         // Pull the next packet off the queue
         EthernetProcessReceivedPacket((Ethernet_Header*)(uint32_t)rxDescriptorList[lastReceiveTail].bufferAddress, mac_addr);
@@ -304,7 +290,10 @@ void e1000_ReceivePacket()
 
         // update tail
         lastReceiveTail = (lastReceiveTail + 1) % RX_DESCRIPTORS;
-        e1000_Write_Register(REG_RDT, lastReceiveTail);
+        e1000_Write_Register(REG_RDT, ++tail);
+        
+        if(debugLevel)
+            kprintf("     %d\n", lastReceiveTail);
 
         // Clear the interrupt
         e1000_Write_Register(REG_ICR, IMS_RXT0);
@@ -377,6 +366,14 @@ void e1000_TX_Init()
 
     // Zero out the descriptor list
     memset(txDescriptorList, 0, sizeof(TX_DESC_LEGACY) * TX_DESCRIPTORS);
+
+    // Initialize the descriptor list with pre-allocated buffers
+    // (We can do this because we know MyOS will never send a packet larger than 1024 bytes)
+    for (int i = 0; i < TX_DESCRIPTORS; ++i)
+    {
+        // TODO: We may need to make sure buffer address is a physical address if malloc changes
+        txDescriptorList[i].bufferAddress = (uint64_t)malloc(MAX_TX_PACKET);
+    }
 
     // Program the Transmit Descriptor Base Address TDBAL register with the address of the region
     e1000_Write_Register(REG_TDBAL, (uint32_t)txDescriptorList);
