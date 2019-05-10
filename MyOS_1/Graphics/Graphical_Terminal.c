@@ -1,6 +1,7 @@
 #include "Graphical_Terminal.h"
 #include "../Terminal.h"
 #include "../misc.h"
+#include "../printf.h"
 
 // TODO: Support multiple graphical terminals
 unsigned int graphicalColumn = 0;
@@ -89,7 +90,8 @@ void GraphicalTerminalPrintIntTop(int value, uint16_t column)
     graphicalBackground = graphicalForeground;
     graphicalForeground = temp;
 
-    terminal_print_int(value);
+    //terminal_print_int(value);
+    kprintf("%d", value);
 
     // restore position
     graphicalRow = oldRow;

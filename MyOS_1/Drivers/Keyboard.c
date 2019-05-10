@@ -4,6 +4,7 @@
 #include "../Interrupts/PIC.h"
 #include <stdbool.h>
 #include "../Terminal.h"
+#include "../printf.h"
 
 unsigned char normal_keys_map[256];
 bool left_shift_held;
@@ -24,21 +25,29 @@ void _declspec(naked) keyboard_interrupt_handler(void)
     _asm pushad;
     //++interrupts_fired;
 
+    uint8_t status;
+    status = inb(0x64);
+
     // get the scancode and send it on its way
     scan_code = inb(0x60);
 
-    if(!awaitingSpecial)
+    if (!(status & 0x20))
     {
-        if (scan_code == 0xE0)
-            awaitingSpecial = true;
+        if (!awaitingSpecial)
+        {
+            if (scan_code == 0xE0)
+                awaitingSpecial = true;
+            else
+                keyboard_key_received(scan_code);
+        }
         else
-            keyboard_key_received(scan_code);
+        {
+            keyboard_special_key_received(scan_code);
+            awaitingSpecial = false;
+        }
     }
     else
-    {
-        keyboard_special_key_received(scan_code);
-        awaitingSpecial = false;
-    }
+        kprintf("0x%X\n", scan_code);
 
     PIC_sendEOI(KEYBOARD_INTERRUPT);
 

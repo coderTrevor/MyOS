@@ -22,6 +22,7 @@
 #include "Executables/Batch_Files.h"
 #include "paging.h"
 #include "Drivers/Virtio_Net.h"
+#include "Drivers/PS2_Mouse.h"
 
 int inputPosition = 0;
 #define COMMAND_HISTORY_SIZE        10
@@ -162,6 +163,13 @@ void Shell_Process_command(void)
     }
 
     char subCommand[MAX_COMMAND_LENGTH];
+
+    // Initialize mouse
+    if (strcmp(currentCommand, "m") == 0)
+    {
+        Mouse_Init();
+        return;
+    }
 
     // Display kernel mapping
     if (strcmp(currentCommand, "base") == 0)

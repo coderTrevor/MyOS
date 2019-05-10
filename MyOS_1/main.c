@@ -21,6 +21,7 @@
 #include "Networking/IPv4.h"
 #include "Interrupts/System_Calls.h"
 #include "printf.h"
+#include "Drivers/PS2_Mouse.h"
 
 int debugLevel = 0;
 bool showOverlay = true;
@@ -101,8 +102,10 @@ void KeStartupPhase2(multiboot_info *multibootInfo)
     // Initialize the PCI bus
     PCI_Init();
 
+    //Mouse_Init();
+
     // Execute autoexec.bat (if it exists)
-    Autoexec();
+    //Autoexec();
 
     // Say Hello
     terminal_writestring("Hello world!\n");
@@ -144,6 +147,50 @@ void KeStartupPhase2(multiboot_info *multibootInfo)
                 // Print the number of (non-keyboard) interrupts across the top of the screen
                 terminal_writestring_top("Interrupts: ", 61);
                 terminal_print_int_top(interrupts_fired, 73);
+            }
+        }
+
+        if (mousePresent)
+        {
+            terminal_writestring_top("                      ", 0);
+
+            if (leftButton)
+                terminal_writestring_top("L", 0);
+            if (middleButton)
+                terminal_writestring_top("M", 1);
+            if (rightButton)
+                terminal_writestring_top("R", 2);
+
+            terminal_print_int_top(mouseX, 3);
+            terminal_writestring_top(",", 13);
+            terminal_print_int_top(mouseY, 14);
+
+            if (!textMode)
+            {
+                int cursX = mouseX;
+                if (cursX < 0)
+                    cursX = 0;
+                if (cursX >= MAX_X_RES)
+                    cursX = MAX_X_RES - 1;
+
+                int cursY = mouseY;
+                if (cursY < 0)
+                    cursY = 0;
+                if (cursY >= MAX_Y_RES)
+                    cursY = MAX_Y_RES - 1;
+
+                // convert y to screen space
+                cursY = MAX_Y_RES - cursY;
+
+                // Restore backed-up pixel
+                GraphicsPlotPixel(oldMouseX, oldMouseY, oldColor);
+
+                // Backup current pixel
+                oldColor = GraphicsGetPixel(cursX, cursY);
+
+                GraphicsPlotPixel(cursX, cursY, graphicalForeground);
+                oldMouseX = cursX;
+                oldMouseY = cursY;
             }
         }
 

@@ -28,3 +28,7 @@ void GraphicsClearLines(unsigned int firstLine, unsigned int lines, PIXEL_32BIT 
 void GraphicsInitFromGrub(multiboot_info *multibootInfo);
 
 void GraphicsFillScreen(uint8_t red, uint8_t green, uint8_t blue);
+
+PIXEL_32BIT GraphicsGetPixel(unsigned int x, unsigned int y);
+
+void GraphicsPlotPixel(unsigned int x, unsigned int y, PIXEL_32BIT color);

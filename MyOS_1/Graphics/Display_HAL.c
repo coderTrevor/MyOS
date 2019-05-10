@@ -82,6 +82,14 @@ void GraphicsFillScreen(uint8_t red, uint8_t green, uint8_t blue)
     }
 }
 
+PIXEL_32BIT GraphicsGetPixel(unsigned int x, unsigned int y)
+{
+    unsigned int framebufferOffset = ((y * graphicsWidth + x) * sizeof(PIXEL_32BIT));
+    PIXEL_32BIT *currentPixel = (PIXEL_32BIT *)((uint32_t)linearFrameBuffer + framebufferOffset);
+
+    return *currentPixel;
+}
+
 // Sets a given range of lines on the screen to the given color
 void GraphicsClearLines(unsigned int firstLine, unsigned int lines, PIXEL_32BIT color)
 {
@@ -99,4 +107,13 @@ void GraphicsClearLines(unsigned int firstLine, unsigned int lines, PIXEL_32BIT 
         for (unsigned int x = 0; x < graphicsWidth; ++x)
             linearFrameBuffer[currentIndex++] = clearColor;
     }
+}
+
+void GraphicsPlotPixel(unsigned int x, unsigned int y, PIXEL_32BIT color)
+{
+    unsigned int framebufferOffset = ((y * graphicsWidth + x) * sizeof(PIXEL_32BIT));
+    PIXEL_32BIT *currentPixel = (PIXEL_32BIT *)((uint32_t)linearFrameBuffer + framebufferOffset);
+
+    // copy the current row
+    memcpy((void*)currentPixel, &color, sizeof(PIXEL_32BIT));
 }

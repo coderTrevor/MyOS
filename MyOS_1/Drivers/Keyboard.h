@@ -1,5 +1,6 @@
 #pragma once
 #include "../Interrupts/Interrupts.h"
+#include <stdbool.h>
 
 #define KEYBOARD_INTERRUPT (HARDWARE_INTERRUPTS_BASE + 1) /* remapped interrupt value for keyboard */
 
@@ -75,6 +76,9 @@
 #define UP_PRESSED      0x48
 #define DEL_PRESSED     0x53
 #define DEL_RELEASED    0xD3
+
+extern bool awaitingSpecial;
+extern unsigned char scan_code;
 
 unsigned char unmap_key(unsigned char scanCode);
 

@@ -281,6 +281,7 @@
     <ClCompile Include="Drivers\ISA_DMA.c" />
     <ClCompile Include="Drivers\Keyboard.c" />
     <ClCompile Include="Drivers\PCI_Bus.c" />
+    <ClCompile Include="Drivers\PS2_Mouse.c" />
     <ClCompile Include="Drivers\RTL_8139.c" />
     <ClCompile Include="Drivers\Sound_Blaster_16.c" />
     <ClCompile Include="Drivers\Virtio_Net.c" />
@@ -326,6 +327,7 @@
     <ClInclude Include="Drivers\ISA_DMA.h" />
     <ClInclude Include="Drivers\Keyboard.h" />
     <ClInclude Include="Drivers\PCI_Bus.h" />
+    <ClInclude Include="Drivers\PS2_Mouse.h" />
     <ClInclude Include="Drivers\RTL_8139.h" />
     <ClInclude Include="Drivers\Sound_Blaster_16.h" />
     <ClInclude Include="Drivers\Virtio_Net.h" />

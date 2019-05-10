@@ -4,6 +4,7 @@
 #include "Console_VGA.h"
 #include "misc.h"
 #include "Terminal.h"
+#include "printf.h"
 
 /* terminal globals */
 static const uint16_t VGA_WIDTH = 80;
@@ -246,7 +247,8 @@ void VGA_terminal_print_int_top(int value, uint16_t column)
     terminal_column = column;
     terminal_color = vga_entry_color(VGA_COLOR_BLACK, VGA_COLOR_WHITE);
 
-    terminal_print_int(value);
+    //terminal_print_int(value);
+    kprintf("%d", value);
 
     terminal_row = oldRow;
     terminal_column = oldCol;
