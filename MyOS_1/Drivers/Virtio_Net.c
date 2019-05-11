@@ -34,7 +34,7 @@ virtq controlQueue; // (we don't use this one)
 inline uint32_t VNet_Read_Register(uint16_t reg)
 {
     // if 4-byte register 
-    if (reg <= REG_QUEUE_SIZE)
+    if (reg < REG_QUEUE_SIZE)
     {
         return inl(vNet_base_port + reg);
     }
@@ -51,7 +51,7 @@ inline uint32_t VNet_Read_Register(uint16_t reg)
 inline void VNet_Write_Register(uint16_t reg, uint32_t data)
 {
     // if 4-byte register 
-    if (reg <= REG_QUEUE_SIZE)
+    if (reg < REG_QUEUE_SIZE)
     {
         outl(vNet_base_port + reg, data);
     }
