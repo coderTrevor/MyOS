@@ -52,9 +52,10 @@
 #define VIRTIO_NET_F_GUEST_ANNOUNCE         0x200000
 #define VIRTIO_NET_F_MQ                     0x400000
 #define VIRTIO_NET_F_CTRL_MAC_ADDR          0x800000
+#define VIRTIO_F_ANY_LAYOUT                 (1 << 27)
 
-// These are the features required by this driver
-#define REQUIRED_FEATURES (/*VIRTIO_NET_F_CSUM |*/ VIRTIO_NET_F_MAC)
+// These are the features required by this driver (VirtualBox is borken and won't work without VIRTIO_NET_F_MRG_RXBUF) 
+#define REQUIRED_FEATURES (/*VIRTIO_NET_F_CSUM |*/ VIRTIO_NET_F_MAC | VIRTIO_NET_F_MRG_RXBUF)
 
 // ISR bits
 #define VIRTIO_ISR_VIRTQ_USED               1
@@ -156,7 +157,7 @@ typedef struct virtio_net_hdr
     uint16_t gso_size;
     uint16_t csum_start;
     uint16_t csum_offset;
-    // uint16_t num_buffers;  num_buffer is not part of struct if VIRTIO_NET_F_MRG_RXBUF isn't negotiated
+    uint16_t num_buffers;  // num_buffer is not part of struct if VIRTIO_NET_F_MRG_RXBUF isn't negotiated
 } virtio_net_hdr;
 
 

@@ -164,6 +164,13 @@ void Shell_Process_command(void)
 
     char subCommand[MAX_COMMAND_LENGTH];
 
+    // dhcp
+    if (strcmp(currentCommand, "dhcp") == 0)
+    {
+        DHCP_Send_Discovery(NIC_MAC);
+        return;
+    }
+
     // Initialize mouse
     if (strcmp(currentCommand, "m") == 0)
     {

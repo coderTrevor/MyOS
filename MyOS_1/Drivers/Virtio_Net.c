@@ -471,15 +471,49 @@ void VirtIO_Net_ReceivePacket()
         // Get pointer to the beginning of the buffer
         uint32_t *rxBegin = (uint32_t*)((uint32_t)receiveQueue.descriptors[descIndex].address);
 
+        // See if the buffer spans multiple descriptors
+        int buffers = ((virtio_net_hdr *)rxBegin)->num_buffers;
+
+        if (buffers > 1)
+        {
+            uint32_t bufferSize = 0;
+
+            // determine length of entire buffer that spans the descriptor chain
+            for(int i = 0; i < buffers; ++i)
+            {
+                bufferSize += receiveQueue.descriptors[descIndex + i].length;
+            }
+
+            rxBegin = malloc(bufferSize);
+
+            // Copy buffer pieces to single buffer
+            uint32_t offset = 0;
+            for (int i = 0; i < buffers; ++i)
+            {
+                memcpy((void*)((uint32_t)rxBegin + offset), (void *)receiveQueue.descriptors[descIndex + i].address, receiveQueue.descriptors[descIndex + i].length);
+                offset += receiveQueue.descriptors[descIndex + i].length;
+            }
+        }
+
         // Skip over virtio_net_hdr to get a pointer to the packet
         Ethernet_Header *packet = (Ethernet_Header *)((uint32_t)rxBegin + sizeof(virtio_net_hdr));
 
         EthernetProcessReceivedPacket(packet, mac_addr);
 
-        // Place the used descriptor index back in the available ring (driver area)
-        receiveQueue.driverArea->ringBuffer[receiveQueue.driverArea->index++] = descIndex;
+        // Place the used descriptor indices back in the available ring (driver area)
+        for (int i = 0; i < buffers; ++i)
+        {
+            receiveQueue.driverArea->ringBuffer[receiveQueue.driverArea->index++] = descIndex +i;
+            // restore descriptor settings
+            receiveQueue.descriptors[descIndex + i].flags = VIRTQ_DESC_F_DEVICE_WRITE_ONLY;
+            receiveQueue.descriptors[descIndex + i].length = 1526;
+            receiveQueue.descriptors[descIndex + i].next = 0;
+        }
 
         receiveQueue.lastDeviceAreaIndex++;
+
+        if (buffers > 1)
+            free(rxBegin);
     }
 
     // notify the device that we've updated the availaible ring index
