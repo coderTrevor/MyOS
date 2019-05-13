@@ -23,6 +23,7 @@
 #include "paging.h"
 #include "Drivers/Virtio_Net.h"
 #include "Drivers/PS2_Mouse.h"
+#include "Networking/DHCP.h"
 
 int inputPosition = 0;
 #define COMMAND_HISTORY_SIZE        10
@@ -569,7 +570,7 @@ void Shell_Process_command(void)
         uint8_t dirBuffer[MAX_DIR_SIZE + 1];
         memset(dirBuffer, 0, MAX_DIR_SIZE + 1);
 
-        if (!TFTP_GetFile(IPv4_PackIP(10, 0, 2, 2), "dir.txt", dirBuffer, MAX_DIR_SIZE, NULL))
+        if (!TFTP_GetFile(tftpServerIP, "dir.txt", dirBuffer, MAX_DIR_SIZE, NULL))
         {
             terminal_writestring("Error reading dir.txt from server!\n");
             return;
@@ -656,7 +657,7 @@ void Shell_Process_command(void)
             terminal_dumpHex(peBuffer, 32);
 
         // Download the executable
-        if (!TFTP_GetFile(IPv4_PackIP(10, 0, 2, 2), subCommand, peBuffer, peBufferSize, &peFileSize) )
+        if (!TFTP_GetFile(tftpServerIP, subCommand, peBuffer, peBufferSize, &peFileSize) )
         {
             terminal_writestring("Error reading ");
             terminal_writestring(subCommand);
@@ -766,7 +767,7 @@ void Shell_Process_command(void)
 
         uint32_t fileSize = 0;
 
-        if (!TFTP_GetFileSize(IPv4_PackIP(10, 0, 2, 2), subCommand, &fileSize))
+        if (!TFTP_GetFileSize(tftpServerIP, subCommand, &fileSize))
         {
             terminal_writestring("Couldn't get size of ");
             terminal_writestring(subCommand);

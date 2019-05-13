@@ -14,7 +14,7 @@ bool Bitmap24Load(char *filename, PIXEL_32BIT **ppBuffer, uint32_t *width, uint3
 
     // Get the size of the image file
     uint32_t fileSize;
-    if (!TFTP_GetFileSize(IPv4_PackIP(10, 0, 2, 2), filename, &fileSize))
+    if (!TFTP_GetFileSize(tftpServerIP, filename, &fileSize))
     {
         terminal_writestring("Failed to determine size of ");
         terminal_writestring(filename);
@@ -31,7 +31,7 @@ bool Bitmap24Load(char *filename, PIXEL_32BIT **ppBuffer, uint32_t *width, uint3
     }
 
     // Get the file via TFTP
-    if (!TFTP_GetFile(IPv4_PackIP(10, 0, 2, 2), filename, rawFileBuffer, fileSize, NULL))
+    if (!TFTP_GetFile(tftpServerIP, filename, rawFileBuffer, fileSize, NULL))
     {
         terminal_writestring("Unable to open ");
         terminal_writestring(filename);

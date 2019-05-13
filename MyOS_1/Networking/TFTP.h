@@ -10,6 +10,7 @@
 #define TFTP_OP_DATA               0x0300
 #define TFTP_OP_ACK                0x0400
 #define TFTP_OP_ERROR              0x0500
+#define TFTP_OP_OPTION_ACK         0x0600
 
 #define TFTP_TYPE_ASCII             "netascii"
 #define TFTP_TYPE_BINARY            "octet"
@@ -80,6 +81,8 @@ typedef struct TFTP_RequestHeader
 
 
 extern bool tftpHideErrors;
+extern uint32_t tftpServerIP;
+
 
 bool TFTP_GetFile(uint32_t serverIP, char *filename, uint8_t *destinationBuffer, uint32_t maxFileSize, uint32_t *actualFileSize);
 

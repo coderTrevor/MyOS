@@ -13,6 +13,7 @@ uint8_t *tftpFileBuffer = NULL;
 uint32_t tftpFileBufferSize = 0;
 uint8_t *nextFilePointer;
 uint16_t currentBlockNumber;
+uint16_t virtualBoxBlockNumber; // workaround for VirtualBox's bullshit
 uint32_t tftpFileSize;
 
 uint32_t tftpServerIP; // TODO, maybe, support more than one server
@@ -192,13 +193,17 @@ void TFTP_ProcessDataPacket(TFTP_DataHeader *dataPacket, uint16_t sourcePort, ui
     uint16_t serverBlockNumber = SwapBytes16(dataPacket->blockNumber);
     if (currentBlockNumber != serverBlockNumber)
     {
-        terminal_writestring("Error: tftp packet block number, ");
-        terminal_print_int(serverBlockNumber);
-        terminal_writestring(" doesn't match expected value of ");
-        terminal_print_int(currentBlockNumber);
-        terminal_newline();
-        transferInProgress = false;
-        transferError = true;
+        // Workaround for VirtualBox which will always send an extra last packet
+        if (virtualBoxBlockNumber != serverBlockNumber)
+        {
+            terminal_writestring("Error: tftp packet block number, ");
+            terminal_print_int(serverBlockNumber);
+            terminal_writestring(" doesn't match expected value of ");
+            terminal_print_int(currentBlockNumber);
+            terminal_newline();
+            transferInProgress = false;
+            transferError = true;
+        }
         return;
     }   
 
@@ -218,6 +223,9 @@ void TFTP_ProcessDataPacket(TFTP_DataHeader *dataPacket, uint16_t sourcePort, ui
     // see if this was the last block
     if (dataSize < TFTP_MAX_BLOCK_SIZE)
         transferInProgress = false;
+
+    // workaround VirtualBox, which will always send an extra 0-byte-length last data packet
+    virtualBoxBlockNumber = currentBlockNumber;
 
     return;
 }
@@ -247,6 +255,13 @@ void TFTP_ProcessPacket(TFTP_Header *packet, uint16_t sourcePort, uint16_t desti
 
         transferError = true;
         transferInProgress = false;
+        return;
+    }
+
+    if(packet->opcode == TFTP_OP_OPTION_ACK)
+    {
+        // send acknowledgement to the server
+        TFTP_SendAck(0, destinationPort, sourcePort, sourceMAC);
         return;
     }
     

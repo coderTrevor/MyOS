@@ -184,7 +184,7 @@ void e1000_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
 
     terminal_writestring("\n     Requesting IP address via DHCP...\n");
 
-    //ARP_SendRequest(IPv4_PackIP(10, 0, 2, 2), mac_addr);
+    //ARP_SendRequest(IPv4_PackIP(10, 0, 2, 4), mac_addr);
     DHCP_Send_Discovery(mac_addr);
     
     terminal_writestring("    e1000 driver initialized.\n");

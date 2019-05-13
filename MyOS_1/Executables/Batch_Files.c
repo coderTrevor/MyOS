@@ -36,7 +36,7 @@ void OpenAndRunBatch(char *batchFileName)
     if (debugLevel)
         terminal_dumpHex(batchBuffer, 32);
 
-    if (!TFTP_GetFile(IPv4_PackIP(10, 0, 2, 2), batchFileName, batchBuffer, bufferSize, &batchFileSize))
+    if (!TFTP_GetFile(tftpServerIP, batchFileName, batchBuffer, bufferSize, &batchFileSize))
     {
         if (tftpHideErrors && debugLevel)
         {

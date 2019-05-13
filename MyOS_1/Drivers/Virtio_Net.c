@@ -267,7 +267,7 @@ void VirtIO_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
 
     terminal_writestring("\n     Requesting IP address via DHCP...");
 
-    //ARP_SendRequest(IPv4_PackIP(10, 0, 2, 2), mac_addr);
+    //ARP_SendRequest(IPv4_PackIP(10, 0, 2, 4), mac_addr);
     DHCP_Send_Discovery(mac_addr);
 
     terminal_writestring("\n    virtio-net driver initialized.\n");
@@ -279,7 +279,7 @@ void _declspec(naked) VirtIO_Net_InterruptHandler()
 
     ++interrupts_fired;
 
-    //if (debugLevel)
+    if (debugLevel)
         terminal_writestring(" --------- virtio-net interrupt fired! -------\n");
 
     // Get the interrupt status (This will also reset the isr status register)
@@ -298,7 +298,7 @@ void _declspec(naked) VirtIO_Net_InterruptHandler()
         // see if the transmit queue has been used
         while (transmitQueue.deviceArea->index != transmitQueue.lastDeviceAreaIndex)
         {
-            //if(debugLevel)
+            if(debugLevel)
                 terminal_writestring("Transmit success\n");
             transmitQueue.lastDeviceAreaIndex++;
         }
@@ -462,7 +462,8 @@ void VirtIO_Net_ReceivePacket()
 {
     while(receiveQueue.deviceArea->index != receiveQueue.lastDeviceAreaIndex)
     {
-        terminal_writestring("     Packet received successfully!\n");
+        if(debugLevel)
+            terminal_writestring("     Packet received successfully!\n");
 
         // Get the index of the current descriptor from the device's ring buffer
         uint16_t ringBufferIndex = receiveQueue.lastDeviceAreaIndex % receiveQueue.elements;
@@ -490,7 +491,7 @@ void VirtIO_Net_ReceivePacket()
             uint32_t offset = 0;
             for (int i = 0; i < buffers; ++i)
             {
-                memcpy((void*)((uint32_t)rxBegin + offset), (void *)receiveQueue.descriptors[descIndex + i].address, receiveQueue.descriptors[descIndex + i].length);
+                memcpy((void*)((uint32_t)rxBegin + offset), (void *)(uint32_t)receiveQueue.descriptors[descIndex + i].address, receiveQueue.descriptors[descIndex + i].length);
                 offset += receiveQueue.descriptors[descIndex + i].length;
             }
         }
@@ -501,7 +502,7 @@ void VirtIO_Net_ReceivePacket()
         EthernetProcessReceivedPacket(packet, mac_addr);
 
         // Place the used descriptor indices back in the available ring (driver area)
-        for (int i = 0; i < buffers; ++i)
+        for (uint16_t i = 0; i < buffers; ++i)
         {
             receiveQueue.driverArea->ringBuffer[receiveQueue.driverArea->index++] = descIndex +i;
             // restore descriptor settings

@@ -5,6 +5,7 @@
 #include "../misc.h"
 #include "../Terminal.h"
 #include "IPv4.h"
+#include "TFTP.h"
 
 void DHCP_Send_Discovery(uint8_t *sourceMAC)
 {
@@ -113,6 +114,8 @@ void DHCP_ProcessAck(DHCP_HEADER *reply)//, uint8_t *sourceMAC)
 
     uint32_t serverIP = reply->serverIP;
     IPv4_SetGateway(serverIP);  // may be overridden by DHCP_OPTION_ROUTER option
+
+    tftpServerIP = serverIP;
 
     // process DHCP options (skip 4 bytes for the "magic cookie")
     uint8_t *currentPointer = reply->options + 4;

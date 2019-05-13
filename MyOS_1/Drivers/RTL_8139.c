@@ -143,7 +143,7 @@ void RTL_8139_Init(uint8_t bus, uint8_t slot, uint8_t function)
     // Request an IP via DHCP
     terminal_writestring("     Requesting IP address via DHCP...\n");
 
-    //ARP_Send_Request(IPv4_PackIP(10, 0, 2, 2), mac_addr);
+    //ARP_Send_Request(IPv4_PackIP(10, 0, 2, 4), mac_addr);
     DHCP_Send_Discovery(mac_addr);
 
     terminal_writestring("    RTL 8139 driver initialized.\n");
