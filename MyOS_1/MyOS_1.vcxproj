@@ -217,7 +217,7 @@
       <NoEntryPoint>true</NoEntryPoint>
     </Link>
     <PostBuildEvent>
-      <Command>"C:\Program Files\qemu\qemu-system-x86_64w.exe" -soundhw sb16,adlib -monitor stdio -netdev user,id=u1,tftp="C:\Users\Administrator\.VirtualBox\TFTP" -device virtio-net,netdev=u1 -kernel "$(TargetPath)"  -object filter-dump,id=f1,netdev=u1,file="C:\Program Files\qemu\dump.dat" -accel hax &amp;&amp; "C:\Users\Administrator\Documents\Visual Studio 2015\Projects\AutoIncrementBuild\Release\AutoIncrementBuild.exe"</Command>
+      <Command>"C:\Program Files\qemu\qemu-system-x86_64w.exe" -device virtio-gpu -soundhw sb16,adlib -monitor stdio -netdev user,id=u1,tftp="C:\Users\Administrator\.VirtualBox\TFTP" -device e1000,netdev=u1 -kernel "$(TargetPath)"  -object filter-dump,id=f1,netdev=u1,file="C:\Program Files\qemu\dump.dat" -accel hax &amp;&amp; "C:\Users\Administrator\Documents\Visual Studio 2015\Projects\AutoIncrementBuild\Release\AutoIncrementBuild.exe"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Launching QEMU</Message>
@@ -284,6 +284,7 @@
     <ClCompile Include="Drivers\PS2_Mouse.c" />
     <ClCompile Include="Drivers\RTL_8139.c" />
     <ClCompile Include="Drivers\Sound_Blaster_16.c" />
+    <ClCompile Include="Drivers\Virtio_GPU.c" />
     <ClCompile Include="Drivers\Virtio_Net.c" />
     <ClCompile Include="Executables\Batch_Files.c" />
     <ClCompile Include="Executables\PE32.c" />
@@ -330,6 +331,7 @@
     <ClInclude Include="Drivers\PS2_Mouse.h" />
     <ClInclude Include="Drivers\RTL_8139.h" />
     <ClInclude Include="Drivers\Sound_Blaster_16.h" />
+    <ClInclude Include="Drivers\Virtio_GPU.h" />
     <ClInclude Include="Drivers\Virtio_Net.h" />
     <ClInclude Include="Executables\Batch_Files.h" />
     <ClInclude Include="Executables\PE32.h" />
