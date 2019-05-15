@@ -180,6 +180,9 @@
     <ClCompile Include="Drivers\Virtio_GPU.c">
       <Filter>Source Files\Drivers</Filter>
     </ClCompile>
+    <ClCompile Include="Drivers\VirtIO.c">
+      <Filter>Source Files\Drivers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="misc.h">
@@ -303,6 +306,9 @@
       <Filter>Header Files\Drivers</Filter>
     </ClInclude>
     <ClInclude Include="Drivers\Virtio_GPU.h">
+      <Filter>Header Files\Drivers</Filter>
+    </ClInclude>
+    <ClInclude Include="Drivers\Virtio.h">
       <Filter>Header Files\Drivers</Filter>
     </ClInclude>
   </ItemGroup>

@@ -546,7 +546,7 @@ void PCI_DelegateToDriver(uint8_t bus, uint8_t slot, uint8_t function, uint16_t 
         if (deviceID == PCI_DEVICE_VIRTIO_NET)
             VirtIO_Net_Init(bus, slot, function);
         if (deviceID == PCI_DEVICE_VIRTIO_GPU)
-            Virtio_GPU_Init(bus, slot, function);
+            VGPU_Init(bus, slot, function);
         return;
     }
 

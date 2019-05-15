@@ -57,7 +57,7 @@ bool BGA_CheckPresence()
     return false;
 }
 */
-void Virtio_GPU_Init(uint8_t bus, uint8_t slot, uint8_t function)
+void VGPU_Init(uint8_t bus, uint8_t slot, uint8_t function)
 {
     //BGA_bus = bus;
     //BGA_slot = slot;

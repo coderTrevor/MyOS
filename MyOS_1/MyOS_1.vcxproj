@@ -284,6 +284,7 @@
     <ClCompile Include="Drivers\PS2_Mouse.c" />
     <ClCompile Include="Drivers\RTL_8139.c" />
     <ClCompile Include="Drivers\Sound_Blaster_16.c" />
+    <ClCompile Include="Drivers\VirtIO.c" />
     <ClCompile Include="Drivers\Virtio_GPU.c" />
     <ClCompile Include="Drivers\Virtio_Net.c" />
     <ClCompile Include="Executables\Batch_Files.c" />
@@ -331,6 +332,7 @@
     <ClInclude Include="Drivers\PS2_Mouse.h" />
     <ClInclude Include="Drivers\RTL_8139.h" />
     <ClInclude Include="Drivers\Sound_Blaster_16.h" />
+    <ClInclude Include="Drivers\Virtio.h" />
     <ClInclude Include="Drivers\Virtio_GPU.h" />
     <ClInclude Include="Drivers\Virtio_Net.h" />
     <ClInclude Include="Executables\Batch_Files.h" />
