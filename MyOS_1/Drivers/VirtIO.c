@@ -2,6 +2,7 @@
 #include "Virtio.h"
 #include "../misc.h"
 #include "../printf.h"
+#include "PCI_Bus.h"
 
 
 // TODO: Error-checking
@@ -61,4 +62,24 @@ void VirtIO_Allocate_Virtqueue(virtq *virtqueue, uint16_t queueSize)
     virtqueue->deviceArea = (virtq_device_area *)((uint32_t)virtqueue->driverArea + driverAreaSize + driverAreaPadding);
 
     virtqueue->byteSize = virtqueueByteSize;
+}
+
+// Read the capabilities list, one dword at a time
+void VirtIO_Read_PCI_Capabilities(virtio_pci_cap *caps, uint8_t bus, uint8_t slot, uint8_t function, uint8_t capPointer)
+{
+    uint8_t offset;
+    for (offset = 0; offset < sizeof(virtio_pci_cap); offset += sizeof(uint32_t))
+    {
+        uint32_t currentDWord = PCI_ConfigReadDWord(bus, slot, function, capPointer + offset);
+        memcpy((void *)((uint32_t)caps + offset), &currentDWord, sizeof(uint32_t));
+    }
+
+    // size of virtio_pci_cap should be a multiple of 4
+    if (offset != sizeof(virtio_pci_cap))
+        terminal_writestring("virtio_pci_cap has unexpected size!\n");
+
+    //kprintf("cfg_type: 0x%X\n", caps->cfg_type);
+
+    //kprintf("cap_vndr: 0x%X\ncap_next: 0x%X\ncap_len: 0x%X\ncfg_type: 0x%X\n", caps->cap_vndr, caps->cap_next, caps->cap_len, caps->cfg_type);
+    //kprintf("bar: %d\noffset: 0x%X\nlength: 0x%X\n", caps->bar, caps->offset, caps->length);
 }

@@ -4,9 +4,10 @@
 #include "../Terminal.h"
 #include "RTL_8139.h"
 #include "Bochs_VGA.h"
-#include "Virtio_Net.h"
 #include "e1000.h"
-#include "Virtio_GPU.h"
+
+void VirtIO_Net_Init(uint8_t bus, uint8_t slot, uint8_t function);
+void VGPU_Init(uint8_t bus, uint8_t slot, uint8_t function);
 
 char *PCI_GetVendorName(uint16_t vendorID)
 {
@@ -570,6 +571,12 @@ void PCI_EnableBusMastering(uint8_t bus, uint8_t slot, uint8_t function)
     PCI_SetCommand(bus, slot, function, command);
 }
 
+uint32_t PCI_GetBAR(uint8_t bus, uint8_t slot, uint8_t function, uint8_t bar)
+{
+    uint8_t offset = BAR0_OFFSET + (4 * bar);
+    return PCI_ConfigReadDWord(bus, slot, function, offset);
+}
+
 uint32_t PCI_GetBaseAddress0(uint8_t bus, uint8_t slot, uint8_t function)
 {
     return PCI_ConfigReadDWord(bus, slot, function, BAR0_OFFSET);
@@ -600,6 +607,11 @@ uint32_t PCI_GetBaseAddress5(uint8_t bus, uint8_t slot, uint8_t function)
     return PCI_ConfigReadDWord(bus, slot, function, BAR5_OFFSET);
 }
 
+uint8_t PCI_GetCapabilitiesPointer(uint8_t bus, uint8_t slot, uint8_t function)
+{
+    uint16_t pointer = PCI_ConfigReadWord(bus, slot, function, CAP_POINTER_OFFSET) & ~3;
+    return pointer & 0xFF;
+}
 
 uint16_t PCI_GetClassCodes(uint8_t bus, uint8_t device, uint8_t function)
 {

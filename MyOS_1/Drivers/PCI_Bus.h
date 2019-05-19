@@ -5,19 +5,24 @@
 #define PCI_CONFIG_ADDRESS  0xCF8
 #define PCI_CONFIG_DATA     0xCFC
 
-#define VENDOR_ID_OFFFSET   0
-#define DEVICE_ID_OFFSET    0x02
-#define COMMAND_OFFSET      0x04
-#define CLASSES_OFFSET      0x0A
-#define HEADER_TYPE_OFFSET  0x0E
-#define BAR0_OFFSET         0x10
-#define BAR1_OFFSET         0x14
-#define BAR2_OFFSET         0x18
-#define BAR3_OFFSET         0x1C
-#define BAR4_OFFSET         0x20
-#define BAR5_OFFSET         0x24
+#define VENDOR_ID_OFFFSET       0
+#define DEVICE_ID_OFFSET        0x02
+#define COMMAND_OFFSET          0x04
+#define CLASSES_OFFSET          0x0A
+#define HEADER_TYPE_OFFSET      0x0E
+#define BAR0_OFFSET             0x10
+#define BAR1_OFFSET             0x14
+#define BAR2_OFFSET             0x18
+#define BAR3_OFFSET             0x1C
+#define BAR4_OFFSET             0x20
+#define BAR5_OFFSET             0x24
+#define CAP_POINTER_OFFSET      0x34
 #define INTERRUPT_LINE_OFFSET   0x3C
-#define MULTIFUNCTION       0x80
+#define MULTIFUNCTION           0x80
+
+#define PCI_BAR_IS_IO           0x01
+#define PCI_BAR_IO_MASK         0xFFFFFFFC
+#define PCI_BAR_MMIO_MASK       0xFFFFFFF0
 
 #define BUS_MASTER_ENABLED  0x04
 
@@ -53,12 +58,16 @@ void PCI_DelegateToDriver(uint8_t bus, uint8_t slot, uint8_t function, uint16_t 
 
 void PCI_EnableBusMastering(uint8_t bus, uint8_t slot, uint8_t function);
 
+uint32_t PCI_GetBAR(uint8_t bus, uint8_t slot, uint8_t function, uint8_t bar);
+
 uint32_t PCI_GetBaseAddress0(uint8_t bus, uint8_t slot, uint8_t function);
 uint32_t PCI_GetBaseAddress1(uint8_t bus, uint8_t slot, uint8_t function);
 uint32_t PCI_GetBaseAddress2(uint8_t bus, uint8_t slot, uint8_t function);
 uint32_t PCI_GetBaseAddress3(uint8_t bus, uint8_t slot, uint8_t function);
 uint32_t PCI_GetBaseAddress4(uint8_t bus, uint8_t slot, uint8_t function);
 uint32_t PCI_GetBaseAddress5(uint8_t bus, uint8_t slot, uint8_t function);
+
+uint8_t PCI_GetCapabilitiesPointer(uint8_t bus, uint8_t slot, uint8_t function);
 
 uint16_t PCI_GetClassCodes(uint8_t bus, uint8_t device, uint8_t function);
 

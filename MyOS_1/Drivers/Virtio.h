@@ -33,6 +33,61 @@
 /* This means the buffer contains a list of buffer descriptors. */
 #define VIRTQ_DESC_F_INDIRECT               4
 
+
+// Reserved feature bits
+#define VIRTIO_F_RING_INDIRECT_DESC (1 << 28) /* Negotiating this feature indicates that the driver can use descriptors 
+with the VIRTQ_DESC_F_INDIRECT flag set, as described in 2.6.5.3 Indirect Descriptors and 2.7.7 Indirect Flag : Scatter - Gather Support. */
+#define VIRTIO_F_RING_EVENT_IDX     (1 << 29) /* This feature enables the used_event and the avail_event fields as described in 2.6.7, 2.6.8 and 2.7.10. */
+#define VIRTIO_F_VERSION_1          0x100000000
+
+typedef struct virtio_pci_cap
+{
+    uint8_t cap_vndr;   /* Generic PCI field: PCI_CAP_ID_VNDR */
+    uint8_t cap_next;   /* Generic PCI field: next ptr. */
+    uint8_t cap_len;    /* Generic PCI field: capability length */
+    uint8_t cfg_type;   /* Identifies the structure. */
+    uint8_t bar;        /* Where to find it. */
+    uint8_t padding[3]; /* Pad to full dword. */
+    uint32_t offset;    /* Offset within bar. */
+    uint32_t length;    /* Length of the structure, in bytes. */
+} virtio_pci_cap;
+
+// defines for cfg_type of virtio_pci_cap
+/* Common configuration */
+#define VIRTIO_PCI_CAP_COMMON_CFG   1
+/* Notifications */
+#define VIRTIO_PCI_CAP_NOTIFY_CFG   2
+/* ISR Status */
+#define VIRTIO_PCI_CAP_ISR_CFG      3
+/* Device specific configuration */
+#define VIRTIO_PCI_CAP_DEVICE_CFG   4
+/* PCI configuration access */
+#define VIRTIO_PCI_CAP_PCI_CFG      5
+
+
+typedef struct virtio_pci_common_cfg 
+{
+    /* About the whole device. */
+    uint32_t device_feature_select; /* read-write */
+    uint32_t device_feature;        /* read-only for driver */
+    uint32_t driver_feature_select; /* read-write */
+    uint32_t driver_feature;        /* read-write */
+    uint16_t msix_config;           /* read-write */
+    uint16_t num_queues;            /* read-only for driver */
+    uint8_t device_status;          /* read-write */
+    uint8_t config_generation;      /* read-only for driver */
+                          
+    /* About a specific virtqueue. */
+    uint16_t queue_select;      /* read-write */
+    uint16_t queue_size;        /* read-write */
+    uint16_t queue_msix_vector; /* read-write */
+    uint16_t queue_enable;      /* read-write */
+    uint16_t queue_notify_off;  /* read-only for driver */
+    uint64_t queue_desc;        /* read-write */
+    uint64_t queue_driver;      /* read-write */
+    uint64_t queue_device;      /* read-write */
+} virtio_pci_common_cfg;
+
 typedef struct virtq_descriptor
 {
     /* Address (guest-physical). */
@@ -99,3 +154,5 @@ typedef struct virtq
 
 
 void VirtIO_Allocate_Virtqueue(virtq *virtqueue, uint16_t queueSize);
+
+void VirtIO_Read_PCI_Capabilities(virtio_pci_cap *caps, uint8_t bus, uint8_t slot, uint8_t function, uint8_t capPointer);

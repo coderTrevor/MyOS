@@ -2,6 +2,7 @@
 #include "../Terminal.h"
 #include "../System_Specific.h"
 #include "../misc.h"
+#include "../printf.h"
 #include "../Graphics/Display_HAL.h"
 #include "PCI_Bus.h"
 
@@ -101,8 +102,7 @@ bool BGA_SetResolution(uint16_t width, uint16_t height, uint16_t bitDepth)
     // Get the linear frame buffer address, which may have changed
     BGA_linearFrameBuffer = (uint32_t*)(PCI_GetBaseAddress0(BGA_bus, BGA_slot, BGA_function) & 0xFFFFFFF0);
     linearFrameBuffer = BGA_linearFrameBuffer;
-    //terminal_print_ulong_hex(linearFrameBuffer);
-    //terminal_newline();
+    //kprintf("0x%X\n", linearFrameBuffer);
 
     // TODO IMPORTANT: Give the framebuffer address a map in the page table
 
