@@ -680,6 +680,38 @@ void Shell_Process_command(void)
         return;
     }
 
+    // Bg command
+    memset(subCommand, 0, MAX_COMMAND_LENGTH);
+    strncpy(subCommand, currentCommand, strlen("bg"));
+    if (strcmp(subCommand, "bg") == 0)
+    {
+        memset(subCommand, 0, MAX_COMMAND_LENGTH);
+        strncpy(subCommand, currentCommand + strlen("bg "), MAX_COMMAND_LENGTH - strlen("bg "));
+
+        if (textMode)
+        {
+            if (graphicsPresent)
+                terminal_writestring("You must switch to graphical mode with the \"gfx\" command before setting a background.\n");
+            else
+                terminal_writestring("Sorry, I don't recognize your display adapter; I can't show you a bitmap.\n");
+            return;
+        }
+
+        if (strlen(subCommand) == 0)
+        {
+            terminal_writestring("You must specify the name of a file to show!\n\nUsage: show [Name_Of_File.bmp]\n");
+            return;
+        }
+
+        if (!SetGraphicalTerminalBackground(subCommand))
+            return;
+
+        GraphicsBlit(0, 0, backgroundImage, graphicsWidth, graphicsHeight);
+        GraphicsBlitWithAlpha(0, 0, foregroundText, graphicsWidth, graphicsHeight);
+
+        return;
+    }
+
     // Show command
     memset(subCommand, 0, MAX_COMMAND_LENGTH);
     strncpy(subCommand, currentCommand, strlen("show"));
@@ -711,6 +743,9 @@ void Shell_Process_command(void)
 
         // Display bitmap at bottom-right corner of the screen
         GraphicsBlit(graphicsWidth - width, graphicsHeight - height, imageBuffer, width, height);
+
+        if(backgroundImage && foregroundText)
+            GraphicsBlitToForeground(graphicsWidth - width, graphicsHeight - height, imageBuffer, width, height);
 
         free(imageBuffer);
 

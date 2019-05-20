@@ -22,6 +22,7 @@
 #include "Interrupts/System_Calls.h"
 #include "printf.h"
 #include "Drivers/PS2_Mouse.h"
+#include "Graphics/Cursor.h"
 
 int debugLevel = 0;
 bool showOverlay = true;
@@ -182,13 +183,18 @@ void KeStartupPhase2(multiboot_info *multibootInfo)
                 // convert y to screen space
                 cursY = MAX_Y_RES - cursY;
 
-                // Restore backed-up pixel
-                GraphicsPlotPixel(oldMouseX, oldMouseY, oldColor);
+                // Restore backed-up image
+                GraphicsBlit(oldMouseX, oldMouseY, (PIXEL_32BIT *)areaUnderCursor, 16, 16);
+                //GraphicsPlotPixel(oldMouseX, oldMouseY, oldColor);
 
-                // Backup current pixel
-                oldColor = GraphicsGetPixel(cursX, cursY);
+                // Backup current image
+                //oldColor = GraphicsGetPixel(cursX, cursY);
+                GraphicsCopyToImage(cursX, cursY, (PIXEL_32BIT *)areaUnderCursor, 16, 16);
 
-                GraphicsPlotPixel(cursX, cursY, graphicalForeground);
+                //GraphicsPlotPixel(cursX, cursY, graphicalForeground);
+
+                GraphicsBlitWithAlpha(cursX, cursY, (PIXEL_32BIT *)cursorImage, 16, 16);
+
                 oldMouseX = cursX;
                 oldMouseY = cursY;
             }

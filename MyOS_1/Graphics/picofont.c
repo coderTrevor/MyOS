@@ -150,7 +150,10 @@ void FNT_RenderMax(const char* text, unsigned int len, FNT_xy position)
 	}*/
 
 	FNT_Generate(text, len, graphicsWidth, (PIXEL_32BIT *)linearFrameBuffer, position);
-	
+
+    if(backgroundImage && foregroundText)
+        FNT_Generate(text, len, graphicsWidth, foregroundText, position);
+
 	/*if(SDL_MUSTLOCK(surface)){
 		SDL_UnlockSurface(surface);
 	}

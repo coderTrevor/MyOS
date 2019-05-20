@@ -292,6 +292,7 @@
     <ClCompile Include="File Formats\VOC.c" />
     <ClCompile Include="GDT.c" />
     <ClCompile Include="Graphics\Bitmap.c" />
+    <ClCompile Include="Graphics\Cursor.c" />
     <ClCompile Include="Graphics\Display_HAL.c" />
     <ClCompile Include="Graphics\font.c" />
     <ClCompile Include="Graphics\Graphical_Terminal.c" />
@@ -340,6 +341,7 @@
     <ClInclude Include="File Formats\VOC.h" />
     <ClInclude Include="GDT.h" />
     <ClInclude Include="Graphics\Bitmap.h" />
+    <ClInclude Include="Graphics\Cursor.h" />
     <ClInclude Include="Graphics\Display_HAL.h" />
     <ClInclude Include="Graphics\Graphical_Terminal.h" />
     <ClInclude Include="Graphics\picofont.h" />

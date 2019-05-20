@@ -130,7 +130,7 @@ bool Bitmap24Load(char *filename, PIXEL_32BIT **ppBuffer, uint32_t *width, uint3
         for (unsigned int x = 0; x < *width; ++x)
         {
             // copy the color elements from the pixel data to the current pixel
-            currentPixel->alpha = 0;
+            currentPixel->alpha = 255;
             currentPixel->blue = *(pixelData++);
             currentPixel->green = *(pixelData++);
             currentPixel->red = *(pixelData++);

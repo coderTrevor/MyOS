@@ -22,10 +22,6 @@ volatile virtio_pci_common_cfg *pCommonConfig;
 
 void VGPU_Init(uint8_t bus, uint8_t slot, uint8_t function)
 {
-    //BGA_bus = bus;
-    //BGA_slot = slot;
-    //BGA_function = function;
-
     terminal_writestring("    Initializing virtio-gpu driver...\n");
 
     // Read the pointer to the capabilities list

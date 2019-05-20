@@ -183,6 +183,9 @@
     <ClCompile Include="Drivers\VirtIO.c">
       <Filter>Source Files\Drivers</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\Cursor.c">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="misc.h">
@@ -310,6 +313,9 @@
     </ClInclude>
     <ClInclude Include="Drivers\Virtio.h">
       <Filter>Header Files\Drivers</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Cursor.h">
+      <Filter>Header Files\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

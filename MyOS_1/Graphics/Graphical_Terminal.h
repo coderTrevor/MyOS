@@ -13,6 +13,8 @@ extern unsigned int graphicalColumn;
 extern unsigned int graphicalRow;
 extern unsigned int graphicalMaxColumns;
 extern unsigned int graphicalMaxRows;
+extern PIXEL_32BIT *backgroundImage;
+extern PIXEL_32BIT *foregroundText;
 
 //extern FNT_xy currentPos;
 extern PIXEL_32BIT graphicalForeground, graphicalBackground;
@@ -32,3 +34,5 @@ void GraphicalTerminalScrollUp(void);
 //void GraphicalTerminalWriteString(char *string);
 
 void GraphicalTerminalWritestringTop(const char *string, uint16_t column);
+
+bool SetGraphicalTerminalBackground(char *bitmapFileName);

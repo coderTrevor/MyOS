@@ -3,6 +3,7 @@
 #include "picofont.h"
 #include "../multiboot.h"
 #include "../misc.h"
+#include "Graphical_Terminal.h"
 
 // TODO: Support multiple displays
 bool graphicsPresent = false;
@@ -30,6 +31,67 @@ void GraphicsBlit(unsigned int x, unsigned int y, PIXEL_32BIT *image, uint32_t w
         // advance the pointers
         currentPixel += graphicsWidth;
         image += width;
+    }
+}
+
+// copy an image to the given coordinates in the foreground
+// it is the caller's responsibility to ensure the image doesn't go off the screen (for now)
+void GraphicsBlitToForeground(unsigned int x, unsigned int y, PIXEL_32BIT *image, uint32_t width, uint32_t height)
+{
+    unsigned int framebufferOffset = ((y * graphicsWidth + x) * sizeof(PIXEL_32BIT));
+    PIXEL_32BIT *currentPixel = (PIXEL_32BIT *)((uint32_t)foregroundText + framebufferOffset);
+
+    // for every row of pixels
+    for (size_t h = 0; h < height; ++h)
+    {
+        // copy the current row
+        memcpy((void*)currentPixel, (const void *)image, sizeof(PIXEL_32BIT) * width);
+
+        // advance the pointers
+        currentPixel += graphicsWidth;
+        image += width;
+    }
+}
+
+void GraphicsBlitWithAlpha(unsigned int x, unsigned int y, PIXEL_32BIT *image, uint32_t width, uint32_t height)
+{
+    unsigned int framebufferOffset = ((y * graphicsWidth + x) * sizeof(PIXEL_32BIT));
+    PIXEL_32BIT *currentPixel = (PIXEL_32BIT *)((uint32_t)linearFrameBuffer + framebufferOffset);
+
+    // for every row of pixels
+    for (size_t h = 0; h < height; ++h)
+    {
+        // copy the current row
+        for (size_t w = 0; w < width; ++w)
+        {
+            if(image->alpha)
+                memcpy((void*)currentPixel, (const void *)image, sizeof(PIXEL_32BIT));
+
+            ++currentPixel;
+            ++image;
+        }
+
+        // advance the pointers
+        currentPixel += graphicsWidth - width;
+    }
+}
+
+// Backup section of the screen to an image
+void GraphicsCopyToImage(unsigned int x, unsigned int y, PIXEL_32BIT *dest, uint32_t width, uint32_t height)
+{
+    unsigned int framebufferOffset = ((y * graphicsWidth + x) * sizeof(PIXEL_32BIT));
+    PIXEL_32BIT *currentPixel = (PIXEL_32BIT *)((uint32_t)linearFrameBuffer + framebufferOffset);
+    //unsigned int destOffset = 0;
+
+    // for every row of pixels
+    for (size_t h = 0; h < height; ++h)
+    {
+        // copy the current row
+        memcpy(dest, (void*)currentPixel, sizeof(PIXEL_32BIT) * width);
+
+        // advance the pointers
+        currentPixel += graphicsWidth;
+        dest += width;
     }
 }
 
@@ -91,7 +153,7 @@ PIXEL_32BIT GraphicsGetPixel(unsigned int x, unsigned int y)
 }
 
 // Sets a given range of lines on the screen to the given color
-void GraphicsClearLines(unsigned int firstLine, unsigned int lines, PIXEL_32BIT color)
+void GraphicsClearLines(unsigned int firstLine, unsigned int lines, PIXEL_32BIT color, uint32_t *imageBuffer)
 {
     // TODO: Support other bitdepths / announce error
     if (graphicsBpp != 32)
@@ -105,7 +167,7 @@ void GraphicsClearLines(unsigned int firstLine, unsigned int lines, PIXEL_32BIT 
     for (unsigned y = 0; y < lines; ++y)
     {
         for (unsigned int x = 0; x < graphicsWidth; ++x)
-            linearFrameBuffer[currentIndex++] = clearColor;
+            imageBuffer[currentIndex++] = clearColor;
     }
 }
 

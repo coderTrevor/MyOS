@@ -6,6 +6,14 @@
 
 // Handles an "abstract" terminal
 
+// New way of keeping track of what's on the screen, storing text in a buffer:
+#define MAX_LINE_WIDTH 80
+typedef char screenLine[MAX_LINE_WIDTH];
+#define MAX_BUFFER_LINES    250
+screenLine screenBuffer[MAX_BUFFER_LINES] = { 0 };
+unsigned int screenBeginning = 0; // current index into screenBuffer for top of the screen
+unsigned int screenPosition = 0;
+
 void terminal_backspace()
 {
     if (textMode)
