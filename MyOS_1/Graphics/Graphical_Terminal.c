@@ -68,12 +68,22 @@ void GraphicalTerminalInit()
 
     GraphicsFillScreen(0, 0, 0);
 
-    // Allocate memory for foreground buffer
     size_t foregroundBufferSize = sizeof(PIXEL_32BIT) * graphicsWidth * graphicsHeight;
-    foregroundText = malloc(foregroundBufferSize);
+
+    // If the foreground hasn't been allocated
+    if(!foregroundText)
+    {
+        // Allocate memory for foreground buffer
+        foregroundText = malloc(foregroundBufferSize);
+    }
 
     // Clear out the foreground buffer
     memset(foregroundText, 0, foregroundBufferSize);
+
+    // If there's a background image, draw it now
+    if (backgroundImage)
+        GraphicsBlit(0, 0, backgroundImage, graphicsWidth, graphicsHeight);
+
 }
 
 /*void GraphicalTerminalWriteString(char *string)
