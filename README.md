@@ -30,12 +30,14 @@ There's not much here beyond what's provided with tutorials like those from the 
 * Minimal support for COM1 serial input and output (Currently commented-out)
 * Basic interrupt support, mostly just used by the keyboard and NIC drivers
 * A very minimal RTL 8139 NIC driver (only tested with Qemu)
-* A virtio-net driver (only working in Qemu)
+* A virtio-net driver
+* An e1000 driver (only working in Qemu)
 * Some network protocols are minimally implemented, like ARP, IP, UDP, and a DHCP client
 * Filesystem support is only offered through a TFTP client with a hardcoded server IP
 * Can be built with MSVC 2015 (which makes it somewhat rare in the hobby OS world)
 * The OS builds as a .dll file. This file is multiboot-compliant and can be loaded by Qemu with the -kernel option, or you can boot it with GRUB.
 * It has graphical support (if available, provided either by Grub or a Bochs Graphics Adapter) and can display a bitmap.
+* It has the ability to set a background image.
 * It has some very basic sound support and will play .voc files.
 * It can run a collection of shell commands from a batch file.
 
