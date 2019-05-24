@@ -97,7 +97,10 @@ FNT_xy FNT_Generate(const char* text, unsigned int len, unsigned int w, PIXEL_32
 				if(fnt[text[i] * FNT_FONTHEIGHT + y] >> (7 - x) & 1)
 					pixels[((col - 1) * FNT_FONTWIDTH) + x + xy.x + (xy.y + y + row * (FNT_FONTHEIGHT + FNT_ROWSPACING)) * w] = graphicalForeground;
                 else
-                    pixels[((col - 1) * FNT_FONTWIDTH) + x + xy.x + (xy.y + y + row * (FNT_FONTHEIGHT + FNT_ROWSPACING)) * w] = graphicalBackground;
+                {
+                    if(!backgroundImage)
+                        pixels[((col - 1) * FNT_FONTWIDTH) + x + xy.x + (xy.y + y + row * (FNT_FONTHEIGHT + FNT_ROWSPACING)) * w] = graphicalBackground;
+                }
 			}
 		}	
 	}
@@ -149,10 +152,33 @@ void FNT_RenderMax(const char* text, unsigned int len, FNT_xy position)
 		SDL_LockSurface(surface);
 	}*/
 
-	FNT_Generate(text, len, graphicsWidth, (PIXEL_32BIT *)linearFrameBuffer, position);
+    PIXEL_32BIT temp = graphicalForeground;
+    graphicalForeground = graphicalOutline;
 
-    if(backgroundImage && foregroundText)
+    // draw black outline first
+    ++position.x;
+    ++position.y;
+    FNT_Generate(text, len, graphicsWidth, linearFrameBuffer, position);
+
+    graphicalForeground = temp;
+    --position.x;
+    --position.y;
+    FNT_Generate(text, len, graphicsWidth, linearFrameBuffer, position);
+
+    if (backgroundImage && foregroundText)
+    {
+        graphicalForeground = graphicalOutline;
+
+        // draw black outline first
+        ++position.x;
+        ++position.y;
         FNT_Generate(text, len, graphicsWidth, foregroundText, position);
+
+        graphicalForeground = temp;
+        --position.x;
+        --position.y;
+        FNT_Generate(text, len, graphicsWidth, foregroundText, position);
+    }
 
 	/*if(SDL_MUSTLOCK(surface)){
 		SDL_UnlockSurface(surface);

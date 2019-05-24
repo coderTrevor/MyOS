@@ -17,7 +17,7 @@ extern PIXEL_32BIT *backgroundImage;
 extern PIXEL_32BIT *foregroundText;
 
 //extern FNT_xy currentPos;
-extern PIXEL_32BIT graphicalForeground, graphicalBackground;
+extern PIXEL_32BIT graphicalForeground, graphicalBackground, graphicalOutline;
 
 void GraphicalTerminalBackspace();
 

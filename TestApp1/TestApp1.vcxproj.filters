@@ -21,6 +21,12 @@
     <ClInclude Include="..\MyOS_1\Interrupts\System_Calls.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\MyOS_1\Graphics\Display_HAL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MyOS_1\Graphics\Graphical_Terminal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

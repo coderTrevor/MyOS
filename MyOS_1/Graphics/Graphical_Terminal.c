@@ -11,7 +11,7 @@ unsigned int graphicalMaxColumns = 0;
 unsigned int graphicalMaxRows = 0;
 
 FNT_xy currentPos;
-PIXEL_32BIT graphicalForeground, graphicalBackground;
+PIXEL_32BIT graphicalForeground, graphicalBackground, graphicalOutline;
 PIXEL_32BIT *backgroundImage = NULL;
 PIXEL_32BIT *foregroundText = NULL;
 
@@ -62,6 +62,12 @@ void GraphicalTerminalInit()
     graphicalBackground.red = 0;
     graphicalBackground.green = 0;
     graphicalBackground.blue = 0;
+
+    // set graphicalOutline to black with opaque alpha
+    graphicalOutline.alpha = 255;
+    graphicalOutline.red = 0;
+    graphicalOutline.green = 0;
+    graphicalOutline.blue = 0;
 
     graphicalColumn = 0;
     graphicalRow = 0;

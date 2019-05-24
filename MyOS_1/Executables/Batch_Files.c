@@ -8,7 +8,7 @@
 // Batch files are just a collection of commands the shell understands.
 // They are similar to shell scripts but they are identified by their .bat extension.
 
-bool BatchEcho = true;
+bool BatchEcho = false;
 
 // see if the filename ends with .bat
 bool IsBatchFile(char *filename)

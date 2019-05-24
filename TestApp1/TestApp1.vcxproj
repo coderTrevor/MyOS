@@ -160,6 +160,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\MyOS_1\Graphics\Display_HAL.h" />
+    <ClInclude Include="..\MyOS_1\Graphics\Graphical_Terminal.h" />
     <ClInclude Include="..\MyOS_1\Interrupts\System_Calls.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>

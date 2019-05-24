@@ -24,6 +24,7 @@
 #include "Drivers/Virtio_Net.h"
 #include "Drivers/PS2_Mouse.h"
 #include "Networking/DHCP.h"
+#include "printf.h"
 
 int inputPosition = 0;
 #define COMMAND_HISTORY_SIZE        10
@@ -152,10 +153,100 @@ void PrintMemMap()
 void *malloc(size_t);
 void free(void *ptr);
 
+// Expand environment variables
+// TODO: Support arbitrary variable names
+// TODO: Check math regarding maxLength
+void Shell_Expand_Command(char *remainingCommand, int maxLength)
+{
+    // find the first pair of % symbols
+    char *firstPercent = strchr(remainingCommand, '%');
+    if (!firstPercent)
+        return;
+
+    char *secondPercent = strchr(firstPercent + 1, '%');
+    if (!secondPercent)
+        return;
+
+    char newCommand[MAX_COMMAND_LENGTH + 1];
+    memset(newCommand, 0, MAX_COMMAND_LENGTH + 1);
+
+    //int commandLength = strlen(remainingCommand);
+
+    // copy first part of current command to the new string
+    int firstStringLength = firstPercent - remainingCommand;
+    strncpy(newCommand, remainingCommand, firstStringLength);
+
+    if (debugLevel)
+    {
+        terminal_writestring(newCommand);
+        terminal_newline();
+    }
+
+    // Check for %% escape sequence
+    if (secondPercent - firstPercent == 1)
+    {
+        // Just copy a single percent over
+        strncpy(newCommand + firstStringLength, secondPercent, maxLength - firstStringLength);
+        if (debugLevel)
+        {
+            terminal_writestring(newCommand);
+            terminal_newline();
+        }
+
+        // Process remaining string
+        Shell_Expand_Command(newCommand + firstStringLength + 1, maxLength - firstStringLength - 1);
+    }
+    else
+    {
+        char sub[MAX_COMMAND_LENGTH + 1];
+        memset(sub, 0, MAX_COMMAND_LENGTH + 1);
+        strncpy(sub, firstPercent + 1, secondPercent - firstPercent - 1);
+
+        // Attempt to match substring to an environment variable
+        if (strcmp(sub, "BUILD") == 0)
+        {
+            // Copy build number into sub
+            snprintf(sub, MAX_COMMAND_LENGTH, "%d", BUILD_NUMBER);
+        }
+        if (strcmp(sub, "BUILDMOD10") == 0)
+        {
+            // Copy build number into sub
+            snprintf(sub, MAX_COMMAND_LENGTH, "%d", BUILD_NUMBER % 10);
+        }
+
+        if (debugLevel)
+        {
+            terminal_writestring(sub);
+            terminal_newline();
+        }
+
+        // Copy sub over
+        int subLength = strlen(sub);
+        if (subLength + firstStringLength > maxLength)
+            subLength = maxLength - firstStringLength;
+
+        strncpy(newCommand + firstStringLength, sub, subLength);
+
+        // Copy over everything after sub
+        strncpy(newCommand + firstStringLength + subLength, secondPercent + 1, maxLength - firstStringLength - subLength);
+
+        // Process remaining string
+        Shell_Expand_Command(newCommand + firstStringLength + subLength, maxLength - firstStringLength - subLength);
+    }
+
+    // copy newCommand into remainingCommand
+    strncpy(remainingCommand, newCommand, maxLength);
+
+    // TODO: additional %'s
+    return;
+}
+
 #pragma warning(push)                 // disable warning message about divide-by-zero, because we do that intentionally with the crash command
 #pragma warning(disable : 4723)       // (This is to test fault handling)
 void Shell_Process_command(void)
 {
+    Shell_Expand_Command(currentCommand, MAX_COMMAND_LENGTH);
+
     if (debugLevel)
     {
         terminal_writestring("Processing: ");
@@ -818,6 +909,55 @@ void Shell_Process_command(void)
         return;
     }
 
+    // If statement
+    memset(subCommand, 0, MAX_COMMAND_LENGTH);
+    strncpy(subCommand, currentCommand, strlen("IF"));
+    if (strcmp(subCommand, "IF") == 0)
+    {
+        // IF statements have the format IF 1==1 command
+        char *firstEquals = strchr(currentCommand, '=');
+        if (!firstEquals)
+        {
+            kprintf("IF command must contain '=='\n");
+            return;
+        }
+
+        char *secondEquals = strchr(firstEquals + 1, '=');
+        if (!secondEquals)
+        {
+            kprintf("IF command must contain '=='\n");
+            return;
+        }
+
+        // Get LHS and RHS strings
+        char LHS[MAX_COMMAND_LENGTH];
+        memset(LHS, 0, MAX_COMMAND_LENGTH);
+        char RHS[MAX_COMMAND_LENGTH];
+        memset(RHS, 0, MAX_COMMAND_LENGTH);
+
+        strncpy(LHS, currentCommand + 3, firstEquals - currentCommand - 3);
+        
+        char *firstSpaceAfterEquals = strchr(secondEquals, ' ');
+        if (!firstSpaceAfterEquals)
+        {
+            kprintf("Command must be given after conditional on the same line\n");
+            return;
+        }
+
+        strncpy(RHS, secondEquals + 1, firstSpaceAfterEquals - secondEquals - 1);
+
+        if(debugLevel)
+            kprintf("LHS: '%s'\nRHS: '%s'\n", LHS, RHS);
+
+        if (strcmp(LHS, RHS))
+            return;
+
+        // copy conditional command into current command and execute it
+        strncpy(currentCommand, firstSpaceAfterEquals + 1, MAX_COMMAND_LENGTH - (firstSpaceAfterEquals - currentCommand) - 1);
+        Shell_Process_command();
+
+        return;
+    }
     terminal_writestring("Sorry, I don't know how to process that input.\n");
 }
 #pragma warning(pop)
