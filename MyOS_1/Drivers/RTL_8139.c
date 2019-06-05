@@ -59,11 +59,21 @@ void RTL_8139_Init(uint8_t bus, uint8_t slot, uint8_t function)
     }
 
     // Setup an interrupt handler for this device
-    // TODO: Support IRQ sharing
-    Set_IDT_Entry((unsigned long)rtl_8139_InterruptHandler, HARDWARE_INTERRUPTS_BASE + rtl8139_IRQ);
 
-    // Tell the PIC to enable the NIC's IRQ
-    IRQ_Enable_Line(rtl8139_IRQ);
+    // Are we using IRQ 9 or 11?
+    if (rtl8139_IRQ == 9 || rtl8139_IRQ == 11)
+    {
+        // Support IRQ sharing
+        Interrupts_Add_Shared_Handler(rtl_8139_SharedInterruptHandler, rtl8139_IRQ);
+    }
+    else
+    {
+        // No irq sharing
+        Set_IDT_Entry((unsigned long)rtl_8139_InterruptHandler, HARDWARE_INTERRUPTS_BASE + rtl8139_IRQ);
+
+        // Tell the PIC to enable the NIC's IRQ
+        IRQ_Enable_Line(rtl8139_IRQ);
+    }
 
     // enable PCI bus mastering
     PCI_EnableBusMastering(bus, slot, function);
@@ -157,7 +167,7 @@ void _declspec(naked) rtl_8139_InterruptHandler()
     /* do something */
     ++interrupts_fired;
 
-    if(debugLevel)
+    if (debugLevel)
         terminal_writestring(" --------- rtl 8139 interrupt fired! -------\n");
 
     // get the interrupt status
@@ -167,17 +177,17 @@ void _declspec(naked) rtl_8139_InterruptHandler()
     {
         terminal_writestring("rtl8139 Error: Unhandled ISR (TODO) ");
         terminal_print_ulong_hex(isr);
-        for(;;)
+        for (;;)
             __halt();
     }
     //terminal_print_ulong_hex(isr);
 
     outw(rtl8139_base_port + RTL_ISR, 0xFFFF);
-    
+
     // check the status and see if it's a transmit success
     if (isr & RTL_ISR_TX_OK)
     {
-        if(debugLevel)
+        if (debugLevel)
             terminal_writestring("     Packet sent successfully!\n");
 
         // clear the interrupt
@@ -200,7 +210,7 @@ void _declspec(naked) rtl_8139_InterruptHandler()
 
     PIC_sendEOI(HARDWARE_INTERRUPTS_BASE + rtl8139_IRQ);
 
-    if(debugLevel)
+    if (debugLevel)
         terminal_writestring(" --------- rtl 8139 interrupt done! -------\n");
 
     _asm
@@ -208,6 +218,53 @@ void _declspec(naked) rtl_8139_InterruptHandler()
         popad
         iretd
     }
+}
+
+bool rtl_8139_SharedInterruptHandler()
+{
+    if (debugLevel)
+        terminal_writestring(" --------- rtl 8139 interrupt fired! -------\n");
+
+    // get the interrupt status
+    isr = inw(rtl8139_base_port + RTL_ISR);
+
+    if (isr & ~(RTL_ISR_RX_OK | RTL_ISR_TX_OK))
+    {
+        terminal_writestring("rtl8139 Error: Unhandled ISR (TODO) ");
+        terminal_print_ulong_hex(isr);
+        for (;;)
+            __halt();
+    }
+
+    outw(rtl8139_base_port + RTL_ISR, 0xFFFF);
+
+    // check the status and see if it's a transmit success
+    if (isr & RTL_ISR_TX_OK)
+    {
+        if (debugLevel)
+            terminal_writestring("     Packet sent successfully!\n");
+
+        // clear the interrupt
+        //outw(rtl8139_base_port + RTL_ISR, RTL_TX_OK);
+    }
+
+    // check the status and see if it's a received success
+    if (isr & RTL_ISR_RX_OK)
+    {
+        RTL_8139_ReceivePacket();
+    }
+
+    //outw(rtl8139_base_port + RTL_ISR, RTL_RX_OK);
+    /*if (isr & RTL_TX_OK)
+
+    // clear all interrupts
+    outw(rtl8139_base_port + RTL_ISR, 0xFFFF);*/
+    //isr = inw(rtl8139_base_port + RTL_ISR);
+    //terminal_print_ulong_hex(isr);
+    if (debugLevel)
+        terminal_writestring(" --------- rtl 8139 interrupt done! -------\n");
+
+    return (isr != 0);
 }
 
 void RTL_8139_ProcessRxPacket()

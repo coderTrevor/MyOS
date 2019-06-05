@@ -208,10 +208,10 @@ void Shell_Expand_Command(char *remainingCommand, int maxLength)
             // Copy build number into sub
             snprintf(sub, MAX_COMMAND_LENGTH, "%d", BUILD_NUMBER);
         }
-        if (strcmp(sub, "BUILDMOD10") == 0)
+        if (strcmp(sub, "BUILDMOD20") == 0)
         {
-            // Copy build number into sub
-            snprintf(sub, MAX_COMMAND_LENGTH, "%d", BUILD_NUMBER % 10);
+            // Copy build number % 20 into sub
+            snprintf(sub, MAX_COMMAND_LENGTH, "%d", BUILD_NUMBER % 20);
         }
 
         if (debugLevel)

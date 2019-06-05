@@ -190,11 +190,21 @@ void VirtIO_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
     VirtIO_Net_SetupReceiveBuffers();
 
     // Setup an interrupt handler for this device
-    // TODO: Check for and support IRQ sharing
-    Set_IDT_Entry((unsigned long)VirtIO_Net_InterruptHandler, HARDWARE_INTERRUPTS_BASE + vNet_IRQ);
 
-    // Tell the PIC to enable the NIC's IRQ
-    IRQ_Enable_Line(vNet_IRQ);
+    // Are we using IRQ 9 or 11?
+    if (vNet_IRQ == 9 || vNet_IRQ == 11)
+    {
+        // Support IRQ sharing
+        Interrupts_Add_Shared_Handler(VirtIO_Net_SharedInterruptHandler, vNet_IRQ);
+    }
+    else
+    {
+        // No irq sharing
+        Set_IDT_Entry((unsigned long)VirtIO_Net_InterruptHandler, HARDWARE_INTERRUPTS_BASE + vNet_IRQ);
+
+        // Tell the PIC to enable the NIC's IRQ
+        IRQ_Enable_Line(vNet_IRQ);
+    }
 
     // Tell the device it's initialized
     VNet_Write_Register(REG_DEVICE_STATUS, STATUS_DRIVER_READY);
@@ -239,7 +249,7 @@ void _declspec(naked) VirtIO_Net_InterruptHandler()
         // see if the transmit queue has been used
         while (transmitQueue.deviceArea->index != transmitQueue.lastDeviceAreaIndex)
         {
-            if(debugLevel)
+            if (debugLevel)
                 terminal_writestring("Transmit success\n");
             transmitQueue.lastDeviceAreaIndex++;
         }
@@ -261,6 +271,47 @@ void _declspec(naked) VirtIO_Net_InterruptHandler()
         popad
         iretd
     }
+}
+
+bool VirtIO_Net_SharedInterruptHandler()
+{
+    if (debugLevel)
+        terminal_writestring(" --------- virtio-net interrupt fired! -------\n");
+
+    // Get the interrupt status (This will also reset the isr status register)
+    uint32_t isr;
+    isr = VNet_Read_Register(REG_ISR_STATUS);
+
+    // TODO: Support configuration changes (doubt this will ever happen)
+    if (isr & VIRTIO_ISR_CONFIG_CHANGED)
+        terminal_writestring("TODO: VirtIO-Net configuration has changed\n");
+
+    // Check for used queues
+    if (isr & VIRTIO_ISR_VIRTQ_USED)
+    {
+        //terminal_writestring("Virtq used\n");
+
+        // see if the transmit queue has been used
+        while (transmitQueue.deviceArea->index != transmitQueue.lastDeviceAreaIndex)
+        {
+            if (debugLevel)
+                terminal_writestring("Transmit success\n");
+            transmitQueue.lastDeviceAreaIndex++;
+        }
+
+        // see if the receive queue has been used
+        if (receiveQueue.deviceArea->index != receiveQueue.lastDeviceAreaIndex)
+        {
+            VirtIO_Net_ReceivePacket();
+        }
+    }
+
+    PIC_sendEOI(HARDWARE_INTERRUPTS_BASE + vNet_IRQ);
+
+    if (debugLevel)
+        terminal_writestring(" --------- virtio-net interrupt done! -------\n");
+
+    return (isr != 0);
 }
 
 void VirtIO_Net_SetupReceiveBuffers()

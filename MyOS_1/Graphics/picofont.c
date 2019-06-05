@@ -98,7 +98,7 @@ FNT_xy FNT_Generate(const char* text, unsigned int len, unsigned int w, PIXEL_32
 					pixels[((col - 1) * FNT_FONTWIDTH) + x + xy.x + (xy.y + y + row * (FNT_FONTHEIGHT + FNT_ROWSPACING)) * w] = graphicalForeground;
                 else
                 {
-                    if(!backgroundImage)
+                    //if(!backgroundImage)
                         pixels[((col - 1) * FNT_FONTWIDTH) + x + xy.x + (xy.y + y + row * (FNT_FONTHEIGHT + FNT_ROWSPACING)) * w] = graphicalBackground;
                 }
 			}

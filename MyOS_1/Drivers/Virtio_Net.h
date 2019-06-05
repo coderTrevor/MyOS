@@ -75,6 +75,8 @@ void VirtIO_Net_ScanRQ();
 
 void VirtIO_Net_SendPacket(Ethernet_Header *packet, uint16_t dataSize);
 
+bool VirtIO_Net_SharedInterruptHandler();
+
 void VirtIO_Net_SetupReceiveBuffers();
 
 void VirtIO_Net_ReceivePacket();

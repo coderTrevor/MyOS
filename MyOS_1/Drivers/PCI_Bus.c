@@ -662,6 +662,25 @@ void PCI_ConfigWriteDWord(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offse
     outl(PCI_CONFIG_DATA, data);
 }
 
+
+void PCI_ConfigWriteWord(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset, uint16_t data)
+{
+    uint32_t address;
+    uint32_t lbus = (uint32_t)bus;
+    uint32_t lslot = (uint32_t)slot;
+    uint32_t lfunc = (uint32_t)func;
+
+    /* create configuration address as per Figure 1 */
+    address = (uint32_t)((lbus << 16) | (lslot << 11) |
+        (lfunc << 8) | (offset & 0xfc) | ((uint32_t)0x80000000));
+
+    /* write out the address */
+    outl(PCI_CONFIG_ADDRESS, address);
+
+    /* write out the data */
+    outw(PCI_CONFIG_DATA, data);
+}
+
 uint32_t PCI_ConfigReadDWord(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset)
 {
     uint32_t address;

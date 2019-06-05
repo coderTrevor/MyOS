@@ -172,11 +172,21 @@ void e1000_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
     PCI_EnableBusMastering(bus, slot, function);
 
     // Setup an interrupt handler for this device
-    // TODO: Check for and support IRQ sharing
-    Set_IDT_Entry((unsigned long)e1000_InterruptHandler, HARDWARE_INTERRUPTS_BASE + e1000_IRQ);
 
-    // Tell the PIC to enable the NIC's IRQ
-    IRQ_Enable_Line(e1000_IRQ);
+    // Are we using IRQ 9 or 11?
+    if (e1000_IRQ == 9 || e1000_IRQ == 11)
+    {
+        // Support IRQ sharing
+        Interrupts_Add_Shared_Handler(e1000_SharedInterruptHandler, e1000_IRQ);
+    }
+    else
+    {
+        // No irq sharing
+        Set_IDT_Entry((unsigned long)e1000_InterruptHandler, HARDWARE_INTERRUPTS_BASE + e1000_IRQ);
+
+        // Tell the PIC to enable the NIC's IRQ
+        IRQ_Enable_Line(e1000_IRQ);
+    }
 
     // Register this NIC with the ethernet subsystem
     EthernetRegisterNIC_SendFunction(e1000_SendPacket);
@@ -202,8 +212,8 @@ void _declspec(naked) e1000_InterruptHandler()
     // Get the interrupt status (This will also reset the isr status register)
     uint32_t isr;
     isr = e1000_Read_Register(REG_ICR);
-    
-    if(debugLevel)
+
+    if (debugLevel)
         kprintf("isr: 0x%lX\n", isr);
 
     if (isr & IMS_RXT0)
@@ -221,6 +231,34 @@ void _declspec(naked) e1000_InterruptHandler()
         popad
         iretd
     }
+}
+
+bool e1000_SharedInterruptHandler()
+{
+    ++interrupts_fired;
+
+    if (debugLevel)
+        terminal_writestring(" --------- e1000 shared interrupt fired! -------\n");
+
+    // Get the interrupt status (This will also reset the isr status register)
+    uint32_t isr;
+    isr = e1000_Read_Register(REG_ICR);
+
+    if (debugLevel)
+        kprintf("isr: 0x%lX\n", isr);
+
+    if (isr & IMS_RXT0)
+        e1000_ReceivePacket();
+
+    //e1000_Read_Register(REG_ICR);
+
+    if (debugLevel)
+        terminal_writestring(" --------- e1000 net interrupt done! -------\n");
+
+    if (isr)
+        return true;
+
+    return false;
 }
 
 uint32_t e1000_Read_Register(uint32_t regOffset)

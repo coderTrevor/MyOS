@@ -88,6 +88,12 @@ typedef struct virtio_pci_common_cfg
     uint64_t queue_device;      /* read-write */
 } virtio_pci_common_cfg;
 
+typedef struct virtio_pci_notify_cap 
+{
+    struct virtio_pci_cap cap;
+    uint32_t notify_off_multiplier; /* Multiplier for queue_notify_off. */
+} virtio_pci_notify_cap;
+
 typedef struct virtq_descriptor
 {
     /* Address (guest-physical). */

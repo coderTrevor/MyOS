@@ -59,3 +59,5 @@ void rtl_8139_InterruptHandler();
 void RTL_8139_ReceivePacket();
 
 void RTL_8139_SendPacket(Ethernet_Header *packet, uint16_t dataSize);
+
+bool rtl_8139_SharedInterruptHandler();

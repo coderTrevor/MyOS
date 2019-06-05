@@ -144,6 +144,8 @@ uint32_t e1000_Read_Register(uint32_t reg);
 
 void e1000_SendPacket(Ethernet_Header *packet, uint16_t dataSize);
 
+bool e1000_SharedInterruptHandler();
+
 void e1000_ReceivePacket();
 
 void e1000_RX_Init();
