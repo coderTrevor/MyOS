@@ -14,7 +14,7 @@ void default_interrupt_handler(void);
 
 void gpf_exception_handler(void);
 
-void Interrupts_Add_Shared_Handler(bool (*sharedHandlerAddress)(), uint8_t irq);
+void Interrupts_Add_Shared_Handler(bool (*sharedHandlerAddress)(void), uint8_t irq);
 
 void Interrupts_Init();
 

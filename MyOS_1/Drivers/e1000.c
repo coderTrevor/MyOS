@@ -233,7 +233,7 @@ void _declspec(naked) e1000_InterruptHandler()
     }
 }
 
-bool e1000_SharedInterruptHandler()
+bool e1000_SharedInterruptHandler(void)
 {
     ++interrupts_fired;
 

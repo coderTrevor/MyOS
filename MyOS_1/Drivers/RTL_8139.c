@@ -220,7 +220,7 @@ void _declspec(naked) rtl_8139_InterruptHandler()
     }
 }
 
-bool rtl_8139_SharedInterruptHandler()
+bool rtl_8139_SharedInterruptHandler(void)
 {
     if (debugLevel)
         terminal_writestring(" --------- rtl 8139 interrupt fired! -------\n");

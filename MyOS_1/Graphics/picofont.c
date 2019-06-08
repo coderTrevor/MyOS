@@ -158,12 +158,12 @@ void FNT_RenderMax(const char* text, unsigned int len, FNT_xy position)
     // draw black outline first
     ++position.x;
     ++position.y;
-    FNT_Generate(text, len, graphicsWidth, linearFrameBuffer, position);
+    FNT_Generate(text, len, graphicsWidth, (PIXEL_32BIT *)linearFrameBuffer, position);
 
     graphicalForeground = temp;
     --position.x;
     --position.y;
-    FNT_Generate(text, len, graphicsWidth, linearFrameBuffer, position);
+    FNT_Generate(text, len, graphicsWidth, (PIXEL_32BIT *)linearFrameBuffer, position);
 
     if (backgroundImage && foregroundText)
     {

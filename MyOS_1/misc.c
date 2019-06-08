@@ -11,6 +11,27 @@ uint32_t memoryNextAvailableAddress = 0;
 ALLOCATION_ARRAY allocationArray = { 0 };
 unsigned int nextAllocationSlot = 0;
 
+void* calloc(size_t num, size_t size)
+{
+    if (num == 0 || size == 0)
+        return 0;
+
+    // TODO: This will fail if num * size is greater than what size_t can represent
+    uint8_t *mem = malloc(num * size);
+
+    memset(mem, 0, num * size);
+
+    return mem;
+}
+
+// TODO
+void _exit()
+{
+    //terminal_writestring("Exit called with status \n");// %d\n", status);
+    for (;;)
+        __halt();
+}
+
 void free(void *ptr)
 {
     // TODO: Implement free() properly
@@ -49,6 +70,38 @@ char intToChar(int i)
     if( i > 9 || i < 0)
         return '?';
     return ints[i];
+}
+
+// TODO: Test
+void* realloc(void* ptr, size_t size)
+{
+    if (!ptr)
+        return malloc(size);
+
+    void *ptrNew = malloc(size);
+
+    // Find ptr in allocation array
+    int index;
+    for (index = 0; index < MAX_ALLOCATIONS; ++index)
+    {
+        if (allocationArray.address[index] == (uint32_t)ptr)
+            break;
+    }
+
+    // Could we find it?
+    if (index < MAX_ALLOCATIONS)
+    {
+        size_t lesserSize = size;
+        if (allocationArray.size[index] < size)
+            lesserSize = allocationArray.size[index];
+
+        // Copy the old data to the new memory
+        memcpy(ptrNew, ptr, lesserSize);
+    }
+
+    free(ptr);
+
+    return ptrNew;
 }
 
 char * __cdecl strchr(char *str, int character)

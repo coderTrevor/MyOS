@@ -20,6 +20,10 @@ extern unsigned int nextAllocationSlot;
 extern int debugLevel;
 extern bool showOverlay;
 
+void* calloc(size_t num, size_t size);
+
+void _exit(int status);
+
 void free(void *ptr);
 
 char intToChar(int i);
@@ -34,6 +38,8 @@ void* malloc(size_t size);
 
 int __cdecl memcmp(const void *ptr1, const void *ptr2, size_t num);
 #pragma intrinsic(memcmp)
+
+void* realloc(void* ptr, size_t size);
 
 char * __cdecl strchr(char *str, int character);
 

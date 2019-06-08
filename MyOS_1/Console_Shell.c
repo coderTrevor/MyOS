@@ -25,6 +25,7 @@
 #include "Drivers/PS2_Mouse.h"
 #include "Networking/DHCP.h"
 #include "printf.h"
+#include "Drivers/Virtio_GPU.h"
 
 int inputPosition = 0;
 #define COMMAND_HISTORY_SIZE        10
@@ -255,6 +256,13 @@ void Shell_Process_command(void)
     }
 
     char subCommand[MAX_COMMAND_LENGTH];
+
+    // derp
+    if (strcmp(currentCommand, "gpu") == 0)
+    {
+        kprintf("%d\n", controlQueue.deviceArea->index);
+        return;
+    }
 
     // dhcp
     if (strcmp(currentCommand, "dhcp") == 0)
@@ -741,14 +749,31 @@ void Shell_Process_command(void)
         // TEMPTEMP we've hardcoded some memory starting at 0x800000. This was identity mapped when paging was enabled.
         uint8_t *exeBuffer = (uint8_t*)0x800000;
 
-        uint32_t peBufferSize = 10 * 1024;
-        uint32_t peFileSize;
+        // Get the size of the executable file
+        uint32_t fileSize;
+        if (!TFTP_GetFileSize(tftpServerIP, subCommand, &fileSize))
+        {
+            terminal_writestring("Failed to determine size of ");
+            terminal_writestring(subCommand);
+            terminal_newline();
+            return;
+        }
+
+        // Allocate a buffer for the executable file
+        uint8_t *peBuffer = malloc(fileSize);
+        if (!peBuffer)
+        {
+            terminal_writestring("Not enough memory to open bitmap file\n");
+            return;
+        }
+
+        //uint32_t peFileSize;
 
         if(debugLevel)
             terminal_dumpHex(peBuffer, 32);
 
         // Download the executable
-        if (!TFTP_GetFile(tftpServerIP, subCommand, peBuffer, peBufferSize, &peFileSize) )
+        if (!TFTP_GetFile(tftpServerIP, subCommand, peBuffer, fileSize, NULL) )
         {
             terminal_writestring("Error reading ");
             terminal_writestring(subCommand);
@@ -762,6 +787,9 @@ void Shell_Process_command(void)
         // Run the executable
         if (!loadAndRunPE(exeBuffer, (DOS_Header*)peBuffer))
             terminal_writestring("Error running executable\n");
+
+        // Free the memory for the pe
+        free(peBuffer);
 
         terminal_resume();
 

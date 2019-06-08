@@ -273,7 +273,7 @@ void _declspec(naked) VirtIO_Net_InterruptHandler()
     }
 }
 
-bool VirtIO_Net_SharedInterruptHandler()
+bool VirtIO_Net_SharedInterruptHandler(void)
 {
     if (debugLevel)
         terminal_writestring(" --------- virtio-net interrupt fired! -------\n");

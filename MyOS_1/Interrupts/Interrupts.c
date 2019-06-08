@@ -50,8 +50,8 @@ void _declspec(naked) irq11_shared_interrupt_handler(void)
     for (int i = 0; i < irq11handlerCount; ++i)
     {
         // Call the shared handler. Break from loop if the device owning that handler fired an interrupt.
-        if ((*irq11handlers[i])())
-            break;
+        if ((*irq11handlers[i])());
+            //break;
     }
 
     PIC_sendEOI(HARDWARE_INTERRUPTS_BASE + 11);
@@ -76,8 +76,8 @@ void _declspec(naked) irq9_shared_interrupt_handler(void)
     for (int i = 0; i < irq9handlerCount; ++i)
     {
         // Call the shared handler. Break from loop if the device owning that handler fired an interrupt.
-        if ((*irq9handlers[i])())
-            break;
+        if ((*irq9handlers[i])());
+            //break;
     }
 
     PIC_sendEOI(HARDWARE_INTERRUPTS_BASE + 9);
@@ -180,7 +180,7 @@ void _declspec(naked) invalid_opcode_handler(void)
     }*/
 }
 
-void Interrupts_Add_Shared_Handler(bool (*sharedHandlerAddress)(), uint8_t irq)
+void Interrupts_Add_Shared_Handler(bool (*sharedHandlerAddress)(void), uint8_t irq)
 {
     if (irq != 9 && irq != 11)
     {
@@ -192,7 +192,7 @@ void Interrupts_Add_Shared_Handler(bool (*sharedHandlerAddress)(), uint8_t irq)
     {
         irq9handlers[irq9handlerCount++] = sharedHandlerAddress;
 
-        Set_IDT_Entry(irq9_shared_interrupt_handler, HARDWARE_INTERRUPTS_BASE + 9);
+        Set_IDT_Entry((unsigned long)irq9_shared_interrupt_handler, HARDWARE_INTERRUPTS_BASE + 9);
 
         IRQ_Enable_Line(9);
     }
@@ -200,7 +200,7 @@ void Interrupts_Add_Shared_Handler(bool (*sharedHandlerAddress)(), uint8_t irq)
     {
         irq11handlers[irq11handlerCount++] = sharedHandlerAddress;
 
-        Set_IDT_Entry(irq11_shared_interrupt_handler, HARDWARE_INTERRUPTS_BASE + 11);
+        Set_IDT_Entry((unsigned long)irq11_shared_interrupt_handler, HARDWARE_INTERRUPTS_BASE + 11);
 
         IRQ_Enable_Line(11);
     }

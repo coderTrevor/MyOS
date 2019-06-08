@@ -5,7 +5,7 @@
 #include "../Terminal.h"
 
 // TEMPTEMP - until we have memory allocation, just reserve 10k for an executable
-uint8_t peBuffer[10 * 1024];
+//uint8_t peBuffer[10 * 1024];
 
 
 // returns true on success

@@ -99,6 +99,6 @@ typedef struct IMAGE_SECTION_HEADER
     uint32_t mCharacteristics;
 } IMAGE_SECTION_HEADER;
 
-extern uint8_t peBuffer[10 * 1024];
+//extern uint8_t peBuffer[10 * 1024];
 
 bool loadAndRunPE(uint8_t *executableDestination, DOS_Header *mzAddress);
