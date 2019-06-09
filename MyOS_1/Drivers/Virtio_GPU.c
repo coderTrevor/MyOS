@@ -182,6 +182,11 @@ void VGPU_Init(uint8_t bus, uint8_t slot, uint8_t function)
     // Tell the device what features we'll be using
     VGPU_WriteFeatures(REQUIRED_FEATURES);
 
+    if (VGPU_ReadFeatures() != REQUIRED_FEATURES)
+    {
+        kprintf("Not good. Features are in fact: %llX\n", VGPU_ReadFeatures());
+    }
+
     // Tell the device we're ok with the features we've negotiated
     VGPU_WriteStatus(STATUS_DEVICE_ACKNOWLEDGED | STATUS_DRIVER_LOADED | STATUS_FEATURES_OK);
 
@@ -210,14 +215,15 @@ void VGPU_Init(uint8_t bus, uint8_t slot, uint8_t function)
     // Set the "driver ready" status bit
     VGPU_WriteStatus(STATUS_DEVICE_ACKNOWLEDGED | STATUS_DRIVER_LOADED | STATUS_FEATURES_OK | STATUS_DRIVER_READY);
 
-
     pCommonConfig->queue_select = VIRTIO_GPU_CONTROL_Q_INDEX;
     pCommonConfig->queue_enable = true;
-
+    
     // Send get display info control command
     virtio_gpu_ctrl_hdr *ctrlHeader = malloc(sizeof(virtio_gpu_ctrl_hdr));
-    ctrlHeader->ctx_id = VIRTIO_GPU_CMD_GET_DISPLAY_INFO;
+    memset(ctrlHeader, 0, sizeof(virtio_gpu_ctrl_hdr));
 
+    ctrlHeader->type = VIRTIO_GPU_CMD_GET_DISPLAY_INFO;
+    
     // Get indices for the next two descriptors
     uint16_t descIndex = controlQueue.nextDescriptor % controlQueue.elements;
     ++controlQueue.nextDescriptor;
@@ -233,17 +239,19 @@ void VGPU_Init(uint8_t bus, uint8_t slot, uint8_t function)
 
     // fill descriptor
     controlQueue.descriptors[descIndex].address = (uint64_t)ctrlHeader;
-    controlQueue.descriptors[descIndex].flags = VIRTQ_DESC_F_NEXT;
+    controlQueue.descriptors[descIndex].flags = 0;
     controlQueue.descriptors[descIndex].length = sizeof(virtio_gpu_ctrl_hdr);
     controlQueue.descriptors[descIndex].next = 0;
 
     // Add descriptor chain to the available ring
     controlQueue.driverArea->ringBuffer[index] = descIndex;
-
+    
     // Increase available ring index and notify the device
     controlQueue.driverArea->index++;
 
-    
+    // Setup buffers for device
+    VGPU_SetupDeviceBuffers();
+
     //VNet_Write_Register(REG_QUEUE_NOTIFY, TRANSMIT_QUEUE_INDEX);
     //pCommonConfig->
     *pNotificationArea = VIRTIO_GPU_CONTROL_Q_INDEX;
@@ -339,13 +347,13 @@ void _declspec(naked) VGPU_InterruptHandler()
     }
 }
 
-bool VGPU_SharedInterruptHandler()
+bool VGPU_SharedInterruptHandler(void)
 {
     ++interrupts_fired;
     bool retVal;
     retVal = false;
 
-    if (debugLevel)
+    //if (debugLevel)
         terminal_writestring(" --------- VGPU interrupt fired! -------\n");
 
     // Get the interrupt status (This will also reset the isr status register)
@@ -449,28 +457,33 @@ inline void VGPU_SelectQueue(uint16_t queueIndex)
 
 void VGPU_SetupDeviceBuffers()
 {
-    const uint16_t bufferSize = 2048;
+    const uint16_t bufferSize = 4096;
 
     // Allocate and add 16 buffers for the device to use
-    for (uint16_t i = 0; i < 16; ++i)
+   // for (uint16_t i = 0; i < 16; ++i)
     {
         uint8_t *buffer = malloc(bufferSize);
+        uint16_t nextDesc = controlQueue.nextDescriptor++;
 
         // Add buffer to the descriptor table
-        controlQueue.descriptors[i].address = (uint64_t)buffer;
-        controlQueue.descriptors[i].flags = VIRTQ_DESC_F_DEVICE_WRITE_ONLY;
-        controlQueue.descriptors[i].length = bufferSize;
-        controlQueue.descriptors[i].next = 0;
+        controlQueue.descriptors[nextDesc].address = (uint64_t)buffer;
+        controlQueue.descriptors[nextDesc].flags = VIRTQ_DESC_F_DEVICE_WRITE_ONLY | (1 << 7);
+        controlQueue.descriptors[nextDesc].length = bufferSize;
+        controlQueue.descriptors[nextDesc].next = 0;
 
         // Add index of descriptor to the driver ring
-        controlQueue.driverArea->ringBuffer[i] = i;
+        controlQueue.driverArea->ringBuffer[controlQueue.driverArea->index] = nextDesc;//.driverArea->ringBuffer[i].index = i;
+        //controlQueue.driverArea->ringBuffer[i].length = bufferSize;
     }
-
+      
     // Update next available index
-    controlQueue.driverArea->index = 16;
+    controlQueue.driverArea->index++;
+
+    //controlQueue.nextDescriptor = 16;
 
     // Notify the device of the updated queue
     //VNet_Write_Register(REG_QUEUE_NOTIFY, RECEIVE_QUEUE_INDEX);
+    *pNotificationArea = VIRTIO_GPU_CONTROL_Q_INDEX;
 }
 
 inline void VGPU_SetQueueAddresses(virtq *virtqueue)
@@ -487,7 +500,7 @@ inline void VGPU_WriteFeatures(uint64_t features)
     pCommonConfig->driver_feature = (uint32_t)(features & 0xFFffFFff);
 
     pCommonConfig->driver_feature_select = 1;
-    pCommonConfig->driver_feature = (uint32_t)(features >> 32);
+    pCommonConfig->driver_feature = 0;// (uint32_t)(features >> 32);
 }
 
 inline void VGPU_WriteStatus(uint8_t status)

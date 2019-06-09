@@ -257,6 +257,16 @@ void Shell_Process_command(void)
 
     char subCommand[MAX_COMMAND_LENGTH];
 
+    // test get graphics info syscall
+    if (strcmp(currentCommand, "graphicsInfo") == 0)
+    {
+        bool present;
+        int width, height;
+        SystemCallGetGraphicsInfo(&present, &width, &height);
+        kprintf("Graphics: %d\nwidth: %d\nheight: %d\n", present, width, height);
+        return;
+    }
+
     // derp
     if (strcmp(currentCommand, "gpu") == 0)
     {

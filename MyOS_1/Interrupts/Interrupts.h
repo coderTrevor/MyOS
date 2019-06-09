@@ -12,6 +12,8 @@ void default_exception_handler(void);
 
 void default_interrupt_handler(void);
 
+void get_graphics_interrupt_handler(int eflags, int cs, bool *graphicsInitialized, int *width, int *height);
+
 void gpf_exception_handler(void);
 
 void Interrupts_Add_Shared_Handler(bool (*sharedHandlerAddress)(void), uint8_t irq);

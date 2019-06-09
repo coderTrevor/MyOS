@@ -5,6 +5,21 @@
 #include "System_Calls.h"
 #include <stdarg.h>
 
+// Get graphics info
+void SystemCallGetGraphicsInfo(bool *graphicsMode, int *width, int *height)
+{
+    const int pointerSize = sizeof(bool *) + sizeof(int *) + sizeof(int *);
+    __asm
+    {
+        // push arguments onto stack
+        push [height]
+        push [width]
+        push [graphicsMode]
+        int SYSCALL_GET_GRAPHICS_INFO   // call get_graphics_info_interrupt_handler(graphicsArePresent, width, height)
+        add esp, pointerSize            // restore value of stack pointer
+    }
+}
+
 // print msg to the screen
 void SystemCallPrint(char *msg)
 {

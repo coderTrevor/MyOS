@@ -33,6 +33,8 @@
 
 #include "SDL_syswm.h"
 
+#include "../../../Interrupts/System_Calls.h"
+
 #if SDL_VIDEO_OPENGL
 #include "SDL_opengl.h"
 #endif /* SDL_VIDEO_OPENGL */
@@ -108,6 +110,9 @@ static VideoBootStrap *bootstrap[] = {
 #endif
 #if SDL_VIDEO_DRIVER_QNX
     &QNX_bootstrap,
+#endif
+#if SDL_VIDEO_DRIVER_MYOS
+    &MYOS_bootstrap,
 #endif
 #if SDL_VIDEO_DRIVER_DUMMY
     &DUMMY_bootstrap,
@@ -463,6 +468,7 @@ SDL_VideoInit(const char *driver_name)
     SDL_VideoDevice *video;
     int index;
     int i;
+    printf("VideoInit called\n");
 
     /* Check to make sure we don't overwrite '_this' */
     if (_this != NULL) {

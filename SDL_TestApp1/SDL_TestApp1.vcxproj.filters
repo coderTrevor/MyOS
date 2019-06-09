@@ -318,5 +318,11 @@
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\SDL.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\myos\SDL_myosframebuffer.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\myos\SDL_myosvideo.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

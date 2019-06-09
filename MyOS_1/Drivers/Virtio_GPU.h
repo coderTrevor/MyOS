@@ -14,7 +14,8 @@
 #define VIRTIO_GPU_F_EDID   2
 
 // Sadly, VIRTIO_GPU_F_VIRGL doesn't work on Windows (which sucks because that's the whole reason I started implementing a virtio-gpu driver)
-#define REQUIRED_FEATURES   (VIRTIO_F_VERSION_1)
+// Qemu seems to insist on using these features, whether we negotiate them or not:
+#define REQUIRED_FEATURES   (VIRTIO_F_VERSION_1 | VIRTIO_F_RING_INDIRECT_DESC | VIRTIO_F_RING_EVENT_IDX)
 
 #define VIRTIO_GPU_EVENT_DISPLAY (1 << 0)
 
@@ -89,6 +90,9 @@ typedef struct virtio_gpu_update_cursor
 } virtio_gpu_update_cursor;
 
 
+extern virtq controlQueue;
+
+
 void VGPU_Init(uint8_t bus, uint8_t slot, uint8_t function);
 
 void VGPU_Init_Virtqueue(virtq *virtqueue, uint16_t queueIndex);
@@ -103,7 +107,9 @@ inline void VGPU_SelectQueue(uint16_t queueIndex);
 
 inline void VGPU_SetQueueAddresses(virtq *virtqueue);
 
-bool VGPU_SharedInterruptHandler();
+void VGPU_SetupDeviceBuffers();
+
+bool VGPU_SharedInterruptHandler(void);
 
 inline void VGPU_WriteFeatures(uint64_t features);
 

@@ -109,6 +109,45 @@ void _declspec(naked) default_exception_handler(void)
     }*/
 }
 
+void _declspec(naked) get_graphics_interrupt_handler(int eflags, int cs, bool *graphicsInitialized, int *width, int *height)
+{
+    // supress warning about unused parameters
+    (void)eflags, (void)cs;
+    _asm
+    {
+        // prologue
+        push ebp
+        mov ebp, esp
+        push ebx
+        push esi
+        push edi
+
+        pushad
+    }
+
+    ++interrupts_fired;
+
+    if (debugLevel)
+        terminal_writestring("syscall get graphics interrupt handler fired.\n");
+
+    *graphicsInitialized = !textMode;
+    *width = graphicsWidth;
+    *height = graphicsHeight;
+
+    _asm
+    {
+        popad
+
+        // epilogue
+        pop edi
+        pop esi
+        pop ebx
+        pop ebp
+
+        iretd
+    }
+}
+
 void _declspec(naked) gpf_exception_handler(void)
 {
     //_asm pushad;

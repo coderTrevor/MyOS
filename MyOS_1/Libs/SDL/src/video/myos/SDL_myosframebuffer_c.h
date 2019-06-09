@@ -19,39 +19,15 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef SDL_config_h_
-#define SDL_config_h_
+#ifndef SDL_myosframebuffer_c_h_
+#define SDL_myosframebuffer_c_h_
 
-#include "SDL_platform.h"
+#include "../../SDL_internal.h"
 
-/**
- *  \file SDL_config.h
- */
+extern int SDL_MYOS_CreateWindowFramebuffer(_THIS, SDL_Window * window, Uint32 * format, void ** pixels, int *pitch);
+extern int SDL_MYOS_UpdateWindowFramebuffer(_THIS, SDL_Window * window, const SDL_Rect * rects, int numrects);
+extern void SDL_MYOS_DestroyWindowFramebuffer(_THIS, SDL_Window * window);
 
-/* Add any platform that doesn't build using the configure system. */
-#if defined(__WIN32__)
-#include "SDL_config_windows.h"
-#elif defined(__WINRT__)
-#include "SDL_config_winrt.h"
-#elif defined(__MACOSX__)
-#include "SDL_config_macosx.h"
-#elif defined(__IPHONEOS__)
-#include "SDL_config_iphoneos.h"
-#elif defined(__ANDROID__)
-#include "SDL_config_android.h"
-#elif defined(__PSP__)
-#include "SDL_config_psp.h"
-#elif defined(__OS2__)
-#include "SDL_config_os2.h"
-#elif defined(__MYOS__)
-#include "SDL_config_myos.h"
-#else
-/* This is a minimal configuration just to get SDL running on new platforms. */
-#include "SDL_config_minimal.h"
-#endif /* platform config */
+#endif /* SDL_myosframebuffer_c_h_ */
 
-#ifdef USING_GENERATED_CONFIG_H
-#error Wrong SDL_config.h, check your include path?
-#endif
-
-#endif /* SDL_config_h_ */
+/* vi: set ts=4 sw=4 expandtab: */

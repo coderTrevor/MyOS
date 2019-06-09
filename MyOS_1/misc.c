@@ -16,8 +16,13 @@ void* calloc(size_t num, size_t size)
     if (num == 0 || size == 0)
         return 0;
 
+    printf("calloc called\n");
+
     // TODO: This will fail if num * size is greater than what size_t can represent
     uint8_t *mem = malloc(num * size);
+
+    if (!mem)
+        printf("     calloc failed! Couldn't allocate %d bytes\n", num * size);
 
     memset(mem, 0, num * size);
 
@@ -25,7 +30,7 @@ void* calloc(size_t num, size_t size)
 }
 
 // TODO
-void _exit()
+void _exit(void)
 {
     //terminal_writestring("Exit called with status \n");// %d\n", status);
     for (;;)
@@ -181,6 +186,9 @@ void* malloc(size_t size)
 
     uint32_t availableAddress = memoryNextAvailableAddress;
 
+    //if(debugLevel)
+    //printf("size: %d\nadrress: %d\n", size, memoryNextAvailableAddress);
+
     /*terminal_writestring("Paged memory available: ");
     terminal_print_int(pagedMemoryAvailable);
     terminal_newline();*/
@@ -217,7 +225,10 @@ void* malloc(size_t size)
         unsigned int pagesAllocated;
         availableAddress = (uint32_t)(PageAllocator(pagesToAllocate, &pagesAllocated));
         if (!availableAddress)
+        {
+            printf("Returning NULL, %d pages allocated out of %d\n", pagesAllocated, pagesToAllocate);
             return NULL;
+        }
 
         /*terminal_writestring("Just allocated ");
         terminal_print_int(pagesAllocated);

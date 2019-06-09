@@ -2,6 +2,7 @@
 #include "Paging.h"
 #include "Console_VGA.h"
 #include <stdint.h>
+#include "Interrupts\System_Calls.h"
 
 // Allocate space for paging structures. We need enough space for three arrays with 0x1000 32-bit entries each.
 // Each array must be aligned on a 0x1000-byte boundary.
@@ -28,7 +29,10 @@ void *PageAllocator(unsigned int pages, unsigned int *pPagesAllocated)
 
     // make sure there's enough pages available
     if (paging4MPagesAvailable < pages)
+    {
+        printf("Not enough pages available, %d out of %d\n", paging4MPagesAvailable, pages);
         return NULL;
+    }
 
     void *retVal = (void *)pagingNextAvailableMemory;
 
