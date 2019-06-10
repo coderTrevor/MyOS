@@ -24,14 +24,14 @@
 
 #include "../SDL_sysvideo.h"
 #include "SDL_myosframebuffer_c.h"
-
+#include "../../../Interrupts/System_Calls.h"
 
 #define MYOS_SURFACE   "_SDL_MyOSSurface"
 
 int SDL_MYOS_CreateWindowFramebuffer(_THIS, SDL_Window * window, Uint32 * format, void ** pixels, int *pitch)
 {
     SDL_Surface *surface;
-    const Uint32 surface_format = SDL_PIXELFORMAT_BGRA8888;
+    const Uint32 surface_format = SDL_PIXELFORMAT_ARGB8888;
     int w, h;
     int bpp;
     Uint32 Rmask, Gmask, Bmask, Amask;
@@ -65,6 +65,9 @@ int SDL_MYOS_UpdateWindowFramebuffer(_THIS, SDL_Window * window, const SDL_Rect 
     if (!surface) {
         return SDL_SetError("Couldn't find myos surface for window");
     }
+
+    //printf("rectsInfo: %d, %d, %d x %d\n", rects->x, rects->y, rects->w, rects->h);
+    graphicsBlit(rects, window->surface->pixels);
 
     /* Send the data to the display */
     if (SDL_getenv("SDL_VIDEO_MYOS_SAVE_FRAMES")) {

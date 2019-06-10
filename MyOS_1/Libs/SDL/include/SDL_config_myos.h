@@ -74,7 +74,8 @@ typedef unsigned long uintptr_t;
 #define SDL_THREADS_DISABLED    1
 
 /* Enable myos timer support (src/timer/myos/\*.c) */
-#define SDL_TIMER_MYOS 1
+//#define SDL_TIMERS_DISABLE  1
+#define SDL_TIMER_MYOS     1
 
 /* Enable the dummy video driver and myos video driver (src/video/dummy/\*.c) and (src/video/myos/\*.c) */
 #define SDL_VIDEO_DRIVER_DUMMY  1
@@ -82,5 +83,8 @@ typedef unsigned long uintptr_t;
 
 /* Enable the dummy filesystem driver (src/filesystem/dummy/\*.c) */
 #define SDL_FILESYSTEM_DUMMY  1
+
+// Disable atomics
+#define SDL_ATOMIC_DISABLED     1
 
 #endif /* SDL_config_myos_h_ */

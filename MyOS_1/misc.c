@@ -17,7 +17,7 @@ void* calloc(size_t num, size_t size)
     if (num == 0 || size == 0)
         return 0;
 
-    printf("calloc called\n");
+    //printf("calloc called\n");
 
     // TODO: This will fail if num * size is greater than what size_t can represent
     uint8_t *mem = malloc(num * size);

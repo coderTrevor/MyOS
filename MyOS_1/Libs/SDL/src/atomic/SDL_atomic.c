@@ -21,6 +21,7 @@
 #include "../SDL_internal.h"
 
 #include "SDL_atomic.h"
+#include "../../../Interrupts/System_Calls.h"
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1500)
 //#include <intrin.h>
@@ -111,9 +112,13 @@ static SDL_SpinLock locks[32];
 static SDL_INLINE void
 enterLock(void *a)
 {
+    //printf("enterLock called\n");
+
     uintptr_t index = ((((uintptr_t)a) >> 3) & 0x1f);
 
     SDL_AtomicLock(&locks[index]);
+
+    //printf("enterLock done\n");
 }
 
 static SDL_INLINE void
@@ -129,6 +134,8 @@ leaveLock(void *a)
 SDL_bool
 SDL_AtomicCAS(SDL_atomic_t *a, int oldval, int newval)
 {
+    //printf("SDL_AtomicCAS called\n");
+
 #ifdef HAVE_MSC_ATOMICS
     return (_InterlockedCompareExchange((long*)&a->value, (long)newval, (long)oldval) == (long)oldval);
 #elif defined(HAVE_WATCOM_ATOMICS)
@@ -151,9 +158,11 @@ SDL_AtomicCAS(SDL_atomic_t *a, int oldval, int newval)
     }
     leaveLock(a);
 
+    //printf("SDL_AtomicCAS done\n");
     return retval;
 #else
     #error Please define your platform.
+    // TODO: Implement for MyOS
 #endif
 }
 
@@ -237,6 +246,7 @@ SDL_AtomicSetPtr(void **a, void *v)
 int
 SDL_AtomicAdd(SDL_atomic_t *a, int v)
 {
+    //printf("SDL_AtomicAdd called\n");
 #ifdef HAVE_MSC_ATOMICS
     return _InterlockedExchangeAdd((long*)&a->value, v);
 #elif defined(HAVE_WATCOM_ATOMICS)
@@ -257,6 +267,7 @@ SDL_AtomicAdd(SDL_atomic_t *a, int v)
     do {
         value = a->value;
     } while (!SDL_AtomicCAS(a, value, (value + v)));
+    //printf("SDL_AtomicAdd done\n");
     return value;
 #endif
 }

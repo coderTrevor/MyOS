@@ -3,6 +3,8 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include "../Libs/SDL/include/SDL_rect.h"
+#include "../Graphics/Display_HAL.h"
 
 #define HARDWARE_INTERRUPTS_BASE     0x20
 
@@ -15,6 +17,8 @@ void default_interrupt_handler(void);
 void get_graphics_interrupt_handler(int eflags, int cs, bool *graphicsInitialized, int *width, int *height);
 
 void gpf_exception_handler(void);
+
+void graphics_blit_interrupt_handler(int eflags, int cs, const SDL_Rect *sourceRect, PIXEL_32BIT *image);
 
 void Interrupts_Add_Shared_Handler(bool (*sharedHandlerAddress)(void), uint8_t irq);
 

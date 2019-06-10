@@ -282,9 +282,6 @@
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\thread\SDL_thread.c">
       <Filter>Source Files\SDL</Filter>
     </ClCompile>
-    <ClCompile Include="..\MyOS_1\Libs\SDL\src\timer\SDL_timer.c">
-      <Filter>Source Files\SDL</Filter>
-    </ClCompile>
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\events\SDL_touch.c">
       <Filter>Source Files\SDL</Filter>
     </ClCompile>
@@ -316,6 +313,9 @@
       <Filter>Source Files\SDL</Filter>
     </ClCompile>
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\myos\SDL_myosvideo.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\timer\SDL_timer.c">
       <Filter>Source Files\SDL</Filter>
     </ClCompile>
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\timer\myos\SDL_systimer.c">

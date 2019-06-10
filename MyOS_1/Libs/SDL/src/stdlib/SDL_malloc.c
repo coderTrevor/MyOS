@@ -30,6 +30,8 @@
 #include "SDL_atomic.h"
 #include "SDL_error.h"
 
+#include "../../../Interrupts/System_Calls.h"
+
 #ifndef HAVE_MALLOC
 #define LACKS_SYS_TYPES_H
 #define LACKS_STDIO_H
@@ -5384,10 +5386,14 @@ void *SDL_malloc(size_t size)
     if (!size) {
         size = 1;
     }
-    
+
+    //printf("SDL_malloc called.\n");
     mem = s_mem.malloc_func(size);
     if (mem) {
-        SDL_AtomicIncRef(&s_mem.num_allocations);
+        // TODO: Reenable
+        //SDL_AtomicIncRef(&s_mem.num_allocations);
+
+        //printf("SDL_malloc continuing.\n");
     }
     return mem;
 }

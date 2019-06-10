@@ -23,6 +23,7 @@
 #include "SDL_video.h"
 #include "SDL_blit.h"
 
+#include "../../../Interrupts/System_Calls.h"
 
 #ifdef __SSE__
 /* *INDENT-OFF* */
@@ -224,6 +225,8 @@ SDL_FillRect3(Uint8 * pixels, int pitch, Uint32 color, int w, int h)
 static void
 SDL_FillRect4(Uint8 * pixels, int pitch, Uint32 color, int w, int h)
 {
+    //printf("SDL_FillRect4 called\n");
+
     while (h--) {
         SDL_memset4(pixels, color, w);
         pixels += pitch;

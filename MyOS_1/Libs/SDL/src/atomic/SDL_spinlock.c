@@ -28,6 +28,8 @@
 #include "SDL_mutex.h"
 #include "SDL_timer.h"
 
+#include "../../../Interrupts/System_Calls.h"
+
 #if !defined(HAVE_GCC_ATOMICS) && defined(__SOLARIS__)
 #include <atomic.h>
 #endif
@@ -139,16 +141,24 @@ void
 SDL_AtomicLock(SDL_SpinLock *lock)
 {
     int iterations = 0;
+
+    //printf("SDL_AtomicLock called\n");
+
     /* FIXME: Should we have an eventual timeout? */
-    while (!SDL_AtomicTryLock(lock)) {
+    // TODO: Fix for MyOS
+    /*while (!SDL_AtomicTryLock(lock)) {
+        printf("SDL_AtomicLock continuing\n");
         if (iterations < 32) {
             iterations++;
             PAUSE_INSTRUCTION();
         } else {
-            /* !!! FIXME: this doesn't definitely give up the current timeslice, it does different things on various platforms. */
+            // !!! FIXME: this doesn't definitely give up the current timeslice, it does different things on various platforms.
             SDL_Delay(0);
         }
     }
+    */
+
+    //printf("SDL_AtomicLock done\n");
 }
 
 void

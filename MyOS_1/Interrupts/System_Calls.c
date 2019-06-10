@@ -36,6 +36,19 @@ void SystemCallGetGraphicsInfo(bool *graphicsMode, int *width, int *height)
     }
 }
 
+void SystemCallGraphicsBlit(const SDL_Rect *sourceRect, PIXEL_32BIT *image)
+{
+    const int pointerSize = sizeof(SDL_Rect *) + sizeof(PIXEL_32BIT *);
+    printf("gb called\n");
+    __asm
+    {        
+        push[image]                     // push arguments onto stack
+        push[sourceRect]
+        int SYSCALL_GRAPHICS_BLIT       // call graphics_blit_interrupt_handler(sourceRect, image)
+        add esp, pointerSize            // restore value of stack pointer                                        
+    }
+}
+
 // print msg to the screen
 void SystemCallPrint(char *msg)
 {

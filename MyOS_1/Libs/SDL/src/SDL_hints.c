@@ -23,6 +23,7 @@
 #include "SDL_hints.h"
 #include "SDL_error.h"
 
+#include "../../../Interrupts/System_Calls.h"
 
 /* Assuming there aren't many hints set and they aren't being queried in
    critical performance paths, we'll just use linked lists here.
@@ -150,7 +151,8 @@ SDL_AddHintCallback(const char *name, SDL_HintCallback callback, void *userdata)
     SDL_DelHintCallback(name, callback, userdata);
 
     entry = (SDL_HintWatch *)SDL_malloc(sizeof(*entry));
-    
+
+    //printf("EventsInit continuing.\n");
     if (!entry) {
         SDL_OutOfMemory();
         return;

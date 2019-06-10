@@ -32,6 +32,7 @@
 #endif
 #include "../video/SDL_sysvideo.h"
 #include "SDL_syswm.h"
+#include "../../../Interrupts/System_Calls.h"
 
 /* An arbitrary limit so we don't have unbounded growth */
 #define SDL_MAX_QUEUED_EVENTS   65535
@@ -1001,11 +1002,15 @@ SDL_SendKeymapChangedEvent(void)
 int
 SDL_EventsInit(void)
 {
+    //printf("EventsInit continuing\n");
+
     SDL_AddHintCallback(SDL_HINT_EVENT_LOGGING, SDL_EventLoggingChanged, NULL);
+    //printf("EventsInit continuing...\n");
     if (SDL_StartEventLoop() < 0) {
         SDL_DelHintCallback(SDL_HINT_EVENT_LOGGING, SDL_EventLoggingChanged, NULL);
         return -1;
     }
+    //printf("EventsInit continuing\n");
 
     SDL_QuitInit();
 

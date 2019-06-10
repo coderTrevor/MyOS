@@ -58,6 +58,9 @@ void IDT_Init(void)
     // Set handler for time delay
     Set_IDT_Entry((unsigned long)time_delay_ms_interrupt_handler, SYSCALL_TIME_DELAY_MS);
 
+    // Set handler for graphics blit function
+    Set_IDT_Entry((unsigned long)graphics_blit_interrupt_handler, SYSCALL_GRAPHICS_BLIT);
+
     /* fill the IDT descriptor */
     IDT_ptr.base = (uint32_t)IDT;
     IDT_ptr.size = (sizeof(IDT_ENTRY) * 256);

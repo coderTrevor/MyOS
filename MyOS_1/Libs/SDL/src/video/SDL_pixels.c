@@ -29,6 +29,7 @@
 #include "SDL_pixels_c.h"
 #include "SDL_RLEaccel_c.h"
 
+#include "../../../Interrupts/System_Calls.h"
 
 /* Lookup tables to expand partial bytes to the full 0..255 range */
 
