@@ -276,9 +276,6 @@
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\thread\generic\SDL_systhread.c">
       <Filter>Source Files\SDL</Filter>
     </ClCompile>
-    <ClCompile Include="..\MyOS_1\Libs\SDL\src\timer\dummy\SDL_systimer.c">
-      <Filter>Source Files\SDL</Filter>
-    </ClCompile>
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\thread\generic\SDL_systls.c">
       <Filter>Source Files\SDL</Filter>
     </ClCompile>
@@ -319,6 +316,9 @@
       <Filter>Source Files\SDL</Filter>
     </ClCompile>
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\myos\SDL_myosvideo.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\timer\myos\SDL_systimer.c">
       <Filter>Source Files\SDL</Filter>
     </ClCompile>
   </ItemGroup>

@@ -257,6 +257,13 @@ void Shell_Process_command(void)
 
     char subCommand[MAX_COMMAND_LENGTH];
 
+    // Display ticksSinceReset
+    if (strcmp(currentCommand, "ticks") == 0)
+    {
+        kprintf("%lld", ticksSinceReset);
+        return;
+    }
+
     // Get number of free pages
     if (strcmp(currentCommand, "pages") == 0)
     {

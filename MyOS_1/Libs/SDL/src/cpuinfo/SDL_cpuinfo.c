@@ -409,6 +409,16 @@ CPU_have3DNow(void)
     return 0;
 }
 
+#ifdef __MYOS__
+#define CPU_haveRDTSC() SDL_FALSE
+#define CPU_haveMMX()   SDL_FALSE
+#define CPU_haveSSE()   SDL_FALSE
+#define CPU_haveSSE2()  SDL_FALSE
+#define CPU_haveSSE3()  SDL_FALSE
+#define CPU_haveSSE41() SDL_FALSE
+#define CPU_haveSSE42() SDL_FALSE
+#define CPU_haveAVX()   SDL_FALSE
+#else
 #define CPU_haveRDTSC() (CPU_CPUIDFeatures[3] & 0x00000010)
 #define CPU_haveMMX() (CPU_CPUIDFeatures[3] & 0x00800000)
 #define CPU_haveSSE() (CPU_CPUIDFeatures[3] & 0x02000000)
@@ -417,6 +427,7 @@ CPU_have3DNow(void)
 #define CPU_haveSSE41() (CPU_CPUIDFeatures[2] & 0x00080000)
 #define CPU_haveSSE42() (CPU_CPUIDFeatures[2] & 0x00100000)
 #define CPU_haveAVX() (CPU_OSSavesYMM && (CPU_CPUIDFeatures[2] & 0x10000000))
+#endif
 
 static int
 CPU_haveAVX2(void)

@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-extern uint64_t ticksSinceReset;
+extern volatile uint64_t ticksSinceReset;
 extern uint64_t nanosecondsPerTick;
 extern uint64_t microsecondsPerTick;
 extern uint64_t millisecondsPerTick;

@@ -1,9 +1,10 @@
 #include "System_Clock.h"
 #include <stdbool.h>
 #include "../misc.h"
+#include "../printf.h"
 
 // system clock defaults to one "tick" (IRQ0 firing) at a rate of about 18.207 hz
-uint64_t ticksSinceReset = 0;
+volatile uint64_t ticksSinceReset = 0;
 
 // These values are approximate. They will need to be updated if we change the PIT's divider
 // If we need more accuracy it may be desirable to convert some of these to fixed point or floating point,
@@ -19,23 +20,15 @@ bool showClock = true;
 
 void TimeDelayMS(uint64_t milliseconds)
 {
-    volatile uint64_t oldTicks = ticksSinceReset;
+    uint64_t oldTicks = ticksSinceReset;
 
     // figure out how many ticks we need to wait
     uint64_t waitTicks = milliseconds / millisecondsPerTick;
-
-    // We don't know how soon ticksSinceReset will be updated, and we want to wait at least until the given time indicated
-    // (TODO: improve accuracy somehow?)
-    // Wait until ticks changes
-    while (oldTicks == ticksSinceReset)
-        ;
-
-    // update oldTicks
-    oldTicks = ticksSinceReset;
+    uint64_t doneTicks = oldTicks + waitTicks;
 
     // wait
-    for (volatile uint64_t ticks = 0; ticks < waitTicks; ++ticks)
-        ;
+    while (ticksSinceReset < doneTicks)
+        ;// kprintf("%lld < %lld, %lld\n", ticksSinceReset, doneTicks, milliseconds);
 }
 
 // Format time in the form hh:mm:ss (time since reset)

@@ -16,5 +16,11 @@ int main()
     else
         printf("malloc() failed\n");
         
+    printf("Executing a 3-second delay...\n");
+    
+    timeDelayMS(3000);
+
+    printf("Done\n");
+
     return 0;
 }

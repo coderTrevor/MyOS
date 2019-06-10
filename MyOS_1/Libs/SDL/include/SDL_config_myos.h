@@ -73,10 +73,10 @@ typedef unsigned long uintptr_t;
 /* Enable the stub thread support (src/thread/generic/\*.c) */
 #define SDL_THREADS_DISABLED    1
 
-/* Enable the stub timer support (src/timer/dummy/\*.c) */
-#define SDL_TIMERS_DISABLED 1
+/* Enable myos timer support (src/timer/myos/\*.c) */
+#define SDL_TIMER_MYOS 1
 
-/* Enable the dummy video driver and myos video driver (src/video/dummy/\*.c) */
+/* Enable the dummy video driver and myos video driver (src/video/dummy/\*.c) and (src/video/myos/\*.c) */
 #define SDL_VIDEO_DRIVER_DUMMY  1
 #define SDL_VIDEO_DRIVER_MYOS   1
 

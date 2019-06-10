@@ -7,6 +7,7 @@
 #define SYSCALL_PRINTF              254
 #define SYSCALL_GET_GRAPHICS_INFO   253
 #define SYSCALL_PAGE_ALLOCATOR      252
+#define SYSCALL_TIME_DELAY_MS       251
 
 void SystemCallPageAllocator(unsigned int pages, unsigned int *pPagesAllocated, uint32_t *pRreturnVal);
 #define pageAllocator SystemCallPageAllocator
@@ -18,3 +19,6 @@ void SystemCallPrint(char *str);
 
 #define printf SystemCallPrintf
 int __cdecl SystemCallPrintf(const char* format, ...);
+
+void SystemCallTimeDelayMS(uint32_t milliSeconds);
+#define timeDelayMS SystemCallTimeDelayMS

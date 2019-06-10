@@ -55,7 +55,8 @@ void IDT_Init(void)
     // Set handler for allocating a new page of memory
     Set_IDT_Entry((unsigned long)page_allocator_interrupt_handler, SYSCALL_PAGE_ALLOCATOR);
 
-    // Set shared IRQ handlers
+    // Set handler for time delay
+    Set_IDT_Entry((unsigned long)time_delay_ms_interrupt_handler, SYSCALL_TIME_DELAY_MS);
 
     /* fill the IDT descriptor */
     IDT_ptr.base = (uint32_t)IDT;

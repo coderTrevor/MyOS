@@ -75,3 +75,16 @@ int __cdecl SystemCallPrintf(const char* format, ...)
     
     return 0;   // TODO: Return number of characters in string
 }
+
+void SystemCallTimeDelayMS(uint32_t milliSeconds)
+{
+    const int pointerSize = sizeof(uint32_t);
+
+    // Do time delay ms system call
+    __asm
+    {
+        push [milliSeconds]         // push milliseconds argument onto the stack
+        int SYSCALL_TIME_DELAY_MS   // call time_delay_ms_interrupt_handler(milliSeconds)
+        add esp, pointerSize        // restore stack pointer
+    }
+}

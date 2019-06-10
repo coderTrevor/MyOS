@@ -118,6 +118,8 @@ SDL_AtomicTryLock(SDL_SpinLock *lock)
 #error Please implement for your platform.
     return SDL_FALSE;
 #endif
+    // TODO: Implement for MyOS
+    return SDL_FALSE;
 }
 
 /* "REP NOP" is PAUSE, coded for tools that don't know it by that name. */

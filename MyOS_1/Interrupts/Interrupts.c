@@ -9,6 +9,7 @@
 #include "../printf.h"
 #include "../Terminal.h"
 #include "../paging.h"
+#include "../Timers/System_Clock.h"
 
 unsigned long interrupts_fired;
 
@@ -386,6 +387,30 @@ void _declspec(naked) printf_interrupt_handler(int eflags, int cs, const char *f
         pop edi
         pop esi
         pop ebx
+        pop ebp
+
+        iretd
+    }
+}
+
+void _declspec(naked) time_delay_ms_interrupt_handler(int eflags, int cs, uint32_t milliSeconds)
+{
+    (void)eflags, (void)cs;
+
+    __asm
+    {
+        // prologue
+        push ebp
+        mov ebp, esp
+
+        sti // enable interrupts so timer can fire
+    }
+
+    TimeDelayMS(milliSeconds);
+
+    __asm
+    {
+        // epilogue
         pop ebp
 
         iretd

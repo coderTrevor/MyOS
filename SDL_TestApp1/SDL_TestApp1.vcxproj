@@ -119,12 +119,13 @@
       </PrecompiledHeader>
       <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
       <PreprocessorDefinitions>__MYOS;NDEBUG;_CONSOLE;HAVE_MALLOC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\MyOS_1\Libs\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+      <OmitFramePointers>true</OmitFramePointers>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -234,7 +235,7 @@
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\thread\generic\SDL_systhread.c" />
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\thread\generic\SDL_systls.c" />
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\thread\SDL_thread.c" />
-    <ClCompile Include="..\MyOS_1\Libs\SDL\src\timer\dummy\SDL_systimer.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\timer\myos\SDL_systimer.c" />
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\timer\SDL_timer.c" />
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\dummy\SDL_nullevents.c" />
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\dummy\SDL_nullframebuffer.c" />
