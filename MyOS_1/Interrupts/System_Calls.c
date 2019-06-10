@@ -5,6 +5,22 @@
 #include "System_Calls.h"
 #include <stdarg.h>
 
+// Allocate memory pages
+void SystemCallPageAllocator(unsigned int pages, unsigned int *pPagesAllocated, uint32_t *pReturnVal)
+{
+    const int pointerSize = sizeof(unsigned int) + sizeof(unsigned int *) + sizeof(uint32_t *);
+
+    __asm
+    {
+        // push arguments onto stack
+        push pReturnVal
+        push pPagesAllocated
+        push pages
+        int  SYSCALL_PAGE_ALLOCATOR  // call PageAllocator(pagesToAllocate, pPagesAllocated, pReturnVal);
+        add esp, pointerSize         // restore value of stack pointer
+    }
+}
+
 // Get graphics info
 void SystemCallGetGraphicsInfo(bool *graphicsMode, int *width, int *height)
 {

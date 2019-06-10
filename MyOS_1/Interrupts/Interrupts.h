@@ -22,6 +22,8 @@ void Interrupts_Init();
 
 void keyboard_interrupt_handler(void);
 
+void page_allocator_interrupt_handler(int eflags, int cs, unsigned int pages, unsigned int *pPagesAllocated, uint32_t *pRetVal);
+
 void page_fault_handler(void);
 
 void invalid_opcode_handler(void);

@@ -134,6 +134,8 @@
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <MapFileName>TestApp1.map</MapFileName>
+      <MapExports>true</MapExports>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(TargetDir)$(TargetFileName)" C:\Users\Administrator\.VirtualBox\TFTP\$(TargetFileName)</Command>
@@ -168,7 +170,6 @@
   <ItemGroup>
     <ClCompile Include="..\MyOS_1\Interrupts\System_Calls.c" />
     <ClCompile Include="..\MyOS_1\misc.c" />
-    <ClCompile Include="..\MyOS_1\paging.c" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="TestApp1.c" />
   </ItemGroup>

@@ -8,6 +8,7 @@
 #include "../Console_VGA.h"
 #include "../printf.h"
 #include "../Terminal.h"
+#include "../paging.h"
 
 unsigned long interrupts_fired;
 
@@ -166,6 +167,34 @@ void _declspec(naked) gpf_exception_handler(void)
     popad
     iretd
     }*/
+}
+
+void  _declspec(naked) page_allocator_interrupt_handler(int eflags, int cs, unsigned int pages, unsigned int *pPagesAllocated, uint32_t *pRetVal)
+{
+    // supress warning about unused parameters
+    (void)eflags, (void)cs;
+
+    _asm
+    {
+        // prologue
+        push ebp
+        mov ebp, esp
+    }
+
+    ++interrupts_fired;
+
+    if (debugLevel)
+        terminal_writestring("syscall page allocator interrupt handler fired.\n");
+        
+    KPageAllocator(pages, pPagesAllocated, pRetVal);
+
+    _asm
+    {
+        // epilogue
+        pop ebp
+
+       iretd
+    }
 }
 
 void _declspec(naked) page_fault_handler(void)

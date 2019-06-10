@@ -4,6 +4,7 @@
 #include "Terminal.h"
 #include "printf.h"
 #include "Interrupts\System_Calls.h"
+#include "Interrupts/Interrupts.h"
 
 uint32_t pagedMemoryAvailable = 0;
 uint32_t memoryNextAvailableAddress = 0;
@@ -223,7 +224,12 @@ void* malloc(size_t size)
         }*/
 
         unsigned int pagesAllocated;
-        availableAddress = (uint32_t)(PageAllocator(pagesToAllocate, &pagesAllocated));
+        // Run KPageAllocator() in kernel mode, otherwise use a system call from applications
+#ifndef MYOS_KERNEL
+        pageAllocator(pagesToAllocate, &pagesAllocated, &availableAddress);
+#else
+        KPageAllocator(pagesToAllocate, &pagesAllocated, &availableAddress);
+#endif
         if (!availableAddress)
         {
             printf("Returning NULL, %d pages allocated out of %d\n", pagesAllocated, pagesToAllocate);

@@ -257,6 +257,13 @@ void Shell_Process_command(void)
 
     char subCommand[MAX_COMMAND_LENGTH];
 
+    // Get number of free pages
+    if (strcmp(currentCommand, "pages") == 0)
+    {
+        kprintf("%d 4M pages remaining\n", paging4MPagesAvailable);
+        return;
+    }
+
     // test get graphics info syscall
     if (strcmp(currentCommand, "graphicsInfo") == 0)
     {

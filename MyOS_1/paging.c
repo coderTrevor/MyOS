@@ -23,7 +23,7 @@ uint32_t paging4MPagesAvailable;    // number of 4M physical memory pages availa
 // pPagesAllocated will receive the number of 4M pages actually allocated.
 // TODO: Check memory map
 // TODO: Make multi-threading safe
-void *PageAllocator(unsigned int pages, unsigned int *pPagesAllocated)
+void KPageAllocator(unsigned int pages, unsigned int *pPagesAllocated, uint32_t *pRetVal)
 {
     *pPagesAllocated = 0;
 
@@ -31,10 +31,11 @@ void *PageAllocator(unsigned int pages, unsigned int *pPagesAllocated)
     if (paging4MPagesAvailable < pages)
     {
         printf("Not enough pages available, %d out of %d\n", paging4MPagesAvailable, pages);
-        return NULL;
+        *pRetVal = (uint32_t)NULL;
+        return;
     }
 
-    void *retVal = (void *)pagingNextAvailableMemory;
+    *pRetVal = pagingNextAvailableMemory;
 
     // limit the number of pages to allocate to the number available.
     if (pages > paging4MPagesAvailable)
@@ -59,5 +60,4 @@ void *PageAllocator(unsigned int pages, unsigned int *pPagesAllocated)
         pagingNextAvailableMemory += FOUR_MEGABYTES;
         ++(*pPagesAllocated);
     }
-    return retVal;
 }

@@ -264,7 +264,6 @@
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_yuv.c" />
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\yuv2rgb\yuv_rgb.c" />
     <ClCompile Include="..\MyOS_1\misc.c" />
-    <ClCompile Include="..\MyOS_1\paging.c" />
     <ClCompile Include="SDL_TestApp1.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include "Terminal.h"
+#include "printf.h"
 
 // not sure why alignas() isn't working for me in MSVC 2015
 // I can't get __declspect(align(4096)) to work either, the linker complains that 
@@ -27,7 +28,7 @@ extern uint32_t paging4MPagesAvailable;
 
 typedef uint32_t ULONG_PTR;
 
-void *PageAllocator(unsigned int pages, unsigned int *pPagesAllocated);
+void KPageAllocator(unsigned int pages, unsigned int *pPagesAllocated, uint32_t *pRetVal);
 
 // setup the page directory and page tables and enable paging
 inline void Paging_Enable(multiboot_info *multibootInfo)

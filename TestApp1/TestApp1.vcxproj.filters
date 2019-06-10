@@ -41,8 +41,5 @@
     <ClCompile Include="..\MyOS_1\Interrupts\System_Calls.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MyOS_1\paging.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

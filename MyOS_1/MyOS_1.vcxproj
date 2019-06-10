@@ -185,7 +185,7 @@
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>__MYOS;NDEBUG;_USRDLL;MYOS_1_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__MYOS;MYOS_KERNEL;NDEBUG;_USRDLL;MYOS_1_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>None</DebugInformationFormat>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <StringPooling>true</StringPooling>
@@ -219,7 +219,7 @@
       <NoEntryPoint>true</NoEntryPoint>
     </Link>
     <PostBuildEvent>
-      <Command>"C:\Program Files\qemu\qemu-system-x86_64w.exe" -soundhw sb16,adlib -monitor stdio -netdev user,id=u1,tftp="C:\Users\Administrator\.VirtualBox\TFTP" -device e1000,netdev=u1 -kernel "$(TargetPath)"  -object filter-dump,id=f1,netdev=u1,file="C:\Program Files\qemu\dump.dat" -accel hax &amp;&amp; "C:\Users\Administrator\Documents\Visual Studio 2015\Projects\AutoIncrementBuild\Release\AutoIncrementBuild.exe"</Command>
+      <Command>"C:\Program Files\qemu\qemu-system-x86_64w.exe" -soundhw sb16,adlib -monitor stdio -netdev user,id=u1,tftp="C:\Users\Administrator\.VirtualBox\TFTP" -device rtl8139,netdev=u1 -kernel "$(TargetPath)"  -object filter-dump,id=f1,netdev=u1,file="C:\Program Files\qemu\dump.dat" -accel hax &amp;&amp; "C:\Users\Administrator\Documents\Visual Studio 2015\Projects\AutoIncrementBuild\Release\AutoIncrementBuild.exe"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Launching QEMU</Message>

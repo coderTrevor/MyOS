@@ -52,6 +52,9 @@ void IDT_Init(void)
     // Set handler to get graphics info
     Set_IDT_Entry((unsigned long)get_graphics_interrupt_handler, SYSCALL_GET_GRAPHICS_INFO);
 
+    // Set handler for allocating a new page of memory
+    Set_IDT_Entry((unsigned long)page_allocator_interrupt_handler, SYSCALL_PAGE_ALLOCATOR);
+
     // Set shared IRQ handlers
 
     /* fill the IDT descriptor */
