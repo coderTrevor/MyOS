@@ -61,6 +61,15 @@ void IDT_Init(void)
     // Set handler for graphics blit function
     Set_IDT_Entry((unsigned long)graphics_blit_interrupt_handler, SYSCALL_GRAPHICS_BLIT);
 
+    // Set handler for fopen
+    Set_IDT_Entry((unsigned long)fopen_interrupt_handler, SYSCALL_FOPEN);
+
+    // Set handler for fclose
+    Set_IDT_Entry((unsigned long)fclose_interrupt_handler, SYSCALL_FCLOSE);
+
+    // Set handler for fread
+    Set_IDT_Entry((unsigned long)fread_interrupt_handler, SYSCALL_FREAD);
+
     /* fill the IDT descriptor */
     IDT_ptr.base = (uint32_t)IDT;
     IDT_ptr.size = (sizeof(IDT_ENTRY) * 256);

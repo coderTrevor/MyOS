@@ -26,6 +26,7 @@
 #include "Networking/DHCP.h"
 #include "printf.h"
 #include "Drivers/Virtio_GPU.h"
+#include "myos_io.h"
 
 int inputPosition = 0;
 #define COMMAND_HISTORY_SIZE        10
@@ -256,6 +257,23 @@ void Shell_Process_command(void)
     }
 
     char subCommand[MAX_COMMAND_LENGTH];
+
+    // Test IO functions
+    if (strcmp(currentCommand, "testio") == 0)
+    {
+        FILE *fp;
+        fp = fopen("dir.txt", "rb");
+
+        char c;
+
+        while (fread(&c, 1, 1, fp))
+            terminal_putchar(c);
+
+        terminal_newline();        
+
+        fclose(fp);
+        return;
+    }    
 
     // Display ticksSinceReset
     if (strcmp(currentCommand, "ticks") == 0)

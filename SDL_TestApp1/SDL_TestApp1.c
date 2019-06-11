@@ -20,6 +20,7 @@
 #define SDL_MAIN_HANDLED 1
 
 #include "../MyOS_1/Libs/SDL/include/SDL.h"
+#include "../MyOS_1/Libs/SDL/include/SDL_video.h"
 
 int main(int argc, char* argv[]) 
 {
@@ -58,11 +59,33 @@ int main(int argc, char* argv[])
     // Update the surface
     SDL_UpdateWindowSurface(window);
 
-    SDL_Delay(3000);  // Pause execution for 3000 milliseconds, for example
+    SDL_Delay(500);  // Pause execution for 500 milliseconds, for example
+
+    // Load BMP
+    SDL_Surface *bitmapSurface = SDL_LoadBMP("kg2.bmp");
+    if (bitmapSurface == NULL)
+    {
+        printf("Unable to load image %s! SDL Error: %s\n", "kg2.bmp", SDL_GetError());
+        //success = false;
+    }
+
+    if (bitmapSurface)
+    {
+        // Blit bitmap to window
+        SDL_BlitScaled(bitmapSurface, NULL, screenSurface, NULL);
+
+        // Update the surface
+        SDL_UpdateWindowSurface(window);
+
+        SDL_Delay(3000);  // Pause execution for 3000 milliseconds, for example
+    }
 
     // Close and destroy the window
     SDL_DestroyWindow(window);
     
+    // Free BMP surface
+    SDL_FreeSurface(bitmapSurface);
+
     // Clean up
     SDL_Quit();
 

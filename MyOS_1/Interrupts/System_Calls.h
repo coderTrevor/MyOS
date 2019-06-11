@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "../Graphics/Display_HAL.h"
 #include "../Libs/SDL/include/SDL_rect.h"
+#include "../myos_io.h"
 
 #define SYSCALL_PRINT               255
 #define SYSCALL_PRINTF              254
@@ -11,6 +12,18 @@
 #define SYSCALL_PAGE_ALLOCATOR      252
 #define SYSCALL_TIME_DELAY_MS       251
 #define SYSCALL_GRAPHICS_BLIT       250
+#define SYSCALL_FOPEN               249
+#define SYSCALL_FCLOSE              248
+#define SYSCALL_FREAD               247
+
+int SystemCallFClose(FILE *fp);
+#define fclose SystemCallFClose
+
+FILE *SystemCallFOpen(const char * filename, const char * mode);
+#define fopen SystemCallFOpen
+
+size_t SystemCallFRead(void * ptr, size_t size, size_t count, FILE * stream);
+#define fread SystemCallFRead
 
 void SystemCallPageAllocator(unsigned int pages, unsigned int *pPagesAllocated, uint32_t *pRreturnVal);
 #define pageAllocator SystemCallPageAllocator

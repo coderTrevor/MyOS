@@ -87,4 +87,6 @@ typedef unsigned long uintptr_t;
 // Disable atomics
 #define SDL_ATOMIC_DISABLED     1
 
+//#define HAVE_STDIO_H    1
+
 #endif /* SDL_config_myos_h_ */

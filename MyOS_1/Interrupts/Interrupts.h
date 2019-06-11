@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include "../Libs/SDL/include/SDL_rect.h"
 #include "../Graphics/Display_HAL.h"
+#include "../myos_io.h"
 
 #define HARDWARE_INTERRUPTS_BASE     0x20
 
@@ -13,6 +14,12 @@ extern unsigned long interrupts_fired;
 void default_exception_handler(void);
 
 void default_interrupt_handler(void);
+
+void fclose_interrupt_handler(int eflags, int cs, int fp, int *pRetVal);
+
+void fopen_interrupt_handler(int eflags, int cs, const char *filename, const char *mode, int *fp);
+
+void fread_interrupt_handler(int eflags, int cs, void * ptr, size_t size, size_t count, FILE * stream, size_t *pSize);
 
 void get_graphics_interrupt_handler(int eflags, int cs, bool *graphicsInitialized, int *width, int *height);
 

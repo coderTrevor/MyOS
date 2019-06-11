@@ -184,7 +184,7 @@
       </PrecompiledHeader>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
       <PreprocessorDefinitions>__MYOS;MYOS_KERNEL;NDEBUG;_USRDLL;MYOS_1_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>None</DebugInformationFormat>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
@@ -309,6 +309,7 @@
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Release|x64'">UninitializedLocalUsageCheck</BasicRuntimeChecks>
     </ClCompile>
     <ClCompile Include="misc.c" />
+    <ClCompile Include="myos_io.c" />
     <ClCompile Include="Networking\ARP.c" />
     <ClCompile Include="Networking\DHCP.c" />
     <ClCompile Include="Networking\Ethernet.c" />
@@ -353,6 +354,7 @@
     <ClInclude Include="Interrupts\System_Calls.h" />
     <ClInclude Include="misc.h" />
     <ClInclude Include="multiboot.h" />
+    <ClInclude Include="myos_io.h" />
     <ClInclude Include="Networking\ARP.h" />
     <ClInclude Include="Networking\DHCP.h" />
     <ClInclude Include="Networking\Ethernet.h" />

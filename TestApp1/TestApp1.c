@@ -16,9 +16,22 @@ int main()
     else
         printf("malloc() failed\n");
         
-    printf("Executing a 3-second delay...\n");
+    printf("Executing a 1-second delay...\n");
     
-    timeDelayMS(3000);
+    timeDelayMS(1000);
+
+    // Try opening a file
+    FILE *fp = fopen("dir.txt", "rb");
+
+    char c;
+    while (fread(&c, 1, 1, fp))
+        printf("%c", c);
+
+    // close the file
+    printf("\nfp: %d\n", fp);
+    int fc = fclose(fp);
+    if (fc)
+        printf("fclose() returned %d\n", fc);
 
     printf("Done\n");
 

@@ -11,6 +11,7 @@
 #include "../paging.h"
 #include "../Timers/System_Clock.h"
 #include "../Graphics/Display_HAL.h"
+#include "../myos_io.h"
 
 unsigned long interrupts_fired;
 
@@ -110,6 +111,94 @@ void _declspec(naked) default_exception_handler(void)
     popad
     iretd
     }*/
+}
+
+void _declspec(naked) fclose_interrupt_handler(int eflags, int cs, int fp, int *pRetVal)
+{
+    // supress warning about unused parameters
+    (void)eflags, (void)cs;
+
+    _asm
+    {
+        // prologue
+        push ebp
+        mov ebp, esp
+    }
+
+    ++interrupts_fired;
+
+    if (debugLevel)
+        terminal_writestring("fclose interrupt handler fired.\n");
+
+    *pRetVal = file_close(fp);
+
+    _asm
+    {
+        // epilogue
+        pop ebp
+
+        iretd
+    }
+
+}
+
+void _declspec(naked) fopen_interrupt_handler(int eflags, int cs, const char *filename, const char *mode, int *fp)
+{
+    // supress warning about unused parameters
+    (void)eflags, (void)cs;
+
+    _asm
+    {
+        // prologue
+        push ebp
+        mov ebp, esp
+
+        // re-enable interrupts
+        sti
+    }
+
+    ++interrupts_fired;
+
+    if (debugLevel)
+        terminal_writestring("fopen interrupt handler fired.\n");
+
+    *fp = file_open(filename, mode);
+
+    _asm
+    {
+        // epilogue
+        pop ebp
+
+        iretd
+    }
+}
+
+void _declspec(naked) fread_interrupt_handler(int eflags, int cs, void * ptr, size_t size, size_t count, FILE * stream, size_t *pSize)
+{
+    // supress warning about unused parameters
+    (void)eflags, (void)cs;
+
+    _asm
+    {
+        // prologue
+        push ebp
+        mov ebp, esp
+    }
+
+    ++interrupts_fired;
+
+    if (debugLevel)
+        terminal_writestring("fread interrupt handler fired.\n");
+
+    *pSize = file_read(ptr, size, count, stream);
+
+    _asm
+    {
+        // epilogue
+        pop ebp
+
+        iretd
+    }
 }
 
 void _declspec(naked) get_graphics_interrupt_handler(int eflags, int cs, bool *graphicsInitialized, int *width, int *height)

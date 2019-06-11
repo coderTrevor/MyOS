@@ -4,21 +4,44 @@
 #include "../Terminal.h"
 #include "System_Calls.h"
 #include <stdarg.h>
+#include "../myos_io.h"
+#include <stdint.h>
 
-// Allocate memory pages
-void SystemCallPageAllocator(unsigned int pages, unsigned int *pPagesAllocated, uint32_t *pReturnVal)
+int SystemCallFClose(FILE *fp)
 {
-    const int pointerSize = sizeof(unsigned int) + sizeof(unsigned int *) + sizeof(uint32_t *);
+    int retVal;
+    int *pRetVal = &retVal;
+    const int pointerSize = sizeof(FILE *) + sizeof(int *);
 
     __asm
     {
         // push arguments onto stack
-        push pReturnVal
-        push pPagesAllocated
-        push pages
-        int  SYSCALL_PAGE_ALLOCATOR  // call PageAllocator(pagesToAllocate, pPagesAllocated, pReturnVal);
-        add esp, pointerSize         // restore value of stack pointer
+        push [pRetVal]
+        push [fp]
+        int SYSCALL_FCLOSE      // call fclose_interrupt_handler(int fp, int *pRetVal)
+        add esp, pointerSize    // restore value of stack pointer
     }
+
+    return retVal;
+}
+
+FILE *SystemCallFOpen(const char * filename, const char * mode)
+{
+    FILE *fp;
+    FILE **fpp = &fp;
+
+    const int pointerSize = sizeof(const char *) + sizeof(const char *) + sizeof(FILE *);
+
+    __asm
+    {
+        // push arguments onto stack
+        push [fpp]
+        push [mode]
+        push [filename]
+        int SYSCALL_FOPEN       // call fopen_interrupt_handler(int eflags, int cs, const char *filename, const char *mode, int *fp)
+        add esp, pointerSize    // restore value of stack pointer
+    }
+    return fp;
 }
 
 // Get graphics info
@@ -46,6 +69,42 @@ void SystemCallGraphicsBlit(const SDL_Rect *sourceRect, PIXEL_32BIT *image)
         push[sourceRect]
         int SYSCALL_GRAPHICS_BLIT       // call graphics_blit_interrupt_handler(sourceRect, image)
         add esp, pointerSize            // restore value of stack pointer                                        
+    }
+}
+
+size_t SystemCallFRead(void * bufPtr, size_t elemSize, size_t count, FILE * stream)
+{
+    size_t retVal;
+    size_t *pRetVal = &retVal;
+    const int pointerSize = sizeof(void *) + sizeof(size_t) + sizeof(size_t) + sizeof(FILE *) + sizeof(size_t *);
+
+    __asm
+    {
+        push [pRetVal]          // push arguments onto stack
+        push [stream]
+        push [count]
+        push [elemSize]
+        push [bufPtr]
+        int SYSCALL_FREAD       // call fread_interrupt_handler(int eflags, int cs, void * ptr, size_t size, size_t count, FILE * stream, size_t *pSize)
+        add esp, pointerSize    // restore value of stack pointer                                        
+    }
+
+    return retVal;
+}
+
+// Allocate memory pages
+void SystemCallPageAllocator(unsigned int pages, unsigned int *pPagesAllocated, uint32_t *pReturnVal)
+{
+    const int pointerSize = sizeof(unsigned int) + sizeof(unsigned int *) + sizeof(uint32_t *);
+
+    __asm
+    {
+        // push arguments onto stack
+        push pReturnVal
+        push pPagesAllocated
+        push pages
+        int  SYSCALL_PAGE_ALLOCATOR  // call PageAllocator(pagesToAllocate, pPagesAllocated, pReturnVal);
+        add esp, pointerSize         // restore value of stack pointer
     }
 }
 
