@@ -21,6 +21,10 @@ void fopen_interrupt_handler(int eflags, int cs, const char *filename, const cha
 
 void fread_interrupt_handler(int eflags, int cs, void * ptr, size_t size, size_t count, FILE * stream, size_t *pSize);
 
+void fseek_interrupt_handler(int eflags, int cs, FILE *stream, long int offset, int origin, int *pRetVal);
+
+void ftell_interrupt_handler(int eflags, int cs, FILE *stream, long int *pRetVal);
+
 void get_graphics_interrupt_handler(int eflags, int cs, bool *graphicsInitialized, int *width, int *height);
 
 void gpf_exception_handler(void);

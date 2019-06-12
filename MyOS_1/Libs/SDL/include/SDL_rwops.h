@@ -32,6 +32,10 @@
 #include "SDL_stdinc.h"
 #include "SDL_error.h"
 
+#if __MYOS__
+#include "../../../myos_io.h"
+#endif
+
 #include "begin_code.h"
 /* Set up for C function definitions, even when using C++ */
 #ifdef __cplusplus
@@ -45,6 +49,7 @@ extern "C" {
 #define SDL_RWOPS_JNIFILE   3U  /**< Android asset */
 #define SDL_RWOPS_MEMORY    4U  /**< Memory stream */
 #define SDL_RWOPS_MEMORY_RO 5U  /**< Read-Only memory stream */
+#define SDL_RWOPS_MYOSFILE  6U  /**< MYOS file */
 
 /**
  * This is the read/write operation structure -- very basic.
@@ -126,6 +131,12 @@ typedef struct SDL_RWops
             SDL_bool autoclose;
             FILE *fp;
         } stdio;
+#elif __MYOS__
+        struct
+        {
+            SDL_bool autoclose;
+            FILE *fp;
+        } myos;
 #endif
         struct
         {

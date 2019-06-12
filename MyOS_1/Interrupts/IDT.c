@@ -70,6 +70,12 @@ void IDT_Init(void)
     // Set handler for fread
     Set_IDT_Entry((unsigned long)fread_interrupt_handler, SYSCALL_FREAD);
 
+    // Set handler for fseek
+    Set_IDT_Entry((unsigned long)fseek_interrupt_handler, SYSCALL_FSEEK);
+
+    // Set handler for ftell
+    Set_IDT_Entry((unsigned long)ftell_interrupt_handler, SYSCALL_FTELL);
+
     /* fill the IDT descriptor */
     IDT_ptr.base = (uint32_t)IDT;
     IDT_ptr.size = (sizeof(IDT_ENTRY) * 256);

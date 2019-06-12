@@ -44,6 +44,62 @@ FILE *SystemCallFOpen(const char * filename, const char * mode)
     return fp;
 }
 
+size_t SystemCallFRead(void * bufPtr, size_t elemSize, size_t count, FILE * stream)
+{
+    size_t retVal;
+    size_t *pRetVal = &retVal;
+    const int pointerSize = sizeof(void *) + sizeof(size_t) + sizeof(size_t) + sizeof(FILE *) + sizeof(size_t *);
+
+    __asm
+    {
+        push[pRetVal]          // push arguments onto stack
+        push[stream]
+        push[count]
+        push[elemSize]
+        push[bufPtr]
+        int SYSCALL_FREAD       // call fread_interrupt_handler(ptr, size, count, stream, pRetVal)
+        add esp, pointerSize    // restore value of stack pointer
+    }
+
+    return retVal;
+}
+
+int SystemCallFSeek(FILE * stream, long int off, int origin)
+{
+    int retVal;
+    int *pRetVal = &retVal;
+    const int pointerSize = sizeof(FILE *) + sizeof(long int) + sizeof(int) + sizeof(int *);
+
+    __asm
+    {
+        push[pRetVal]          // push arguments onto stack
+        push[origin]
+        push[off]
+        push[stream]
+        int SYSCALL_FSEEK       // call fseek_interrupt_handler(stream, offset, origin, pRetVal);
+        add esp, pointerSize    // restore value of stack pointer
+    }
+
+    return retVal;
+}
+
+long int SystemCallFTell(FILE * stream)
+{
+    long int retVal;
+    long int *pRetVal = &retVal;
+    const int pointerSize = sizeof(FILE *) + sizeof(long int *);
+
+    __asm
+    {
+        push[pRetVal]           // push arguments onto stack
+        push[stream]
+        int SYSCALL_FTELL       // call ftell_interrupt_handler(stream, pRetVal);
+        add esp, pointerSize    // restore value of stack pointer
+    }
+
+    return retVal;
+}
+
 // Get graphics info
 void SystemCallGetGraphicsInfo(bool *graphicsMode, int *width, int *height)
 {
@@ -70,26 +126,6 @@ void SystemCallGraphicsBlit(const SDL_Rect *sourceRect, PIXEL_32BIT *image)
         int SYSCALL_GRAPHICS_BLIT       // call graphics_blit_interrupt_handler(sourceRect, image)
         add esp, pointerSize            // restore value of stack pointer                                        
     }
-}
-
-size_t SystemCallFRead(void * bufPtr, size_t elemSize, size_t count, FILE * stream)
-{
-    size_t retVal;
-    size_t *pRetVal = &retVal;
-    const int pointerSize = sizeof(void *) + sizeof(size_t) + sizeof(size_t) + sizeof(FILE *) + sizeof(size_t *);
-
-    __asm
-    {
-        push [pRetVal]          // push arguments onto stack
-        push [stream]
-        push [count]
-        push [elemSize]
-        push [bufPtr]
-        int SYSCALL_FREAD       // call fread_interrupt_handler(int eflags, int cs, void * ptr, size_t size, size_t count, FILE * stream, size_t *pSize)
-        add esp, pointerSize    // restore value of stack pointer                                        
-    }
-
-    return retVal;
 }
 
 // Allocate memory pages

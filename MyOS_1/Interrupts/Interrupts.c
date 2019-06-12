@@ -190,7 +190,63 @@ void _declspec(naked) fread_interrupt_handler(int eflags, int cs, void * ptr, si
     if (debugLevel)
         terminal_writestring("fread interrupt handler fired.\n");
 
-    *pSize = file_read(ptr, size, count, stream);
+    *pSize = file_read(ptr, size, count, (int)stream);
+
+    _asm
+    {
+        // epilogue
+        pop ebp
+
+        iretd
+    }
+}
+
+void _declspec(naked) fseek_interrupt_handler(int eflags, int cs, FILE *stream, long int offset, int origin, int *pRetVal)
+{
+    // supress warning about unused parameters
+    (void)eflags, (void)cs;
+
+    _asm
+    {
+        // prologue
+        push ebp
+        mov ebp, esp
+    }
+
+    ++interrupts_fired;
+
+    if (debugLevel)
+        terminal_writestring("fseek interrupt handler fired.\n");
+
+    *pRetVal = file_seek(stream, offset, origin);
+
+    _asm
+    {
+        // epilogue
+        pop ebp
+
+        iretd
+    }
+}
+
+void _declspec(naked) ftell_interrupt_handler(int eflags, int cs, FILE *stream, long int *pRetVal)
+{
+    // supress warning about unused parameters
+    (void)eflags, (void)cs;
+
+    _asm
+    {
+        // prologue
+        push ebp
+        mov ebp, esp
+    }
+
+    ++interrupts_fired;
+
+    if (debugLevel)
+        terminal_writestring("ftell interrupt handler fired.\n");
+
+    *pRetVal = file_tell(stream);
 
     _asm
     {

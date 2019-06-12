@@ -36,7 +36,8 @@
 #ifndef WS_OVERLAPPEDWINDOW
 #define WS_OVERLAPPEDWINDOW 0
 #endif
-#else  /* fprintf, _exit(), etc. */
+#elif !__MYOS__
+/* fprintf, _exit(), etc. */
 #include <stdio.h>
 #include <stdlib.h>
 #if ! defined(__WINRT__)

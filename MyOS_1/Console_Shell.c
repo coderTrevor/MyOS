@@ -258,16 +258,50 @@ void Shell_Process_command(void)
 
     char subCommand[MAX_COMMAND_LENGTH];
 
+    // skip lines beginning with ';'
+    if (currentCommand[0] == ';')
+        return;
+
     // Test IO functions
     if (strcmp(currentCommand, "testio") == 0)
     {
         FILE *fp;
-        fp = fopen("dir.txt", "rb");
+        fp = fopen("kg2.bmp", "rb");
 
         char c;
 
-        while (fread(&c, 1, 1, fp))
-            terminal_putchar(c);
+        /*while (fread(&c, 1, 1, fp))
+            terminal_putchar(c);*/
+
+        fseek(fp, 0, SEEK_CUR);
+
+        printf("pos: %ld\n", ftell(fp));
+
+        fseek(fp, 0, SEEK_CUR);
+
+        printf("pos: %ld\n", ftell(fp));
+
+        uint64_t data;
+        fread(&data, 1, 2, fp);
+        fread(&data, 4, 1, fp);
+        fread(&data, 2, 1, fp);
+        fread(&data, 2, 1, fp);
+        fread(&data, 4, 1, fp);
+        fread(&data, 4, 1, fp);
+
+        printf("data: %d\n", data);
+
+        fseek(fp, 0, SEEK_CUR);
+
+        printf("pos: %ld\n", ftell(fp));
+
+        fseek(fp, 0, SEEK_CUR);
+
+        printf("pos: %ld\n", ftell(fp));
+
+        fseek(fp, 0, SEEK_END);
+
+        printf("pos: %ld\n", ftell(fp));
 
         terminal_newline();        
 

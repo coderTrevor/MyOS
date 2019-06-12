@@ -80,6 +80,9 @@ size_t file_read(void * ptr, size_t size, size_t count, int fp)
     // TODO: Won't work if size * count is greater than what size_t can represent
     // TODO: Set error or eof as appropriate
 
+    if(debugLevel)
+        kprintf("fread(%p, %d, %d, %d)\n", ptr, size, count, fp);
+
     if (!size || !count)
         return 0;
 
@@ -99,4 +102,105 @@ size_t file_read(void * ptr, size_t size, size_t count, int fp)
     openFiles.filePos[fp] += readSize;
 
     return readSize;
+}
+
+// TODO: Support EOF bit
+int file_seek(FILE * stream, long int offset, int origin)
+{
+    int fp = (int)stream;
+    
+    if (fp < 0 || fp >= MAX_FILES)
+    {
+        kprintf("file_seek: Invalid file index passed, %d\n", fp);
+        return -1;
+    }
+
+    if (!openFiles.isOpen[fp])
+    {
+        kprintf("file_seek called on closed file with index %d\n", fp);
+        return -1;
+    }
+
+    if(debugLevel)
+        kprintf("fseek(%d, %d, ", stream, offset);
+
+    switch (origin)
+    {
+        case SEEK_SET:
+            // Seek based on beginning of file
+            if(debugLevel)
+                kprintf(" SEEK_SET)\n");
+
+            if(offset >= 0)
+                openFiles.filePos[fp] = offset;
+            else
+            {
+                kprintf("file_seek: requested offset would make file pointer negative!\n");
+                openFiles.filePos[fp] = 0;
+                return -1;
+            }
+            break;
+
+        case SEEK_CUR:
+            // Seek based on current file pointer
+            if (debugLevel)
+                kprintf(" SEEK_CUR)\n");
+
+            if(offset >= 0 || ((unsigned long)(-offset) >= openFiles.filePos[fp]))
+                openFiles.filePos[fp] += offset;
+            else
+            {
+                kprintf("file_seek: requested offset would make file pointer negative!\n");
+                openFiles.filePos[fp] = 0;
+                return -1;
+            }
+            break;
+
+        case SEEK_END:
+            // Seek based on end of file
+            if (debugLevel)
+                kprintf(" SEEK_END)\n");
+
+            if(offset >= 0 || ((unsigned long)(-offset) >= openFiles.fileSize[fp]))
+                openFiles.filePos[fp] = openFiles.fileSize[fp] + offset;
+            else
+            {
+                kprintf("file_seek: requested offset would make file pointer negative!\n");
+                openFiles.filePos[fp] = 0;
+                return -1;
+            }
+            break;
+
+        default:
+            kprintf("file_seek: Invalid value passed for origin, %d\n", origin);
+            return -1;
+    }
+
+    if (openFiles.filePos >= openFiles.fileSize)
+    {
+        kprintf("seek_file: file position exceeded file size!\n");
+        openFiles.filePos[fp] = openFiles.fileSize[fp] - 1;
+        return -1;
+    }
+
+    return 0;
+}
+
+long int file_tell(FILE * stream)
+{
+    int fp = (int)stream;
+
+    if (fp < 0 || fp >= MAX_FILES)
+    {
+        kprintf("file_tell: Invalid file index passed, %d\n", fp);
+        return -1L;
+    }
+
+    if (!openFiles.isOpen[fp])
+    {
+        kprintf("file_tell called on closed file with index %d\n", fp);
+        return -1L;
+    }
+
+    return openFiles.filePos[fp];
 }

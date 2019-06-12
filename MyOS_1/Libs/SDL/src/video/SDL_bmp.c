@@ -20,6 +20,8 @@
 */
 #include "../SDL_internal.h"
 
+#include "../../../Interrupts/System_Calls.h"
+
 /*
    Code to load and save surfaces in Windows BMP format.
 

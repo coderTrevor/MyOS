@@ -60,6 +60,10 @@
 #include "nacl_io/nacl_io.h"
 #endif
 
+#if __MYOS__
+#include "../../../Interrupts/System_Calls.h"
+#endif
+
 #ifdef __WIN32__
 
 /* Functions to read/write Win32 API file pointers */
@@ -416,7 +420,100 @@ stdio_close(SDL_RWops * context)
     }
     return status;
 }
-#endif /* !HAVE_STDIO_H */
+#endif /* HAVE_STDIO_H */
+
+#if __MYOS__
+
+#define fseek_off_t long int
+
+static int SDLCALL
+myos_close(SDL_RWops * context)
+{
+    int status = 0;
+    if (context) 
+    {
+        if (context->hidden.myos.autoclose) 
+        {
+            /* WARNING:  Check the return value here! */
+            if (fclose(context->hidden.myos.fp) != 0)
+                status = SDL_Error(SDL_EFWRITE);
+        }
+        SDL_FreeRW(context);
+    }
+    return status;
+}
+
+static size_t SDLCALL
+myos_read(SDL_RWops * context, void *ptr, size_t size, size_t maxnum)
+{
+    size_t nread;
+
+    nread = fread(ptr, size, maxnum, context->hidden.myos.fp);
+    // TODO: Implement ferror
+    /*if (nread == 0 && ferror(context->hidden.myos.fp)) 
+    {
+        SDL_Error(SDL_EFREAD);
+    }*/
+    return nread;
+}
+
+static Sint64 SDLCALL
+myos_seek(SDL_RWops * context, Sint64 offset, int whence)
+{
+#if defined(FSEEK_OFF_MIN) && defined(FSEEK_OFF_MAX)
+    if (offset < (Sint64)(FSEEK_OFF_MIN) || offset >(Sint64)(FSEEK_OFF_MAX)) {
+        return SDL_SetError("Seek offset out of range");
+    }
+#endif
+
+    if (fseek(context->hidden.myos.fp, (fseek_off_t)offset, whence) == 0) 
+    {
+        fseek_off_t pos = ftell(context->hidden.myos.fp);
+        if (pos < 0) {
+            return SDL_SetError("Couldn't get stream offset");
+        }
+        printf("pos: %ld\n", pos);
+        return pos;
+    }
+
+    //printf("TODO: myos_seek not implemented\n");
+
+    return SDL_Error(SDL_EFSEEK);
+}
+
+static Sint64 SDLCALL
+myos_size(SDL_RWops * context)
+{
+    printf("TODO: myos_size not implemented!!!!!!!!\n");
+    return -1;
+    /*Sint64 pos, size;
+
+    pos = SDL_RWseek(context, 0, RW_SEEK_CUR);
+    if (pos < 0) {
+        return -1;
+    }
+    size = SDL_RWseek(context, 0, RW_SEEK_END);
+
+    SDL_RWseek(context, pos, RW_SEEK_SET);
+    return size;*/
+}
+
+static size_t SDLCALL
+myos_write(SDL_RWops * context, const void *ptr, size_t size, size_t num)
+{
+    printf("TODO: myos_write not implemented\n");
+    SDL_Error(SDL_EFWRITE);
+    return 0;
+
+    /*size_t nwrote;
+    nwrote = fwrite(ptr, size, num, context->hidden.myos.fp);
+    if (nwrote == 0 && ferror(context->hidden.myos.fp)) {
+        SDL_Error(SDL_EFWRITE);
+    }
+    return nwrote;*/
+}
+
+#endif /* __MYOS__ */
 
 /* Functions to read/write memory pointers */
 
@@ -572,6 +669,26 @@ SDL_RWFromFile(const char *file, const char *mode)
     rwops->close = windows_file_close;
     rwops->type = SDL_RWOPS_WINFILE;
 
+#elif defined(__MYOS__)
+    {
+        rwops = SDL_AllocRW();
+        if (!rwops)
+            return NULL;            /* SDL_SetError already setup by SDL_AllocRW() */
+
+        FILE *fp = fopen(file, mode);
+
+        if (fp < 0) 
+        {
+            SDL_FreeRW(rwops);
+            SDL_SetError("MYOS: Couldn't open %s", file);
+            return NULL;
+        }
+        else 
+        {
+            rwops = SDL_RWFromFP(fp, 1);
+        }
+    }
+
 #elif HAVE_STDIO_H
     {
         #ifdef __APPLE__
@@ -589,7 +706,7 @@ SDL_RWFromFile(const char *file, const char *mode)
         }
     }
 #else
-    SDL_SetError("SDL not compiled with stdio support");
+    SDL_SetError("MYOS SDL not compiled with stdio support");
 #endif /* !HAVE_STDIO_H */
 
     return rwops;
@@ -614,11 +731,30 @@ SDL_RWFromFP(FILE * fp, SDL_bool autoclose)
     }
     return rwops;
 }
+#elif __MYOS__
+SDL_RWops *
+SDL_RWFromFP(FILE * fp, SDL_bool autoclose)
+{
+    SDL_RWops *rwops = NULL;
+
+    rwops = SDL_AllocRW();
+    if (rwops != NULL) {
+        rwops->size = myos_size;
+        rwops->seek = myos_seek;
+        rwops->read = myos_read;
+        rwops->write = myos_write;
+        rwops->close = myos_close;
+        rwops->hidden.myos.fp = fp;
+        rwops->hidden.myos.autoclose = autoclose;
+        rwops->type = SDL_RWOPS_MYOSFILE;
+    }
+    return rwops;
+}
 #else
 SDL_RWops *
 SDL_RWFromFP(void * fp, SDL_bool autoclose)
 {
-    SDL_SetError("SDL not compiled with stdio support");
+    SDL_SetError("MY OS SDL not compiled with stdio support");
     return NULL;
 }
 #endif /* HAVE_STDIO_H */

@@ -62,10 +62,14 @@ int main(int argc, char* argv[])
     SDL_Delay(500);  // Pause execution for 500 milliseconds, for example
 
     // Load BMP
-    SDL_Surface *bitmapSurface = SDL_LoadBMP("kg2.bmp");
+    char *filename = "kghrwide.bmp";
+#if __MYOS__
+    filename = "kg2.bmp";
+#endif
+    SDL_Surface *bitmapSurface = SDL_LoadBMP(filename);
     if (bitmapSurface == NULL)
     {
-        printf("Unable to load image %s! SDL Error: %s\n", "kg2.bmp", SDL_GetError());
+        printf("Unable to load image %s! SDL Error: %s\n", filename, SDL_GetError());
         //success = false;
     }
 

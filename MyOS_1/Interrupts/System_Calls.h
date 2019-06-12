@@ -15,6 +15,8 @@
 #define SYSCALL_FOPEN               249
 #define SYSCALL_FCLOSE              248
 #define SYSCALL_FREAD               247
+#define SYSCALL_FSEEK               246
+#define SYSCALL_FTELL               245
 
 int SystemCallFClose(FILE *fp);
 #define fclose SystemCallFClose
@@ -24,6 +26,12 @@ FILE *SystemCallFOpen(const char * filename, const char * mode);
 
 size_t SystemCallFRead(void * ptr, size_t size, size_t count, FILE * stream);
 #define fread SystemCallFRead
+
+int SystemCallFSeek(FILE * stream, long int offset, int origin);
+#define fseek SystemCallFSeek
+
+long int SystemCallFTell(FILE * stream);
+#define ftell SystemCallFTell
 
 void SystemCallPageAllocator(unsigned int pages, unsigned int *pPagesAllocated, uint32_t *pRreturnVal);
 #define pageAllocator SystemCallPageAllocator

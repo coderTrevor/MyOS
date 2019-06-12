@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define MAX_ALLOCATIONS   2048
+#define MAX_ALLOCATIONS   4096
 // Struct-of-arrays for memory allocation
 // TODO: Make more dynamic
 // TEMPTEMP: This is super-inefficient and mostly just a placeholder until something better is required
