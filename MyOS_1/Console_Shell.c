@@ -152,8 +152,6 @@ void PrintMemMap()
     }
 }
 
-void *malloc(size_t);
-void free(void *ptr);
 
 // Expand environment variables
 // TODO: Support arbitrary variable names
@@ -268,7 +266,7 @@ void Shell_Process_command(void)
         FILE *fp;
         fp = fopen("kg2.bmp", "rb");
 
-        char c;
+        //char c;
 
         /*while (fread(&c, 1, 1, fp))
             terminal_putchar(c);*/
@@ -368,11 +366,34 @@ void Shell_Process_command(void)
         return;
     }
 
+    // Print info about freed memory
+    if (strcmp(currentCommand, "frees") == 0)
+    {
+        terminal_writestring("Reclaimed memory:\n");
+
+        for (size_t i = 0; i < nextFreeMemorySlot; ++i)
+        {
+            if (freeMemoryArray.inUse[i])
+            {
+                terminal_print_ulong_hex(freeMemoryArray.address[i]);
+                terminal_writestring(": ");
+                terminal_print_int(freeMemoryArray.size[i]);
+                terminal_writestring(" bytes\n");
+            }
+            else
+                kprintf("Freed memory index %d is marked not in use\n", i);
+        }
+
+        if (nextFreeMemorySlot)
+            kprintf("%d total freed memory slots\n", nextFreeMemorySlot);
+        else
+            terminal_writestring("none\n");
+        return;
+    }
     // Print info about memory allocations
     if (strcmp(currentCommand, "allocations") == 0)
     {
         terminal_writestring("Memory allocations:\n");
-        bool some = false;
 
         for (size_t i = 0; i < nextAllocationSlot; ++i)
         {
@@ -381,12 +402,22 @@ void Shell_Process_command(void)
                 terminal_print_ulong_hex(allocationArray.address[i]);
                 terminal_writestring(": ");
                 terminal_print_int(allocationArray.size[i]);
-                terminal_writestring(" bytes\n");
-                some = true;
+                terminal_writestring(" bytes");
+
+#ifdef DEBUG_MEM
+                kprintf("   from %s, line %d\n", allocationArray.filename[i], allocationArray.lineNumber[i]);
+#else
+                terminal_newline();
+#endif
+
             }
+            else
+                kprintf("Allocated memory index %d is marked not in use\n", i);
         }
 
-        if (!some)
+        if (nextAllocationSlot)
+            kprintf("%d total allocations\n", nextAllocationSlot);
+        else
             terminal_writestring("none\n");
         return;
     }
@@ -400,6 +431,7 @@ void Shell_Process_command(void)
         terminal_writestring(" Megabytes available in unallocated pages\n");
 
         uint8_t *block = (uint8_t *)malloc(256);
+        
         if (!block)
         {
             terminal_writestring("Out of available memory.\n");

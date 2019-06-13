@@ -9,8 +9,21 @@
 uint32_t pagedMemoryAvailable = 0;
 uint32_t memoryNextAvailableAddress = 0;
 
+// TODO: Change this to a more robust scheme (?)
 ALLOCATION_ARRAY allocationArray = { 0 };
 unsigned int nextAllocationSlot = 0;
+
+// Very, very basic support for freeing memory:
+ALLOCATION_ARRAY freeMemoryArray = { 0 };
+unsigned int nextFreeMemorySlot = 0;
+
+#ifdef DEBUG_MEM
+#define noFileName "FILENAME NOT SET";
+char *dbgMemFilename = noFileName;
+int   dbgMemLineNumber = 0;
+char *dbgFreeFilename = noFileName;
+int   dbgFreeLineNumber = 0;
+#endif 
 
 void* calloc(size_t num, size_t size)
 {
@@ -38,36 +51,73 @@ void _exit(void)
         __halt();
 }
 
+
+inline void addAllocationToFreeMemoryArray(int allocationIndex)
+{
+    // Try to add this memory to the free memory array
+    if (nextFreeMemorySlot == MAX_ALLOCATIONS)
+    {
+        printf("No slots left for freed memory\n");
+        return;
+    }
+    
+    freeMemoryArray.address[nextFreeMemorySlot] = allocationArray.address[allocationIndex];
+    freeMemoryArray.size[nextFreeMemorySlot] = allocationArray.size[allocationIndex];
+    freeMemoryArray.inUse[nextFreeMemorySlot++] = true;
+}
+
+#ifdef DEBUG_MEM
+void dbg_free(void *ptr, char *filename, int lineNumber)
+{
+    dbgFreeFilename = filename;
+    dbgFreeLineNumber = lineNumber;
+    free(ptr);
+}
+#endif
+
+// TODO: Make thread-safe
 void free(void *ptr)
 {
-    // TODO: Implement free() properly
-    bool found = false;
+    // Find this pointer in the allocation array
     for (size_t i = 0; i < nextAllocationSlot; ++i)
     {
         if (allocationArray.address[i] == (uint32_t)ptr)
         {
             if (allocationArray.inUse[i])
             {
-                allocationArray.inUse[i] = false;
-                found = true;
+                addAllocationToFreeMemoryArray(i);
+
+                // We want to keep the allocation array from being fragmented, so we
+                // copy the final entry in allocation array to the i position and
+                // decrease the size of the allocation array
+                --nextAllocationSlot;
+                if (nextAllocationSlot)
+                {
+                    allocationArray.address[i] = allocationArray.address[nextAllocationSlot];
+                    allocationArray.size[i] = allocationArray.size[nextAllocationSlot];
+                }
+
+                allocationArray.inUse[nextAllocationSlot] = false;
             }
             else
             {
-                /*terminal_writestring("free() called to free already-freed pointer, ");
-                terminal_print_ulong_hex((uint32_t)ptr);
-                terminal_newline();*/
-                printf("free() called to free already-freed pointer, %lX\n");
+                printf("free() called to free already-freed pointer, 0x%lX\n", ptr);
             }
+
+            return;
         }
     }
 
-    if (!found)
-    {
-        /*terminal_writestring("free() called with invalid pointer: ");
-        terminal_print_ulong_hex((uint32_t)ptr);
-        terminal_newline();*/
-        printf("free() called with invalid pointer: %lX\n");
-    }
+    printf("free() called with invalid pointer: 0x%lX", ptr);
+#ifdef DEBUG_MEM
+    printf("   from %s, line %d\n", dbgFreeFilename, dbgFreeLineNumber);
+    dbgFreeFilename = noFileName;
+    dbgFreeLineNumber = 0;
+    for (;;)
+        __halt();
+#else
+    printf("\n");
+#endif
 }
 
 char intToChar(int i)
@@ -177,6 +227,16 @@ char * __cdecl strncpy(char *destination, const char *source, size_t num)
     return destination;
 }
 
+#ifdef DEBUG_MEM
+void *dbg_malloc(size_t size, char *filename, int lineNumber)
+{
+    dbgMemFilename = filename;
+    dbgMemLineNumber = lineNumber;
+    return malloc(size);
+}
+#endif
+
+unsigned int reuses = 0;
 void* malloc(size_t size)
 {
     if (nextAllocationSlot >= MAX_ALLOCATIONS)
@@ -185,7 +245,50 @@ void* malloc(size_t size)
         return NULL;
     }
 
+#ifdef DEBUG_MEM
+    allocationArray.lineNumber[nextAllocationSlot] = dbgMemLineNumber;
+    strncpy(allocationArray.filename[nextAllocationSlot], dbgMemFilename, MAX_DEBUG_FILENAME_LENGTH);
+    dbgMemFilename = noFileName;
+    dbgMemLineNumber = 0;
+#endif
+
+
+    // See if there's freed memory available to reallocate (first fit algorithm; memory will end up wasted)
+    for(size_t i = 0; i < nextFreeMemorySlot; ++i)
+    {
+        if (freeMemoryArray.size[i] >= size)
+        {
+            // We found a piece of free memory we can reuse
+
+            // Keep track of the memory in our allocations array
+            allocationArray.address[nextAllocationSlot] = freeMemoryArray.address[i];
+            allocationArray.size[nextAllocationSlot] = freeMemoryArray.size[i];
+            allocationArray.inUse[nextAllocationSlot] = true;
+
+            // We want to keep freeMemoryArray from fragmenting, so we'll copy
+            // last used free memory entry of the array to the i position and decrease
+            // the used portion of the array by one
+            --nextFreeMemorySlot;
+            if (nextFreeMemorySlot)
+            {
+                freeMemoryArray.address[i] = freeMemoryArray.address[nextFreeMemorySlot];
+                freeMemoryArray.size[i] = freeMemoryArray.size[nextFreeMemorySlot];
+            }
+            // The last entry is no longer in use
+            freeMemoryArray.inUse[nextFreeMemorySlot] = false;
+
+#ifdef DEBUG_MEM
+            printf("Reusing freed memory from slot %d, (reuse #%d)\n", i, ++reuses);
+#endif
+            return (void *)allocationArray.address[nextAllocationSlot++];
+        }
+    }
+
     uint32_t availableAddress = memoryNextAvailableAddress;
+
+#ifdef DEBUG_MEM
+    printf("Allocating new %d bytes\n", size);
+#endif
 
     //if(debugLevel)
     //printf("size: %d\nadrress: %d\n", size, memoryNextAvailableAddress);

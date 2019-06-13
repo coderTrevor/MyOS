@@ -3,9 +3,9 @@
 
 #include "stdafx.h"
 #include "../MyOS_1/Console_VGA.h"
-#include <intrin.h>
 #include "../MyOS_1/Interrupts/System_Calls.h"
 #include "../MyOS_1/paging.h"
+#include "../MyOS_1/misc.h"
 
 int main()
 {

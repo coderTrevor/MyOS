@@ -11,6 +11,7 @@
 #include "../Networking/ARP.h"
 #include "../Networking/IPv4.h"
 #include "Virtio.h"
+#include "../Timers/System_Clock.h"
 
 // TODO: Support multiple NIC's
 
@@ -95,12 +96,13 @@ void VirtIO_Net_Init_Virtqueue(virtq *virtqueue, uint16_t queueIndex)
     // Allocate and initialize the queue
     VirtIO_Allocate_Virtqueue(virtqueue, queueSize);
 
-    //if (debugLevel)
+    if (debugLevel)
     {
         kprintf("\n       queue %d: 0x%X", queueIndex, virtqueue->descriptors);
         kprintf("         queue size: %d", virtqueue->elements);
         kprintf("\n       driverArea: 0x%X", virtqueue->driverArea);
         kprintf("\n       deviceArea: 0x%X", virtqueue->deviceArea);
+        TimeDelayMS(3000);
     }
 
     // TODO: Convert virtual address to physical address
@@ -251,6 +253,29 @@ void _declspec(naked) VirtIO_Net_InterruptHandler()
         {
             if (debugLevel)
                 terminal_writestring("Transmit success\n");
+            // free used buffers
+            uint16_t deviceRingIndex = transmitQueue.lastDeviceAreaIndex % transmitQueue.elements;
+            uint16_t descIndex = (uint16_t)transmitQueue.deviceArea->ringBuffer[deviceRingIndex].index;
+            descIndex %= transmitQueue.elements;
+
+            if(debugLevel)
+                kprintf("descIndex: %d\n", descIndex);
+            
+            dbg_release((void *)(uint32_t)transmitQueue.descriptors[descIndex].address);
+
+            transmitQueue.descriptors[descIndex].address = 0xFFFFFFFFffffffff;
+            transmitQueue.descriptors[descIndex].length = 0;    // might not be necessary
+
+            while (transmitQueue.descriptors[descIndex].next)
+            {
+                transmitQueue.descriptors[descIndex++].next = 0;
+                descIndex %= transmitQueue.elements;
+                if (!(uint32_t)transmitQueue.descriptors[descIndex].address)
+                    kprintf("That's bad!\n");
+                dbg_release((void *)(uint32_t)transmitQueue.descriptors[descIndex].address);
+                transmitQueue.descriptors[descIndex].address = 0xFFFFFFFFffffffff;
+                transmitQueue.descriptors[descIndex].length = 0;    // might not be necessary
+            }
             transmitQueue.lastDeviceAreaIndex++;
         }
 
@@ -296,6 +321,29 @@ bool VirtIO_Net_SharedInterruptHandler(void)
         {
             if (debugLevel)
                 terminal_writestring("Transmit success\n");
+            // free used buffers
+            uint16_t deviceRingIndex = transmitQueue.lastDeviceAreaIndex % transmitQueue.elements;
+            uint16_t descIndex = (uint16_t)transmitQueue.deviceArea->ringBuffer[deviceRingIndex].index;
+            descIndex %= transmitQueue.elements;
+            //kprintf("descIndex: %d\n", descIndex);
+
+            if(debugLevel)
+                kprintf("0x%lX\n", (uint32_t)transmitQueue.descriptors[descIndex].address);
+            
+            dbg_release((void *)(uint32_t)transmitQueue.descriptors[descIndex].address);
+
+            transmitQueue.descriptors[descIndex].address = 0xDEADBEEFDEADBEEF;
+            transmitQueue.descriptors[descIndex].length = 0;    // might not be necessary
+
+            while (transmitQueue.descriptors[descIndex].next)
+            {
+                transmitQueue.descriptors[descIndex++].next = 0;
+                descIndex %= transmitQueue.elements;
+                
+                dbg_release((void *)(uint32_t)transmitQueue.descriptors[descIndex].address);
+                transmitQueue.descriptors[descIndex].address = 0xBEEFBEEFBEEFBEEF;
+                transmitQueue.descriptors[descIndex].length = 0;    // might not be necessary
+            }
             transmitQueue.lastDeviceAreaIndex++;
         }
 
@@ -321,7 +369,7 @@ void VirtIO_Net_SetupReceiveBuffers()
     // Allocate and add 16 buffers to receive queue
     for (uint16_t i = 0; i < 16; ++i)
     {
-        uint8_t *buffer = malloc(bufferSize);
+        uint8_t *buffer = dbg_alloc(bufferSize);
 
         // Add buffer to the descriptor table
         receiveQueue.descriptors[i].address = (uint64_t)buffer;
@@ -378,7 +426,13 @@ void VirtIO_Net_SendPacket(Ethernet_Header *packet, uint16_t dataSize)
    uint16_t bufferSize = sizeof(virtio_net_hdr);
 
     // Allocate a buffer for the header
-    virtio_net_hdr *netBuffer = malloc(bufferSize);
+    virtio_net_hdr *netBuffer = dbg_alloc(bufferSize);
+
+    if (!netBuffer)
+    {
+        kprintf("Not enough memory to allocate netBuffer\n");
+        return;
+    }
 
     // Set parameters of netBuffer
     memset(netBuffer, 0, sizeof(virtio_net_hdr));
@@ -393,24 +447,35 @@ void VirtIO_Net_SendPacket(Ethernet_Header *packet, uint16_t dataSize)
 
     if (debugLevel)
     {
-        kprintf("\ndescIndex %d", descIndex);
-        kprintf("\ndescIndex2 %d", descIndex2);
-        kprintf("\nIndex %d", index);
+        kprintf("descIndex %d", descIndex);
+        kprintf(" -- descIndex2 %d", descIndex2);
+        kprintf(" -- Index %d\n", index);
     }
 
     // fill descriptor with net header
     transmitQueue.descriptors[descIndex].address = (uint64_t)netBuffer;
+    if (transmitQueue.descriptors[descIndex].address == 0xdeadbeef || transmitQueue.descriptors[descIndex].address == 0xdeadbeefdeadbeef)
+        kprintf("Very bad\n");
     transmitQueue.descriptors[descIndex].flags = VIRTQ_DESC_F_NEXT;
     transmitQueue.descriptors[descIndex].length = bufferSize;
     transmitQueue.descriptors[descIndex].next = descIndex2;
 
     // copy packet to new buffer, because packetBuffer won't be a physical address
-    uint8_t *packetBuffer = malloc(dataSize);
+    uint8_t *packetBuffer = dbg_alloc(dataSize);
+
+    if (!netBuffer)
+    {
+        kprintf("Not enough memory to allocate packetBuffer\n");
+        return;
+    }
+
     memcpy(packetBuffer, packet, dataSize);
     // (TODO: malloc returns identity-mapped addresses for now but later we'll need a function to convert virtual to physical)
 
     // fill descriptor with ethernet packet
     transmitQueue.descriptors[descIndex2].address = (uint64_t)packetBuffer;
+    if (transmitQueue.descriptors[descIndex2].address == 0xdeadbeef || transmitQueue.descriptors[descIndex].address == 0xdeadbeefdeadbeef)
+        kprintf("Very bad\n");
     transmitQueue.descriptors[descIndex2].flags = 0;
     transmitQueue.descriptors[descIndex2].length = dataSize;
     transmitQueue.descriptors[descIndex2].next = 0;
@@ -477,7 +542,12 @@ void VirtIO_Net_ReceivePacket()
                 bufferSize += receiveQueue.descriptors[descIndex + i].length;
             }
 
-            rxBegin = malloc(bufferSize);
+            rxBegin = dbg_alloc(bufferSize);
+            if (!rxBegin)
+            {
+                kprintf("Not enough memory to allocate rxBegin\n");
+                return; // TODO: Is this the best way to handle this
+            }
 
             // Copy buffer pieces to single buffer
             uint32_t offset = 0;
@@ -506,7 +576,7 @@ void VirtIO_Net_ReceivePacket()
         receiveQueue.lastDeviceAreaIndex++;
 
         if (buffers > 1)
-            free(rxBegin);
+            dbg_release(rxBegin);
     }
 
     // notify the device that we've updated the availaible ring index

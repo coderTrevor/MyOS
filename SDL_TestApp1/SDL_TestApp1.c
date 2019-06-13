@@ -4,7 +4,6 @@
 //#include "stdafx.h"
 #ifndef WIN32
 #include "../MyOS_1/Console_VGA.h"
-#include <intrin.h>
 #include "../MyOS_1/Interrupts/System_Calls.h"
 //#undef _MSVC_VER
 #undef _WIN32
