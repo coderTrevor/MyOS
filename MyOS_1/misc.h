@@ -37,6 +37,7 @@ extern unsigned int nextFreeMemorySlot;
 extern int debugLevel;
 extern bool showOverlay;
 
+
 void* calloc(size_t num, size_t size);
 
 void *dbg_malloc(size_t size, char *filename, int lineNumber);
@@ -80,3 +81,5 @@ void * __cdecl memcpy(void* dest, const void* src, size_t count);
 
 void * __cdecl memset(void *ptr, int value, size_t num);
 #pragma intrinsic(memset)
+
+void showAllocations(void);

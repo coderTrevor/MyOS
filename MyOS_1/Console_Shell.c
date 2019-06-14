@@ -393,32 +393,7 @@ void Shell_Process_command(void)
     // Print info about memory allocations
     if (strcmp(currentCommand, "allocations") == 0)
     {
-        terminal_writestring("Memory allocations:\n");
-
-        for (size_t i = 0; i < nextAllocationSlot; ++i)
-        {
-            if (allocationArray.inUse[i])
-            {
-                terminal_print_ulong_hex(allocationArray.address[i]);
-                terminal_writestring(": ");
-                terminal_print_int(allocationArray.size[i]);
-                terminal_writestring(" bytes");
-
-#ifdef DEBUG_MEM
-                kprintf("   from %s, line %d\n", allocationArray.filename[i], allocationArray.lineNumber[i]);
-#else
-                terminal_newline();
-#endif
-
-            }
-            else
-                kprintf("Allocated memory index %d is marked not in use\n", i);
-        }
-
-        if (nextAllocationSlot)
-            kprintf("%d total allocations\n", nextAllocationSlot);
-        else
-            terminal_writestring("none\n");
+        showAllocations();
         return;
     }
 

@@ -2,6 +2,7 @@
 #include "../misc.h"
 #include "../Terminal.h"
 #include "Ethernet.h"
+#include "../Drivers/Virtio_Net.h"
 
 // TODO: Support multiple transactions
 uint16_t transactionID;

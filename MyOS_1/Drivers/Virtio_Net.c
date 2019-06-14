@@ -493,13 +493,17 @@ void VirtIO_Net_SendPacket(Ethernet_Header *packet, uint16_t dataSize)
 // scan receive queue for non-zero data
 void VirtIO_Net_ScanRQ()
 {
+    showAllocations();
+
     // check for device failure
     if (VNet_Read_Register(REG_DEVICE_STATUS) & STATUS_DEVICE_ERROR)
         terminal_writestring("Virtio-net device has encountered an error!\n");
 
     kprintf("receive used index: %d\n", receiveQueue.deviceArea->index);
+    kprintf("Last device area index: %d\n", receiveQueue.lastDeviceAreaIndex);
+    kprintf("Last receive queue: %d\n", receiveQueue.driverArea->index);
 
-    uint32_t addr = (uint32_t)&receiveQueue.descriptors[0];
+    /*uint32_t addr = (uint32_t)&receiveQueue.descriptors[0];
     uint32_t lastAddr = addr + receiveQueue.byteSize;
     //addr = receiveQueue.driverArea;
 
@@ -512,7 +516,7 @@ void VirtIO_Net_ScanRQ()
         addr = (uint32_t)receiveQueue.descriptors[i].address;
         lastAddr = addr + receiveQueue.descriptors[i].length;
         terminal_dump_nonzero_memory(addr, lastAddr);
-    }
+    }*/
 }
 
 void VirtIO_Net_ReceivePacket()
@@ -527,7 +531,7 @@ void VirtIO_Net_ReceivePacket()
         uint16_t descIndex = (uint16_t)receiveQueue.deviceArea->ringBuffer[ringBufferIndex].index;
 
         // Get pointer to the beginning of the buffer
-        uint32_t *rxBegin = (uint32_t*)((uint32_t)receiveQueue.descriptors[descIndex].address);
+        uint32_t *rxBegin = (uint32_t*)((uint32_t)receiveQueue.descriptors[descIndex % receiveQueue.elements].address);
 
         // See if the buffer spans multiple descriptors
         int buffers = ((virtio_net_hdr *)rxBegin)->num_buffers;
@@ -539,7 +543,7 @@ void VirtIO_Net_ReceivePacket()
             // determine length of entire buffer that spans the descriptor chain
             for(int i = 0; i < buffers; ++i)
             {
-                bufferSize += receiveQueue.descriptors[descIndex + i].length;
+                bufferSize += receiveQueue.descriptors[(descIndex + i) % receiveQueue.elements].length;
             }
 
             rxBegin = dbg_alloc(bufferSize);
@@ -553,8 +557,10 @@ void VirtIO_Net_ReceivePacket()
             uint32_t offset = 0;
             for (int i = 0; i < buffers; ++i)
             {
-                memcpy((void*)((uint32_t)rxBegin + offset), (void *)(uint32_t)receiveQueue.descriptors[descIndex + i].address, receiveQueue.descriptors[descIndex + i].length);
-                offset += receiveQueue.descriptors[descIndex + i].length;
+                memcpy((void*)((uint32_t)rxBegin + offset), 
+                       (void *)(uint32_t)receiveQueue.descriptors[(descIndex + i) % receiveQueue.elements].address,
+                       receiveQueue.descriptors[(descIndex + i) % receiveQueue.elements].length);
+                offset += receiveQueue.descriptors[(descIndex + i) % receiveQueue.elements].length;
             }
         }
 
@@ -566,11 +572,11 @@ void VirtIO_Net_ReceivePacket()
         // Place the used descriptor indices back in the available ring (driver area)
         for (uint16_t i = 0; i < buffers; ++i)
         {
-            receiveQueue.driverArea->ringBuffer[receiveQueue.driverArea->index++] = descIndex +i;
+            receiveQueue.driverArea->ringBuffer[(receiveQueue.driverArea->index++) % receiveQueue.elements] = descIndex +i;
             // restore descriptor settings
-            receiveQueue.descriptors[descIndex + i].flags = VIRTQ_DESC_F_DEVICE_WRITE_ONLY;
-            receiveQueue.descriptors[descIndex + i].length = 1526;
-            receiveQueue.descriptors[descIndex + i].next = 0;
+            receiveQueue.descriptors[(descIndex + i) % receiveQueue.elements].flags = VIRTQ_DESC_F_DEVICE_WRITE_ONLY;
+            receiveQueue.descriptors[(descIndex + i) % receiveQueue.elements].length = 1526;
+            receiveQueue.descriptors[(descIndex + i) % receiveQueue.elements].next = 0;
         }
 
         receiveQueue.lastDeviceAreaIndex++;

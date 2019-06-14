@@ -403,3 +403,34 @@ void * __cdecl memset(void *ptr, int value, size_t num)
 
     return dst;
 }
+
+void showAllocations(void)
+{
+    printf("Memory allocations:\n");
+
+    for (size_t i = 0; i < nextAllocationSlot; ++i)
+    {
+        if (allocationArray.inUse[i])
+        {
+            printf("0x%lX: %d bytes", allocationArray.address[i], allocationArray.size[i]);
+            /*terminal_print_ulong_hex(allocationArray.address[i]);
+            terminal_writestring(": ");
+            terminal_print_int(allocationArray.size[i]);
+            terminal_writestring(" bytes");*/
+
+#ifdef DEBUG_MEM
+            printf("   from %s, line %d\n", allocationArray.filename[i], allocationArray.lineNumber[i]);
+#else
+            printf("\n");
+#endif
+
+        }
+        else
+            printf("Allocated memory index %d is marked not in use\n", i);
+    }
+
+    if (nextAllocationSlot)
+        printf("%d total allocations\n", nextAllocationSlot);
+    else
+        printf("none\n");
+}
