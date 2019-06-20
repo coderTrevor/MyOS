@@ -13,6 +13,8 @@ extern unsigned long interrupts_fired;
 
 void default_exception_handler(void);
 
+void exit_interrupt_handler(int eflags, int cs);
+
 void default_interrupt_handler(void);
 
 void fclose_interrupt_handler(int eflags, int cs, int fp, int *pRetVal);

@@ -3,10 +3,10 @@
 #include "../misc.h"
 #include "PE32.h"
 #include "../Terminal.h"
+#include "../printf.h"
 
-// TEMPTEMP - until we have memory allocation, just reserve 10k for an executable
-//uint8_t peBuffer[10 * 1024];
 
+jmp_buf peReturnBuf;
 
 // returns true on success
 bool loadAndRunPE(uint8_t *executableDestination, DOS_Header *mzAddress)
@@ -127,8 +127,12 @@ bool loadAndRunPE(uint8_t *executableDestination, DOS_Header *mzAddress)
         terminal_newline();
     }
 
-    // Run the program
-    (*entryPoint)();
+    // This is where the exit() system call will return to. If setjmp() doesn't return 0, then the executable used exit().
+    if(setjmp(peReturnBuf) == 0)
+    {
+        // run the program
+        (*entryPoint)();
+    }
 
     return true;
 }

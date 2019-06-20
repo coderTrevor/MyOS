@@ -7,6 +7,17 @@
 #include "../myos_io.h"
 #include <stdint.h>
 
+
+void SystemCallExit()
+{
+    //printf("exit called\n");
+
+    __asm
+    {
+        int SYSCALL_EXIT_APP
+    }
+}
+
 int SystemCallFClose(FILE *fp)
 {
     int retVal;

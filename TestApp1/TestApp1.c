@@ -16,9 +16,9 @@ int main()
     else
         printf("malloc() failed\n");
         
-    printf("Executing a 1-second delay...\n");
+    //printf("Executing a 1-second delay...\n");
     
-    timeDelayMS(1000);
+    //timeDelayMS(1000);
 
     // Try opening a file
     FILE *fp = fopen("dir.txt", "rb");
@@ -34,6 +34,10 @@ int main()
         printf("fclose() returned %d\n", fc);
 
     printf("Done\n");
+
+    exit();
+
+    printf("This code will never be executed because of the call to exit()\n");
 
     return 0;
 }

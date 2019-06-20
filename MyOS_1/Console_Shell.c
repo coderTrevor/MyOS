@@ -260,6 +260,72 @@ void Shell_Process_command(void)
     if (currentCommand[0] == ';')
         return;
 
+    // test setjmp() and longjmp()
+    if (strcmp(currentCommand, "setjmp") == 0)
+    {
+        jmp_buf envBuf;
+        /*uint32_t ebpVal;
+        uint32_t ebxVal;
+        uint32_t ediVal;
+        uint32_t eipVal;
+        uint32_t esiVal;
+        uint32_t espVal;
+
+        __asm
+        {
+            mov ebpVal, ebp          // backup registers
+            mov ebxVal, ebx
+            mov ediVal, edi
+            mov eax, returnPoint
+            mov eipVal, eax
+            mov esiVal, esi
+            mov espVal, esp
+        }
+
+        kprintf("ebpVal: 0x%lX\n", ebpVal);
+        kprintf("ebxVal: 0x%lX\n", ebxVal);
+        kprintf("ediVal: 0x%lX\n", ediVal);
+        kprintf("eipVal: 0x%lX\n", eipVal);
+        kprintf("esiVal: 0x%lX\n", esiVal);
+        kprintf("espVal: 0x%lX\n", espVal);*/
+
+        int retVal = setjmp(envBuf);
+    /*returnPoint:
+        
+        kprintf("\nebpVal: 0x%lX\n", gebpVal);
+        kprintf("ebxVal: 0x%lX\n", gebxVal);
+        kprintf("ediVal: 0x%lX\n", gediVal);
+        kprintf("eipVal: 0x%lX\n", geipVal);
+        kprintf("esiVal: 0x%lX\n", gesiVal);
+        kprintf("espVal: 0x%lX\n", gespVal);*/
+
+        if (retVal == 0)
+        {
+            kprintf("setjmp suceeded\n");
+            longjmp(envBuf, 42);
+        }
+        else
+        {
+            kprintf("longjmp suceeded\n");
+            return;
+        }
+
+        kprintf("You won't see this\n");
+        return;
+    }
+
+    // Print stack pointer
+    if (strcmp(currentCommand, "sp") == 0)
+    {
+        uint32_t spvar;
+        __asm
+        {
+            mov spvar, esp
+        }
+        kprintf("0x%lX\n", spvar);
+        return;
+    }
+
     // Test IO functions
     if (strcmp(currentCommand, "testio") == 0)
     {

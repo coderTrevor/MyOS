@@ -28,6 +28,21 @@ typedef struct ALLOCATION_ARRAY
 #endif
 } ALLOCATION_ARRAY;
 
+
+// For setjmp() and longjmp():
+typedef struct jmp_buf_struct
+{
+    // eax, ecx, and edx are caller-saved, so we don't need to back those up
+    uint32_t ebpVal;
+    uint32_t ebxVal;
+    uint32_t ediVal;
+    uint32_t eipVal;
+    uint32_t esiVal;
+    uint32_t espVal;
+}jmp_buf[1];
+
+extern jmp_buf peReturnBuf;
+
 extern ALLOCATION_ARRAY allocationArray;
 extern unsigned int nextAllocationSlot;
 
@@ -49,6 +64,10 @@ void _exit(int status);
 void free(void *ptr);
 
 char intToChar(int i);
+
+int longjmp(jmp_buf env, int val);
+
+int setjmp(jmp_buf buf);
 
 size_t __cdecl strlen(const char* str);
 #pragma intrinsic(strlen)

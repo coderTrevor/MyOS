@@ -113,6 +113,16 @@ void _declspec(naked) default_exception_handler(void)
     }*/
 }
 
+void _declspec(naked) exit_interrupt_handler(int eflags, int cs)
+{
+    // supress warning about unused parameters
+    (void)eflags, (void)cs;
+
+    longjmp(peReturnBuf, 42);
+
+    // No need for iretd because we'll never return here
+}
+
 void _declspec(naked) fclose_interrupt_handler(int eflags, int cs, int fp, int *pRetVal)
 {
     // supress warning about unused parameters

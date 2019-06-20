@@ -76,6 +76,9 @@ void IDT_Init(void)
     // Set handler for ftell
     Set_IDT_Entry((unsigned long)ftell_interrupt_handler, SYSCALL_FTELL);
 
+    // Set handler for exit
+    Set_IDT_Entry((unsigned long)exit_interrupt_handler, SYSCALL_EXIT_APP);
+
     /* fill the IDT descriptor */
     IDT_ptr.base = (uint32_t)IDT;
     IDT_ptr.size = (sizeof(IDT_ENTRY) * 256);

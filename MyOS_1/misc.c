@@ -43,15 +43,6 @@ void* calloc(size_t num, size_t size)
     return mem;
 }
 
-// TODO
-void _exit(void)
-{
-    //terminal_writestring("Exit called with status \n");// %d\n", status);
-    for (;;)
-        __halt();
-}
-
-
 inline void addAllocationToFreeMemoryArray(int allocationIndex)
 {
     // Try to add this memory to the free memory array
@@ -158,6 +149,57 @@ void* realloc(void* ptr, size_t size)
     free(ptr);
 
     return ptrNew;
+}
+
+// Globals for setjmp / longjmp
+// TODO: Actually use jmp_buf struct and not these hacky globals
+uint32_t gebpVal;
+uint32_t gebxVal;
+uint32_t gediVal;
+uint32_t geipVal;
+uint32_t gesiVal;
+uint32_t gespVal;
+
+// TODO: use env instead of global variables
+int __declspec(naked) longjmp(jmp_buf env, int val)
+{
+    __asm
+    {
+        mov ebp, gebpVal    // restore ebp, ebx, edi, esi, and esp registers
+        mov ebx, gebxVal
+        mov edi, gediVal
+        mov esi, gesiVal
+        mov esp, gespVal    
+
+        push geipVal        // push stored return address to the stack (longjmp will return to this address when ret is executed)
+
+        mov eax, val        // return val
+        sti                 // re-enable interrupts (they were never re-enabled from the exit_interrupt_handler)
+        ret
+    }
+}
+
+// TODO: Store these values in buf, not global variables
+int __declspec(naked) setjmp(jmp_buf buf)
+{
+    __asm
+    {
+        mov gebpVal, ebp        // store ebp, ebx, and edi
+        mov gebxVal, ebx
+        mov gediVal, edi
+
+        pop eax                 // store return value in geipVal
+        mov geipVal, eax
+        push eax
+
+        mov gesiVal, esi        // save esi in gesiVal
+
+        lea ecx, [esp + 8]      // Get value of esp before setjmp call
+        mov gespVal, ecx
+    
+        xor eax, eax            // clear eax (return 0)
+        ret
+    }
 }
 
 char * __cdecl strchr(char *str, int character)

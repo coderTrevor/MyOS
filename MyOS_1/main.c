@@ -48,6 +48,19 @@ typedef uint32_t ULONG_PTR;
 
 char timeString[9];
 
+// Jump to the memory location the kernel is paged to
+uint32_t __declspec(naked) JumpToUpperHalf()
+{
+    __asm
+    {
+        pop eax                     // Pop return address off the stack
+        add eax, LOADBASE           // Change address to reflect where the kernel has been loaded in virtual memory
+        add eax, BASE_ADDRESS
+        push eax                    // Push the new return address back on the stack
+        ret                         // Jump to the virtually-addressed kernel code
+    }
+}
+
 // KeStartup doesn't actually exist in memory where MSVC thinks it does
 // so we can't call any functions or use any globals until we setup paging
 // (Actually, calling functions does work, but I suspect it may not in the future if the kernel grows too big)
@@ -74,6 +87,10 @@ void KeStartup()
 
     // Initialize global descriptor table
     GDT_Init();
+
+    //uint32_t eipVal = 
+    JumpToUpperHalf();
+    //kprintf("eipVal: 0x%lX\n", eipVal);
 
     // Initialize graphical mode if Grub set one for us
     GraphicsInitFromGrub(multibootInfo);

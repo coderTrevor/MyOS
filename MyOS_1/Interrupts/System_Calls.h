@@ -17,6 +17,10 @@
 #define SYSCALL_FREAD               247
 #define SYSCALL_FSEEK               246
 #define SYSCALL_FTELL               245
+#define SYSCALL_EXIT_APP            244
+
+void SystemCallExit();
+#define exit SystemCallExit
 
 int SystemCallFClose(FILE *fp);
 #define fclose SystemCallFClose
