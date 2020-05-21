@@ -54,7 +54,7 @@ uint32_t __declspec(naked) JumpToUpperHalf()
     __asm
     {
         pop eax                     // Pop return address off the stack
-        add eax, LOADBASE           // Change address to reflect where the kernel has been loaded in virtual memory
+        sub eax, LOADBASE           // Change address to reflect where the kernel has been loaded in virtual memory
         add eax, BASE_ADDRESS
         push eax                    // Push the new return address back on the stack
         ret                         // Jump to the virtually-addressed kernel code
@@ -123,7 +123,7 @@ void KeStartupPhase2(multiboot_info *multibootInfo)
     //Mouse_Init();
 
     // Execute autoexec.bat (if it exists)
-    Autoexec();
+    //Autoexec();
 
     // Say Hello
     terminal_writestring("Hello world!\n");

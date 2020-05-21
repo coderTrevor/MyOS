@@ -14,7 +14,7 @@ bool BatchEcho = false;
 bool IsBatchFile(char *filename)
 {
     int commandLength = strlen(filename);
-    char extension[4];
+    char extension[5] = { 0 };
     strncpy(extension, &filename[commandLength - 4], 4);
     
     if (strcmp(extension, ".bat") == 0)
