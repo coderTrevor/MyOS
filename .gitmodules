@@ -1,0 +1,4 @@
+[submodule "My-Doom"]
+	path = My-Doom
+	url = https://github.com/coderTrevor/My-Doom.git
+	branch = With_My_Doom

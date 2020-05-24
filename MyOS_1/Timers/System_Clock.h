@@ -14,6 +14,8 @@ void TimeDelayMS(uint64_t milliseconds);
 
 void TimeGetTimeSinceReset(int *pHours, int *pMinutes, int *pSeconds);
 
+uint32_t TimeGetUptimeMS();
+
 // Format time in the form hh:mm:ss
 void TimeFormatTimeString(char *timeString);
 

@@ -313,7 +313,23 @@ void _declspec(naked) gpf_exception_handler(void)
 
     ++interrupts_fired;
 
-    terminal_writestring("General Protection Fault handler fired.\n");
+    uint32_t errorCode;
+    uint32_t address;
+
+    __asm
+    {
+        pop[errorCode]
+        pop[address]
+    }
+
+    terminal_fill(' ', VGA_COLOR_WHITE, VGA_COLOR_BLUE);
+
+    terminal_writestring("General Protection Fault handler fired.\nError code ");
+    terminal_print_ulong_hex(errorCode);
+    terminal_writestring("\nOffending instruction at ");
+    terminal_print_ulong_hex(address);
+    terminal_writestring(".\nMemory looks like:\n");
+    terminal_dumpHexAround((uint8_t *)address, 128, 128);
     terminal_writestring("System halted.\n");
 
     for (;;)
@@ -389,12 +405,29 @@ void _declspec(naked) page_fault_handler(void)
 
     ++interrupts_fired;
 
-    terminal_writestring("Page fault handler fired.\n");
+    uint32_t errorCode;
+    uint32_t address;
+
+    __asm
+    {
+        pop[errorCode]
+        pop[address]
+    }
+
+    terminal_fill(' ', VGA_COLOR_WHITE, VGA_COLOR_BLUE);
+
+    terminal_writestring("Page Fault handler fired.\nError code ");
+    terminal_print_ulong_hex(errorCode);
+    terminal_writestring("\nOffending instruction at ");
+    terminal_print_ulong_hex(address);
+    terminal_writestring(".\nMemory looks like:\n");
+    //terminal_dumpHex((uint8_t *)address, 256);
+    terminal_dumpHexAround((uint8_t *)address, 128, 128);
     terminal_writestring("System halted.\n");
 
-    for(;;)
+    for (;;)
         __halt();
-
+    
     /*_asm
     {
     popad
@@ -420,7 +453,7 @@ void _declspec(naked) invalid_opcode_handler(void)
     terminal_writestring("Invalid opcode handler fired.\nEncountered invalid opcode at ");
     terminal_print_ulong_hex(address);
     terminal_writestring(".\nMemory looks like:\n");
-    terminal_dumpHex((uint8_t *)address, 256);
+    terminal_dumpHexAround((uint8_t *)address, 128, 128);
     terminal_writestring("System halted.\n");
 
     for(;;)
@@ -591,6 +624,28 @@ void _declspec(naked) time_delay_ms_interrupt_handler(int eflags, int cs, uint32
     }
 
     TimeDelayMS(milliSeconds);
+
+    __asm
+    {
+        // epilogue
+        pop ebp
+
+        iretd
+    }
+}
+
+void _declspec(naked) time_get_uptime_ms_handler(int eflags, int cs, uint32_t *pRetVal)
+{
+    (void)eflags, (void)cs;
+
+    __asm
+    {
+        // prologue
+        push ebp
+        mov ebp, esp
+    }
+
+    *pRetVal = TimeGetUptimeMS();
 
     __asm
     {

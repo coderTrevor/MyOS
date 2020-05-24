@@ -18,6 +18,7 @@
 #define SYSCALL_FSEEK               246
 #define SYSCALL_FTELL               245
 #define SYSCALL_EXIT_APP            244
+#define SYSCALL_TIME_UPTIME_MS      243
 
 void SystemCallExit();
 #define exit SystemCallExit
@@ -53,3 +54,6 @@ int __cdecl SystemCallPrintf(const char* format, ...);
 
 void SystemCallTimeDelayMS(uint32_t milliSeconds);
 #define timeDelayMS SystemCallTimeDelayMS
+
+uint32_t SystemCallTimeGetUptimeMS();
+#define timeGetUptimeMS SystemCallTimeGetUptimeMS

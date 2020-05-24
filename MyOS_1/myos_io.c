@@ -21,6 +21,7 @@ int file_close(int fp)
     return 0;
 }
 
+// TODO: Should never return 0 on success
 int file_open(const char * filename, const char * mode)
 {
     if (strcmp(mode, "r") != 0 && strcmp(mode, "rb") != 0)

@@ -129,7 +129,7 @@ void SystemCallGetGraphicsInfo(bool *graphicsMode, int *width, int *height)
 void SystemCallGraphicsBlit(const SDL_Rect *sourceRect, PIXEL_32BIT *image)
 {
     const int pointerSize = sizeof(SDL_Rect *) + sizeof(PIXEL_32BIT *);
-    printf("gb called\n");
+    //printf("gb called\n");
     __asm
     {        
         push[image]                     // push arguments onto stack
@@ -202,8 +202,26 @@ void SystemCallTimeDelayMS(uint32_t milliSeconds)
     // Do time delay ms system call
     __asm
     {
-        push [milliSeconds]         // push milliseconds argument onto the stack
+        push[milliSeconds]         // push milliseconds argument onto the stack
         int SYSCALL_TIME_DELAY_MS   // call time_delay_ms_interrupt_handler(milliSeconds)
         add esp, pointerSize        // restore stack pointer
     }
+}
+
+uint32_t SystemCallTimeGetUptimeMS()
+{
+    const int pointerSize = sizeof(uint32_t*);
+
+    uint32_t uptimeMS;
+    uint32_t *pUptimeMS = &uptimeMS;
+
+    // Do get uptime ms system call
+    __asm
+    {
+        push[pUptimeMS]             // push uptimeMS argument onto the stack
+        int SYSCALL_TIME_UPTIME_MS  // call time_get_uptime_ms()
+        add esp, pointerSize        // restore stack pointer
+    }
+
+    return uptimeMS;
 }

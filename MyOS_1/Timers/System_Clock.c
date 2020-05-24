@@ -31,6 +31,11 @@ void TimeDelayMS(uint64_t milliseconds)
         ;// kprintf("%lld < %lld, %lld\n", ticksSinceReset, doneTicks, milliseconds);
 }
 
+uint32_t TimeGetUptimeMS()
+{
+    return (uint32_t)(ticksSinceReset * millisecondsPerTick);
+}
+
 // Format time in the form hh:mm:ss (time since reset)
 // timeString must be at least 9 bytes long
 void TimeFormatTimeString(char *timeString)

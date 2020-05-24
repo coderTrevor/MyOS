@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL_TestApp1", "SDL_TestApp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL_TestApp1_For_Windows", "SDL_TestApp1_For_Windows\SDL_TestApp1_For_Windows.vcxproj", "{E287BF76-1C8A-41CE-8698-A412691721BC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "My_Doom", "My-Doom\My_Doom.vcxproj", "{07EC26D7-871D-4847-AAC0-7A80B40B99CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -51,6 +53,14 @@ Global
 		{E287BF76-1C8A-41CE-8698-A412691721BC}.Release|x64.Build.0 = Release|x64
 		{E287BF76-1C8A-41CE-8698-A412691721BC}.Release|x86.ActiveCfg = Release|Win32
 		{E287BF76-1C8A-41CE-8698-A412691721BC}.Release|x86.Build.0 = Release|Win32
+		{07EC26D7-871D-4847-AAC0-7A80B40B99CE}.Debug|x64.ActiveCfg = Debug|x64
+		{07EC26D7-871D-4847-AAC0-7A80B40B99CE}.Debug|x64.Build.0 = Debug|x64
+		{07EC26D7-871D-4847-AAC0-7A80B40B99CE}.Debug|x86.ActiveCfg = Debug|Win32
+		{07EC26D7-871D-4847-AAC0-7A80B40B99CE}.Debug|x86.Build.0 = Debug|Win32
+		{07EC26D7-871D-4847-AAC0-7A80B40B99CE}.Release|x64.ActiveCfg = Release|x64
+		{07EC26D7-871D-4847-AAC0-7A80B40B99CE}.Release|x64.Build.0 = Release|x64
+		{07EC26D7-871D-4847-AAC0-7A80B40B99CE}.Release|x86.ActiveCfg = Release|Win32
+		{07EC26D7-871D-4847-AAC0-7A80B40B99CE}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

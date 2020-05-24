@@ -124,6 +124,49 @@ void terminal_dumpHex(uint8_t *data, size_t length)
     //terminal_newline();
 }
 
+// TODO: Clean-up
+// Dump hex values of a memory address and also some values before and after that address
+void terminal_dumpHexAround(uint8_t *data, size_t before, size_t after)
+{
+    uint32_t ptrAddress = (uint32_t)data;
+    if (ptrAddress <= before)
+        terminal_dumpHex(data, before + after);
+
+    ptrAddress -= before;
+    data = (uint8_t*)ptrAddress;
+    uint32_t offset = 0;
+
+    while (offset < before + after)
+    {
+        // Mark the memory address we're interested in
+        if (offset != before)
+            terminal_putchar(' ');
+        else
+            terminal_putchar('>');
+
+        terminal_print_ulong_hex(ptrAddress + offset);
+        terminal_putchar(' ');
+        terminal_putchar(' ');
+
+        for (int i = 0; i < 8 && offset < before + after; i++)
+        {
+            terminal_print_byte_hex(data[offset + i]);
+            terminal_putchar(' ');
+        }
+        offset += 8;
+        terminal_putchar(' ');
+        for (int i = 0; i < 8 && offset < before + after; i++)
+        {
+            terminal_print_byte_hex(data[offset + i]);
+            terminal_putchar(' ');
+        }
+        offset += 8;
+        terminal_newline();
+    }
+
+    //terminal_newline();
+}
+
 // Fills the terminal up with a given character
 // Intended to be used before paging is initialized, so it doesn't rely on any globals
 void fill_term(char c, uint8_t foreground_color, uint8_t background_color)

@@ -6,6 +6,7 @@
 #include "../MyOS_1/Interrupts/System_Calls.h"
 #include "../MyOS_1/paging.h"
 #include "../MyOS_1/misc.h"
+#include <stdint.h>
 
 int main()
 {
@@ -18,7 +19,11 @@ int main()
         
     //printf("Executing a 1-second delay...\n");
     
-    //timeDelayMS(1000);
+    uint32_t ms = timeGetUptimeMS();
+    printf("%d ms\n", ms);
+    timeDelayMS(1000);
+    ms = timeGetUptimeMS();
+    printf("%d ms\n", ms);
 
     // Try opening a file
     FILE *fp = fopen("dir.txt", "rb");
@@ -32,6 +37,29 @@ int main()
     int fc = fclose(fp);
     if (fc)
         printf("fclose() returned %d\n", fc);
+
+    // test strdup()
+    char *testString = "Testing strdup() - Hello World!\n";
+    char *dupe = strdup(testString);
+
+    printf(dupe);
+
+    free(dupe);
+
+    char *testString2 = malloc(128);
+    memset(testString2, 0, 128);
+
+    int length = snprintf(testString2, 128, "Hello, %s from snprintf()!\n", "World");
+
+    printf(testString2);
+
+    free(testString2);
+    
+    char str[] = "This is a sample string";
+    char * pch;
+    pch = strrchr(str, 's');
+    printf("Last occurence of 's' found at %d \n", pch - str + 1);
+
 
     printf("Done\n");
 

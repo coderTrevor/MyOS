@@ -79,6 +79,9 @@ void IDT_Init(void)
     // Set handler for exit
     Set_IDT_Entry((unsigned long)exit_interrupt_handler, SYSCALL_EXIT_APP);
 
+    // Set handler for getting uptime in ms
+    Set_IDT_Entry((unsigned long)time_get_uptime_ms_handler, SYSCALL_TIME_UPTIME_MS);
+
     /* fill the IDT descriptor */
     IDT_ptr.base = (uint32_t)IDT;
     IDT_ptr.size = (sizeof(IDT_ENTRY) * 256);

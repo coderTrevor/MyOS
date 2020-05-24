@@ -118,7 +118,6 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <Optimization>Disabled</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <PreprocessorDefinitions>__MYOS;NDEBUG;_CONSOLE;HAVE_MALLOC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\MyOS_1\Libs\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

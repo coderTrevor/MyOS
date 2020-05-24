@@ -52,7 +52,6 @@ extern unsigned int nextFreeMemorySlot;
 extern int debugLevel;
 extern bool showOverlay;
 
-
 void* calloc(size_t num, size_t size);
 
 void *dbg_malloc(size_t size, char *filename, int lineNumber);
@@ -72,6 +71,8 @@ int setjmp(jmp_buf buf);
 size_t __cdecl strlen(const char* str);
 #pragma intrinsic(strlen)
 
+int strcasecmp(const char *s1, const char *s2);
+
 int __cdecl strcmp(const char *str1, const char *str2);
 #pragma intrinsic(strcmp)
 
@@ -89,9 +90,15 @@ void *malloc(size_t size);
 int __cdecl memcmp(const void *ptr1, const void *ptr2, size_t num);
 #pragma intrinsic(memcmp)
 
+void * __cdecl memmove(void * destination, const void * source, size_t num);
+
 void* realloc(void* ptr, size_t size);
 
 char * __cdecl strchr(char *str, int character);
+
+char * __cdecl strdup(const char *str);
+
+int __cdecl strncmp(const char *str1, const char *str2, size_t len);
 
 char * __cdecl strncpy(char * destination, const char * source, size_t num);
 
@@ -102,3 +109,7 @@ void * __cdecl memset(void *ptr, int value, size_t num);
 #pragma intrinsic(memset)
 
 void showAllocations(void);
+
+char * strrchr(const char *str, int ch);
+
+int toupper(int arg);
