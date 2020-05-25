@@ -7,9 +7,18 @@
 #include "../printf.h"
 
 unsigned char normal_keys_map[256];
+bool keys_down[256] = { false };
+
 bool left_shift_held;
 bool right_shift_held;
 bool awaitingSpecial = false;
+
+// Circular-buffer for input that has been queued
+// Just a very naive implementation for letting applications read keyboard input
+// TODO: Make less-hacky and don't special-case the shell
+uint16_t scanCodeBuffer[KEYS_BUFFER_SIZE] = { 0 };
+int keyReadIndex = 0;
+int keyWriteIndex = 0;
 
 bool key_released(unsigned char scanCode)
 {
@@ -38,11 +47,23 @@ void _declspec(naked) keyboard_interrupt_handler(void)
             if (scan_code == 0xE0)
                 awaitingSpecial = true;
             else
+            {
+                // Handle keyboard input for the shell
                 keyboard_key_received(scan_code);
+
+                // Add scan code to queue for other running applications
+                // TODO: Handle buffer full
+                scanCodeBuffer[(keyWriteIndex++) % KEYS_BUFFER_SIZE] = scan_code;
+            }
         }
         else
         {
+            // Handle input for the shell
             keyboard_special_key_received(scan_code);
+
+            // Add scan code to the keyboard queue; Have the upper byte start with 0xE0 to mark the key as special
+            scanCodeBuffer[(keyWriteIndex++) % KEYS_BUFFER_SIZE] = 0xE000 + scan_code;
+
             awaitingSpecial = false;
         }
     }
@@ -239,4 +260,14 @@ void keyboard_special_key_received(unsigned char scanCode)
     default:
         break;
     }
+}
+
+bool keyboard_read_from_queue(uint16_t *pScanCode)
+{
+    if (keyReadIndex == keyWriteIndex)
+        return false;
+
+    *pScanCode = scanCodeBuffer[(keyReadIndex++) % KEYS_BUFFER_SIZE];
+
+    return true;
 }

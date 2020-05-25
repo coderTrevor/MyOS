@@ -61,6 +61,22 @@ int main()
     printf("Last occurence of 's' found at %d \n", pch - str + 1);
 
 
+    // TODO: fix:
+    /*
+    printf("Press q to quit\n");
+
+    uint16_t key;
+
+    while (true)
+    {
+        bool keyReady = readFromKeyboard(&key);
+        if (keyReady)
+        {
+            if(!(keyReady & 0x80))
+                printf("%c\n", (char)key);
+        }
+    }*/
+
     printf("Done\n");
 
     exit();

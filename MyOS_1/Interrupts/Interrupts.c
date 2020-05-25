@@ -610,6 +610,28 @@ void _declspec(naked) printf_interrupt_handler(int eflags, int cs, const char *f
     }
 }
 
+void _declspec(naked) read_from_keyboard_handler(int eflags, int cs, uint16_t *pScanCode, bool *pRetVal)
+{
+    (void)eflags, (void)cs;
+
+    __asm
+    {
+        // prologue
+        push ebp
+        mov ebp, esp
+    }
+
+    *pRetVal = keyboard_read_from_queue(pScanCode) & 0xff;
+
+    __asm
+    {
+        // epilogue
+        pop ebp
+
+        iretd
+    }
+}
+
 void _declspec(naked) time_delay_ms_interrupt_handler(int eflags, int cs, uint32_t milliSeconds)
 {
     (void)eflags, (void)cs;

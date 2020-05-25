@@ -49,6 +49,8 @@ void print_string_interrupt_handler(int eflags, int cs, char *str);
 
 void printf_interrupt_handler(int eflags, int cs, const char *fmt, va_list va);
 
+void read_from_keyboard_handler(int eflags, int cs, uint16_t *pScanCode, bool *pRetVal);
+
 void time_delay_ms_interrupt_handler(int eflags, int cs, uint32_t milliSeconds);
 
 void time_get_uptime_ms_handler(int eflags, int cs, uint32_t *pRetVal);

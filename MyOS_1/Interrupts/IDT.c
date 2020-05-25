@@ -82,6 +82,9 @@ void IDT_Init(void)
     // Set handler for getting uptime in ms
     Set_IDT_Entry((unsigned long)time_get_uptime_ms_handler, SYSCALL_TIME_UPTIME_MS);
 
+    // Set handler for reading from keyboard
+    Set_IDT_Entry((unsigned long)read_from_keyboard_handler, SYSCALL_READ_FROM_KEYBOARD);
+
     /* fill the IDT descriptor */
     IDT_ptr.base = (uint32_t)IDT;
     IDT_ptr.size = (sizeof(IDT_ENTRY) * 256);

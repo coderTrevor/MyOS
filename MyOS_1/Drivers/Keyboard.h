@@ -80,6 +80,12 @@
 extern bool awaitingSpecial;
 extern unsigned char scan_code;
 
+// Circular-buffer for input that has been queued
+#define KEYS_BUFFER_SIZE    64
+extern uint16_t scanCodeBuffer[KEYS_BUFFER_SIZE];
+extern int keyReadIndex;
+extern int keyWriteIndex;
+
 unsigned char unmap_key(unsigned char scanCode);
 
 void init_key_map();
@@ -87,5 +93,7 @@ void init_key_map();
 void keyboard_key_received(unsigned char scanCode);
 
 void keyboard_special_key_received(unsigned char scanCode);
+
+bool keyboard_read_from_queue(uint16_t *pScanCode);
 
 void keyboard_interrupt_handler(void);

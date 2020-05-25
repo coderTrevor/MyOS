@@ -27,6 +27,7 @@
 #include "printf.h"
 #include "Drivers/Virtio_GPU.h"
 #include "myos_io.h"
+#include "Drivers\Keyboard.h"
 
 int inputPosition = 0;
 #define COMMAND_HISTORY_SIZE        10
@@ -897,6 +898,9 @@ void Shell_Process_command(void)
 
         // TEMPTEMP we've hardcoded some memory starting at 0x800000. This was identity mapped when paging was enabled.
         uint8_t *exeBuffer = (uint8_t*)0x800000;
+
+        // reset keyboard input buffer
+        keyReadIndex = keyWriteIndex = 0;
 
         // Get the size of the executable file
         uint32_t fileSize;

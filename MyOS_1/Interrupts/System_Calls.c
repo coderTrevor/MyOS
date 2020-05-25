@@ -6,6 +6,7 @@
 #include <stdarg.h>
 #include "../myos_io.h"
 #include <stdint.h>
+#include "../Drivers/Keyboard.h"
 
 
 void SystemCallExit()
@@ -219,9 +220,29 @@ uint32_t SystemCallTimeGetUptimeMS()
     __asm
     {
         push[pUptimeMS]             // push uptimeMS argument onto the stack
-        int SYSCALL_TIME_UPTIME_MS  // call time_get_uptime_ms()
+        int SYSCALL_TIME_UPTIME_MS  // call time_get_uptime_ms_handler()
         add esp, pointerSize        // restore stack pointer
     }
 
     return uptimeMS;
+}
+
+// TODO: Evaluate for hacky-ness. Thrown together without much thought.
+bool SystemCallReadFromKeyboard(uint16_t *key)
+{
+    const int pointerSize = sizeof(uint16_t *);
+
+    bool returnVal;
+    bool *pReturnVal = &returnVal;
+
+    // Do read keyboard system call
+    __asm
+    {
+        push[pReturnVal];               // push pReturnVal argument onto the stack
+        push[key]                       // push key address argument onto the stack
+        int SYSCALL_READ_FROM_KEYBOARD  // call read_from_keyboard_handler(key, pReturnVal)
+        add esp, pointerSize            // restore stack pointer
+    }
+
+    return returnVal;
 }

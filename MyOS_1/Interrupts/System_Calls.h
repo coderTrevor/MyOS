@@ -19,6 +19,7 @@
 #define SYSCALL_FTELL               245
 #define SYSCALL_EXIT_APP            244
 #define SYSCALL_TIME_UPTIME_MS      243
+#define SYSCALL_READ_FROM_KEYBOARD  242
 
 void SystemCallExit();
 #define exit SystemCallExit
@@ -48,6 +49,9 @@ void SystemCallGraphicsBlit(const SDL_Rect *sourceRect, PIXEL_32BIT *image);
 #define graphicsBlit SystemCallGraphicsBlit
 
 void SystemCallPrint(char *str);
+
+bool SystemCallReadFromKeyboard(uint16_t *key);
+#define readFromKeyboard SystemCallReadFromKeyboard
 
 #define printf SystemCallPrintf
 int __cdecl SystemCallPrintf(const char* format, ...);
