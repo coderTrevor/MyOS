@@ -4,13 +4,23 @@
 #include "PE32.h"
 #include "../Terminal.h"
 #include "../printf.h"
+#include "../Tasks/Context.h"
 
 
 jmp_buf peReturnBuf;
 
 // returns true on success
-bool loadAndRunPE(uint8_t *executableDestination, DOS_Header *mzAddress)
+bool loadAndRunPE(uint8_t *executableDestination, DOS_Header *mzAddress, const char *imageName, bool exclusive)
 {
+    uint32_t espVal;
+
+    if (debugLevel)
+    {
+        _asm mov[espVal], esp
+        kprintf("Initial esp 0x%lX\n", espVal);
+        terminal_dumpHexAround((uint8_t *)espVal, 16, 16);
+    }
+
     // Ensure the file starts with a 'mz' signature
     if (mzAddress->signature != DOS_MAGIC)
     {
@@ -88,7 +98,7 @@ bool loadAndRunPE(uint8_t *executableDestination, DOS_Header *mzAddress)
             terminal_writestring(sectionHeader->mName);
             terminal_newline();
         }
-        
+
         // Determine the destination of the current section
         uint8_t *sectionDest = (uint8_t*)((uint32_t)executableDestination + sectionHeader->mVirtualAddress);
         if (debugLevel)
@@ -127,11 +137,34 @@ bool loadAndRunPE(uint8_t *executableDestination, DOS_Header *mzAddress)
         terminal_newline();
     }
 
-    // This is where the exit() system call will return to. If setjmp() doesn't return 0, then the executable used exit().
-    if(setjmp(peReturnBuf) == 0)
+    if(multiEnable)
+        DispatchNewTask((uint32_t)entryPoint, 0x20000, imageName, exclusive);
+    else
+    {        
+        /*_asm {
+            // Setup the program's stack
+            mov [espVal], esp
+            mov esp, 0x440000
+            pushad
+        }*/
+        // This is where the exit() system call will return to. If setjmp() doesn't return 0, then the executable used exit().
+        if (setjmp(peReturnBuf) == 0)
+        {
+            // run the program
+            (*entryPoint)();
+        }
+        /*_asm
+        {
+            popad
+            mov esp, [espVal]
+        }*/
+    }
+
+    if (debugLevel)
     {
-        // run the program
-        (*entryPoint)();
+        _asm mov[espVal], esp
+        kprintf("Final esp 0x%lX\n", espVal);
+        terminal_dumpHexAround(0, espVal, 16);
     }
 
     return true;

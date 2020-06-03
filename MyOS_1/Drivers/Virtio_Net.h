@@ -38,6 +38,7 @@
 #define VIRTIO_F_ANY_LAYOUT                 (1 << 27)
 
 // These are the features required by this driver (VirtualBox is borken and won't work without VIRTIO_NET_F_MRG_RXBUF) 
+#undef REQUIRED_FEATURES
 #define REQUIRED_FEATURES (/*VIRTIO_NET_F_CSUM |*/ VIRTIO_NET_F_MAC | VIRTIO_NET_F_MRG_RXBUF)
 
 

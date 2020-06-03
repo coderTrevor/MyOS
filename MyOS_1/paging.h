@@ -60,8 +60,17 @@ inline void Paging_Enable(multiboot_info *multibootInfo)
     // Setup identity mapping for the first four megabytes
     pageDirectory[0] = (PAGE_DIRECTORY_ENTRY)(0x00 | DIRECTORY_ENTRY_PRESENT | DIRECTORY_ENTRY_WRITABLE | DIRECTORY_ENTRY_4MB);
 
+    // Setup identity mapping for the four megabytes starting at megabyte 4
+    pageDirectory[1] = (PAGE_DIRECTORY_ENTRY)((uint32_t)0x400000 | DIRECTORY_ENTRY_PRESENT | DIRECTORY_ENTRY_WRITABLE | DIRECTORY_ENTRY_4MB | DIRECTORY_ENTRY_USER_ACCESSIBLE);
+
     // Setup identity mapping for the four megabytes starting at megabyte 8
-    pageDirectory[2] = (PAGE_DIRECTORY_ENTRY)((uint32_t)0x800000 | DIRECTORY_ENTRY_PRESENT | DIRECTORY_ENTRY_WRITABLE | DIRECTORY_ENTRY_4MB);
+    pageDirectory[2] = (PAGE_DIRECTORY_ENTRY)((uint32_t)0x800000 | DIRECTORY_ENTRY_PRESENT | DIRECTORY_ENTRY_WRITABLE | DIRECTORY_ENTRY_4MB | DIRECTORY_ENTRY_USER_ACCESSIBLE);
+
+    // Identity map the next four megs
+    pageDirectory[3] = (PAGE_DIRECTORY_ENTRY)((uint32_t)0xC00000 | DIRECTORY_ENTRY_PRESENT | DIRECTORY_ENTRY_WRITABLE | DIRECTORY_ENTRY_4MB | DIRECTORY_ENTRY_USER_ACCESSIBLE);
+
+    // Identity map the next four megs
+    pageDirectory[4] = (PAGE_DIRECTORY_ENTRY)((uint32_t)0x1000000 | DIRECTORY_ENTRY_PRESENT | DIRECTORY_ENTRY_WRITABLE | DIRECTORY_ENTRY_4MB | DIRECTORY_ENTRY_USER_ACCESSIBLE);
 
     // Map the kernel (4 megs starting at 0x10 0000) to 0xC000 0000
     for (i = 0; i < 1024; ++i)
@@ -106,7 +115,8 @@ inline void Paging_Enable(multiboot_info *multibootInfo)
     pageDir = pageDirectory;
 
     // determine available pages
-    pagingNextAvailableMemory = FOUR_MEGABYTES * 3; // Next available page will (likely) start at 12 Megs
+    //pagingNextAvailableMemory = FOUR_MEGABYTES * 3; // Next available page will (likely) start at 12 Megs
+    pagingNextAvailableMemory = FOUR_MEGABYTES * 4; // TEMP: Next available page will (likely) start at 16 Megs
     // We'll assume we have 64 megs available
     paging4MPagesAvailable = 16; // TODO: Calculate based on the memory map Grub gave us
 }

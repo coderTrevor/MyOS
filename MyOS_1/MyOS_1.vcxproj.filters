@@ -58,6 +58,12 @@
     <Filter Include="Source Files\Libs">
       <UniqueIdentifier>{60dc38ca-6797-4fd4-b28a-ea7b37fb964b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Tasks">
+      <UniqueIdentifier>{5f3642f8-f847-47cc-91f6-93d2ebb71ed0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Tasks">
+      <UniqueIdentifier>{b27b41e5-298f-4e04-9dea-743123199d72}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="paging.c">
@@ -192,6 +198,9 @@
     <ClCompile Include="myos_io.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Tasks\Dispatcher.c">
+      <Filter>Source Files\Tasks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="misc.h">
@@ -325,6 +334,9 @@
     </ClInclude>
     <ClInclude Include="myos_io.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tasks\Context.h">
+      <Filter>Header Files\Tasks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

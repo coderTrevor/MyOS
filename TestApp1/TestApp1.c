@@ -10,7 +10,7 @@
 
 int main()
 {
-    printf("Hello World from an .exe using a system call%s\nDid you know that the answer to life, the universe, and everything is %d?\n", " and printf()!", 42);
+    /*printf("Hello World from an .exe using a system call%s\nDid you know that the answer to life, the universe, and everything is %d?\n", " and printf()!", 42);
 
     if (malloc(1))
         printf("malloc() success!\n");
@@ -59,7 +59,7 @@ int main()
     char * pch;
     pch = strrchr(str, 's');
     printf("Last occurence of 's' found at %d \n", pch - str + 1);
-
+    */
 
     // TODO: fix:
     /*
@@ -77,11 +77,25 @@ int main()
         }
     }*/
 
-    printf("Done\n");
+    //printf("Done\n");
 
-    exit();
+    /*uint32_t spvar;
+    __asm
+    {
+        mov spvar, esp
+    }
+    printf("0x%lX\n", spvar);*/
 
-    printf("This code will never be executed because of the call to exit()\n");
+    printf("Hello World from an .exe using a system call%s\nDid you know that the answer to life, the universe, and everything is %d?\n", " and printf()!", 42);
+   // exit();
+
+    //printf("This code will never be executed because of the call to exit()\n");
+
+    while (true)
+    {
+        printf("b");
+        timeDelayMS(300);
+    }
 
     return 0;
 }

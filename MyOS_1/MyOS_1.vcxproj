@@ -318,6 +318,7 @@
     <ClCompile Include="Networking\UDP.c" />
     <ClCompile Include="paging.c" />
     <ClCompile Include="printf.c" />
+    <ClCompile Include="Tasks\Dispatcher.c" />
     <ClCompile Include="Terminal.c" />
     <ClCompile Include="Timers\PIT.c" />
     <ClCompile Include="Timers\System_Clock.c" />
@@ -364,6 +365,7 @@
     <ClInclude Include="paging.h" />
     <ClInclude Include="printf.h" />
     <ClInclude Include="System_Specific.h" />
+    <ClInclude Include="Tasks\Context.h" />
     <ClInclude Include="Terminal.h" />
     <ClInclude Include="Timers\PIT.h" />
     <ClInclude Include="Timers\System_Clock.h" />

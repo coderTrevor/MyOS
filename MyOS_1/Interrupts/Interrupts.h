@@ -17,6 +17,8 @@ void exit_interrupt_handler(int eflags, int cs);
 
 void default_interrupt_handler(void);
 
+uint32_t dispatch_new_task_interrupt_handler(uint32_t eflags, uint32_t cs, uint32_t newStack, uint32_t oldStackStart);
+
 void fclose_interrupt_handler(int eflags, int cs, int fp, int *pRetVal);
 
 void fopen_interrupt_handler(int eflags, int cs, const char *filename, const char *mode, int *fp);

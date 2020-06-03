@@ -85,6 +85,9 @@ void IDT_Init(void)
     // Set handler for reading from keyboard
     Set_IDT_Entry((unsigned long)read_from_keyboard_handler, SYSCALL_READ_FROM_KEYBOARD);
 
+    // Set handler for dispatching a new task
+    Set_IDT_Entry((unsigned long)dispatch_new_task_interrupt_handler, SYSCALL_DISPATCH_NEW_TASK);
+
     /* fill the IDT descriptor */
     IDT_ptr.base = (uint32_t)IDT;
     IDT_ptr.size = (sizeof(IDT_ENTRY) * 256);

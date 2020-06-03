@@ -15,6 +15,7 @@
 
 // Sadly, VIRTIO_GPU_F_VIRGL doesn't work on Windows (which sucks because that's the whole reason I started implementing a virtio-gpu driver)
 // Qemu seems to insist on using these features, whether we negotiate them or not:
+#undef REQUIRED_FEATURES
 #define REQUIRED_FEATURES   (VIRTIO_F_VERSION_1 | VIRTIO_F_RING_INDIRECT_DESC | VIRTIO_F_RING_EVENT_IDX)
 
 #define VIRTIO_GPU_EVENT_DISPLAY (1 << 0)

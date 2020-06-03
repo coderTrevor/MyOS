@@ -2,6 +2,7 @@
 #include "Build_Number.h"
 #include "Console_Shell.h"
 #include "Console_VGA.h"
+#include "Tasks/Context.h"
 #include "misc.h"
 #include "Networking/TFTP.h"
 #include "Networking/IPv4.h"
@@ -324,6 +325,17 @@ void Shell_Process_command(void)
             mov spvar, esp
         }
         kprintf("0x%lX\n", spvar);
+        return;
+    }
+
+    // Test writint
+    if (strcmp(currentCommand, "write") == 0)
+    {
+        tftpHideErrors = false;
+
+        /*uint16_t sourcePort =*/ TFTP_WriteFile(tftpServerIP, "test.txt", TFTP_TYPE_BINARY, NIC_MAC);
+
+        kprintf("Done.\n");
         return;
     }
 
@@ -868,9 +880,10 @@ void Shell_Process_command(void)
 
     // Run command
     memset(subCommand, 0, MAX_COMMAND_LENGTH);
-    strncpy(subCommand, currentCommand, strlen("run"));
-    if (strcmp(subCommand, "run") == 0)
+    strncpy(subCommand, currentCommand, strlen("run "));
+    if (strcmp(subCommand, "run ") == 0)
     {
+        bool exclusive = false;
         memset(subCommand, 0, MAX_COMMAND_LENGTH);
         strncpy(subCommand, currentCommand + strlen("run "), MAX_COMMAND_LENGTH - strlen("run "));
 
@@ -880,10 +893,20 @@ void Shell_Process_command(void)
             return;
         }
 
+        // Check for "exclusive" option
+        if (strncmp(subCommand, "exclusive ", strlen("exclusive ")) == 0)
+        {
+            exclusive = true;
+            memset(subCommand, 0, MAX_COMMAND_LENGTH);
+            strncpy(subCommand, currentCommand + strlen("run exclusive "), MAX_COMMAND_LENGTH - strlen("run exclusive "));
+        }
+
         if (debugLevel)
         {
             terminal_writestring("Ok, I'll run ");
             terminal_writestring(subCommand);
+            if (exclusive)
+                terminal_writestring(" in exclusive mode");
             terminal_newline();
         }
 
@@ -916,17 +939,17 @@ void Shell_Process_command(void)
         uint8_t *peBuffer = malloc(fileSize);
         if (!peBuffer)
         {
-            terminal_writestring("Not enough memory to open bitmap file\n");
+            terminal_writestring("Not enough memory to open executable file\n");
             return;
         }
 
         //uint32_t peFileSize;
 
-        if(debugLevel)
+        if (debugLevel)
             terminal_dumpHex(peBuffer, 32);
 
         // Download the executable
-        if (!TFTP_GetFile(tftpServerIP, subCommand, peBuffer, fileSize, NULL) )
+        if (!TFTP_GetFile(tftpServerIP, subCommand, peBuffer, fileSize, NULL))
         {
             terminal_writestring("Error reading ");
             terminal_writestring(subCommand);
@@ -934,11 +957,11 @@ void Shell_Process_command(void)
             return;
         }
 
-        if(debugLevel)
+        if (debugLevel)
             terminal_dumpHex(peBuffer, 32);
 
         // Run the executable
-        if (!loadAndRunPE(exeBuffer, (DOS_Header*)peBuffer))
+        if (!loadAndRunPE(exeBuffer, (DOS_Header*)peBuffer, subCommand, exclusive))
             terminal_writestring("Error running executable\n");
 
         // Free the memory for the pe
@@ -946,7 +969,117 @@ void Shell_Process_command(void)
 
         terminal_resume();
 
-        if(debugLevel)
+        if (debugLevel)
+            terminal_writestring("done!\n");
+
+        return;
+    }
+
+    // Temporary command to enable multi-tasking
+    if (strcmp(currentCommand, "multi") == 0)
+    {
+        kprintf("Enabling multi-tasking...\n");
+        multiEnable = true;
+        return;
+    }
+
+    // Temporary command to facilitate loading a program at a second memory address,
+    // which will let us get multiprogramming working with two processes without having to worry about virtual memory for now
+    // Runhi command
+    memset(subCommand, 0, MAX_COMMAND_LENGTH);
+    strncpy(subCommand, currentCommand, strlen("runhi"));
+    if (strcmp(subCommand, "runhi") == 0)
+    {
+        bool exclusive = false;
+        memset(subCommand, 0, MAX_COMMAND_LENGTH);
+        strncpy(subCommand, currentCommand + strlen("runhi "), MAX_COMMAND_LENGTH - strlen("runhi "));
+
+        if (strlen(subCommand) == 0)
+        {
+            terminal_writestring("You must specify the name of an executable to run!\n\nUsage: runhi [Name_Of_File.exe]\n");
+            return;
+        }
+
+        // Check for "exclusive" option
+        if (strcmp(subCommand, "exclusive ") == 0)
+        {
+            exclusive = true;
+            memset(subCommand, 0, MAX_COMMAND_LENGTH);
+            strncpy(currentCommand, currentCommand + strlen("runhi exclusive"), MAX_COMMAND_LENGTH - strlen("runhi exclusive"));
+        }
+
+        if (debugLevel)
+        {
+            terminal_writestring("Ok, I'll run ");
+            terminal_writestring(subCommand);
+            if (exclusive)
+                terminal_writestring(" in exclusive mode");
+            terminal_writestring(" at 12 MB");
+            terminal_newline();
+        }
+
+        // See if a batch file was requested
+        if (IsBatchFile(subCommand))
+        {
+            OpenAndRunBatch(subCommand);
+            if (debugLevel)
+                terminal_writestring("done!\n");
+            return;
+        }
+
+        // TEMPTEMP we've hardcoded some memory starting at 0xC00000. This was identity mapped when paging was enabled.
+        uint8_t *exeBuffer = (uint8_t*)0xC00000;
+
+        // reset keyboard input buffer
+        keyReadIndex = keyWriteIndex = 0;
+
+        // Get the size of the executable file
+        uint32_t fileSize;
+        if (!TFTP_GetFileSize(tftpServerIP, subCommand, &fileSize))
+        {
+            terminal_writestring("Failed to determine size of ");
+            terminal_writestring(subCommand);
+            terminal_newline();
+            return;
+        }
+
+        // Allocate a buffer for the executable file
+        uint8_t *peBuffer = malloc(fileSize);
+        if (!peBuffer)
+        {
+            terminal_writestring("Not enough memory to open executable file\n");
+            return;
+        }
+
+        //uint32_t peFileSize;
+
+        if (debugLevel)
+            terminal_dumpHex(peBuffer, 32);
+
+        // Download the executable
+        if (!TFTP_GetFile(tftpServerIP, subCommand, peBuffer, fileSize, NULL))
+        {
+            terminal_writestring("Error reading ");
+            terminal_writestring(subCommand);
+            terminal_writestring(" from server!\n");
+            return;
+        }
+
+        if (debugLevel)
+            terminal_dumpHex(peBuffer, 32);
+
+
+        // Run the executable
+        if (!loadAndRunPE(exeBuffer, (DOS_Header*)peBuffer, subCommand, exclusive))
+            terminal_writestring("Error running executable\n");
+
+
+        // Free the memory for the pe
+        free(peBuffer);
+
+        terminal_resume();
+
+        if (debugLevel)
             terminal_writestring("done!\n");
 
         return;

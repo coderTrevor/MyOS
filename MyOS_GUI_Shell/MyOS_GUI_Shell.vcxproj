@@ -1,0 +1,272 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{DD34D14A-8D2B-41FA-9EA5-02A5355F9BC4}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>MyOS_GUI_Shell</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>Disabled</Optimization>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <PreprocessorDefinitions>__MYOS;NDEBUG;_CONSOLE;HAVE_MALLOC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\MyOS_1\Libs\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+      <OmitFramePointers>true</OmitFramePointers>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Native</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <BaseAddress>0xC00000</BaseAddress>
+      <DataExecutionPrevention>false</DataExecutionPrevention>
+      <MapFileName>GUI.map</MapFileName>
+      <MapExports>true</MapExports>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <EntryPointSymbol>main</EntryPointSymbol>
+    </Link>
+    <PostBuildEvent>
+      <Message>Copying GUI.exe to TFTP directory</Message>
+      <Command>copy "$(TargetDir)$(TargetFileName)" C:\Users\Administrator\.VirtualBox\TFTP\GUI.exe</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\MyOS_1\Interrupts\System_Calls.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\atomic\SDL_atomic.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\atomic\SDL_spinlock.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\audio\dummy\SDL_dummyaudio.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\audio\SDL_audio.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\audio\SDL_audiocvt.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\audio\SDL_audiodev.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\audio\SDL_audiotypecvt.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\audio\SDL_mixer.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\audio\SDL_wave.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\cpuinfo\SDL_cpuinfo.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\events\SDL_clipboardevents.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\events\SDL_displayevents.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\events\SDL_dropevents.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\events\SDL_events.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\events\SDL_gesture.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\events\SDL_keyboard.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\events\SDL_mouse.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\events\SDL_quit.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\events\SDL_touch.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\events\SDL_windowevents.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\file\SDL_rwops.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\e_atan2.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\e_exp.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\e_fmod.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\e_log.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\e_log10.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\e_pow.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\e_rem_pio2.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\e_sqrt.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\k_cos.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\k_rem_pio2.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\k_sin.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\k_tan.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\s_atan.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\s_copysign.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\s_cos.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\s_fabs.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\s_floor.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\s_scalbn.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\s_sin.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\s_tan.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\render\SDL_d3dmath.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\render\SDL_render.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\render\SDL_yuv_sw.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\render\software\SDL_blendfillrect.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\render\software\SDL_blendline.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\render\software\SDL_blendpoint.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\render\software\SDL_drawline.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\render\software\SDL_drawpoint.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\render\software\SDL_render_sw.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\render\software\SDL_rotate.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\SDL.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\SDL_assert.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\SDL_dataqueue.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\SDL_error.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\SDL_hints.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\SDL_log.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\stdlib\SDL_getenv.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\stdlib\SDL_iconv.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\stdlib\SDL_malloc.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\stdlib\SDL_qsort.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\stdlib\SDL_stdlib.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\stdlib\SDL_string.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\thread\generic\SDL_syscond.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\thread\generic\SDL_sysmutex.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\thread\generic\SDL_syssem.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\thread\generic\SDL_systhread.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\thread\generic\SDL_systls.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\thread\SDL_thread.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\timer\myos\SDL_systimer.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\timer\SDL_timer.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\dummy\SDL_nullevents.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\dummy\SDL_nullframebuffer.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\dummy\SDL_nullvideo.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\myos\SDL_myosframebuffer.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\myos\SDL_myosvideo.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_blit.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_blit_0.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_blit_1.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_blit_A.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_blit_auto.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_blit_copy.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_blit_N.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_blit_slow.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_bmp.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_clipboard.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_egl.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_fillrect.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_pixels.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_rect.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_RLEaccel.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_shape.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_stretch.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_surface.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_video.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_vulkan_utils.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_yuv.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\yuv2rgb\yuv_rgb.c" />
+    <ClCompile Include="..\MyOS_1\misc.c" />
+    <ClCompile Include="MyOS_GUI_Shell.cpp">
+      <CallingConvention Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Cdecl</CallingConvention>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GUI_Object.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

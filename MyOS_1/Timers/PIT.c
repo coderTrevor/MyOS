@@ -6,6 +6,7 @@
 #include "../System_Specific.h"
 #include "../File Formats/VOC.h"
 #include "../Drivers/Sound_Blaster_16.h"
+#include "../Tasks/Context.h"
 
 // TEMPTEMP
 bool playSound = false;
@@ -59,20 +60,84 @@ void PIT_Set_Interval(uint32_t hz)
     ticksSinceReset = 0;
 }
 
+uint32_t espVal;
+uint32_t oldTaskIndex;
+READY_QUEUE_ENTRY *oldHead;
+bool multiEnable = false;   // TEMPTEMP HACKHACK
 // Interrupt handler for the PIT
 void _declspec(naked) timer_interrupt_handler(void)
 {
     _disable();
-    _asm pushad;
+    _asm {
+        push ebp
+        pushad;
+    }
 
     //++interrupts_fired;
     ++ticksSinceReset;
+
+    if(debugLevel)
+        kprintf(".");
+
+    // Is there a task waiting to be run?
+    if (!tasks[currentTask].exclusive && readyQueueHead)
+    {
+        --ticksLeftInTask;
+        if (ticksLeftInTask <= 0 && multiEnable)
+        {
+            if(debugLevel)
+                kprintf("Saving %s\n", tasks[currentTask].imageName);
+
+            // Save current context
+            _asm mov[espVal], esp            
+            tasks[currentTask].ESP = espVal;
+
+            oldTaskIndex = currentTask;
+
+            // Find the last ready queue entry in the list
+            READY_QUEUE_ENTRY *finalReadyQueueEntry = readyQueueHead;
+            while (finalReadyQueueEntry->nextEntry)
+                finalReadyQueueEntry = finalReadyQueueEntry->nextEntry;
+
+            // Pull info from the front of the ready queue
+            currentTask = readyQueueHead->taskIndex;
+
+            // Move the current task to the end of the ready queue
+            // Are there more than two ready queue entries?
+            if (readyQueueHead != finalReadyQueueEntry)
+            {
+                readyQueueHead->taskIndex = oldTaskIndex;
+                finalReadyQueueEntry->nextEntry = readyQueueHead;
+                oldHead = readyQueueHead;
+                readyQueueHead = readyQueueHead->nextEntry;
+                oldHead->nextEntry = NULL;
+            }
+            else
+            {
+                readyQueueHead->taskIndex = oldTaskIndex;
+            }            
+
+            if(debugLevel)
+                kprintf("Switching to %s\n", tasks[currentTask].imageName);
+
+            ticksLeftInTask = TICKS_PER_TASK;
+
+            // Get the stack pointer of the next waiting task and make that the stack
+            espVal = tasks[currentTask].ESP;
+
+            if(debugLevel)
+                terminal_dumpHexAround((uint8_t *)espVal, 32, 32);
+            
+            _asm mov esp, espVal
+        }
+    }
 
     PIC_sendEOI(TIMER_INTERRUPT);
 
     _asm
     {
         popad
+        pop ebp
         iretd
     }
 }

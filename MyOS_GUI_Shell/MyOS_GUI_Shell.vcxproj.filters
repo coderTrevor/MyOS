@@ -1,0 +1,330 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\SDL">
+      <UniqueIdentifier>{c94e25be-285f-4acd-af60-cfe785341cee}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\MyOS_1\misc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Interrupts\System_Calls.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\SDL.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\e_atan2.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\e_exp.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\e_fmod.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\e_log.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\e_log10.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\e_pow.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\e_rem_pio2.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\e_sqrt.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\k_cos.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\k_rem_pio2.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\k_sin.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\k_tan.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\s_atan.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\s_copysign.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\s_cos.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\s_fabs.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\s_floor.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\s_scalbn.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\s_sin.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\libm\s_tan.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\SDL_assert.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\atomic\SDL_atomic.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\audio\SDL_audio.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\audio\SDL_audiocvt.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\audio\SDL_audiodev.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\audio\SDL_audiotypecvt.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\render\software\SDL_blendfillrect.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\render\software\SDL_blendline.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\render\software\SDL_blendpoint.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_blit.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_blit_0.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_blit_1.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_blit_A.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_blit_auto.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_blit_copy.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_blit_N.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_blit_slow.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_bmp.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_clipboard.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\events\SDL_clipboardevents.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\cpuinfo\SDL_cpuinfo.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\render\SDL_d3dmath.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\SDL_dataqueue.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\events\SDL_displayevents.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\render\software\SDL_drawline.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\render\software\SDL_drawpoint.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\events\SDL_dropevents.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\audio\dummy\SDL_dummyaudio.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_egl.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\SDL_error.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\events\SDL_events.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_fillrect.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\events\SDL_gesture.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\stdlib\SDL_getenv.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\SDL_hints.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\stdlib\SDL_iconv.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\events\SDL_keyboard.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\SDL_log.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\stdlib\SDL_malloc.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\audio\SDL_mixer.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\events\SDL_mouse.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\myos\SDL_myosframebuffer.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\myos\SDL_myosvideo.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\dummy\SDL_nullevents.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\dummy\SDL_nullframebuffer.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\dummy\SDL_nullvideo.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_pixels.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\stdlib\SDL_qsort.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\events\SDL_quit.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_rect.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\render\SDL_render.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\render\software\SDL_render_sw.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_RLEaccel.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\render\software\SDL_rotate.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\file\SDL_rwops.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_shape.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\atomic\SDL_spinlock.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\stdlib\SDL_stdlib.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_stretch.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\stdlib\SDL_string.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_surface.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\thread\generic\SDL_syscond.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\thread\generic\SDL_sysmutex.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\thread\generic\SDL_syssem.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\thread\generic\SDL_systhread.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\timer\myos\SDL_systimer.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\thread\generic\SDL_systls.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\thread\SDL_thread.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\timer\SDL_timer.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\events\SDL_touch.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_video.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_vulkan_utils.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\audio\SDL_wave.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\events\SDL_windowevents.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_yuv.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\render\SDL_yuv_sw.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\yuv2rgb\yuv_rgb.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="MyOS_GUI_Shell.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GUI_Object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

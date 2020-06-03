@@ -41,6 +41,7 @@
 extern "C" {
 #endif
 
+unsigned int _atoi(const char** str);
 
 /**
  * Output a character to a custom device like UART, used by the printf() function

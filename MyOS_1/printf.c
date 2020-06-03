@@ -185,7 +185,7 @@ static inline bool _is_digit(char ch)
 
 
 // internal ASCII string to unsigned int conversion
-static unsigned int _atoi(const char** str)
+/*static*/ unsigned int _atoi(const char** str)
 {
   unsigned int i = 0U;
   while (_is_digit(**str)) {

@@ -112,7 +112,7 @@ bool TFTP_GetFileSize(uint32_t serverIP, char *filename, uint32_t *pActualFileSi
 
 // source port is used to keep track of different transactions
 uint16_t TFTP_RequestFile(uint32_t serverIP, char *filename, char *transferMode, uint8_t *sourceMAC)
-{    
+{
     TFTP_RequestHeader *tftpData;
     size_t filenameLength = strlen(filename) + 1; // length of filename plus null terminator
     size_t transferModeLength = strlen(transferMode) + 1;
@@ -136,7 +136,44 @@ uint16_t TFTP_RequestFile(uint32_t serverIP, char *filename, char *transferMode,
 
     memset(tftpData, 0, dataSize);
     tftpData->opcode = TFTP_OP_READ_REQUEST;
-    
+
+    strncpy(tftpData->filename, filename, filenameLength - 1);
+    char *transferModePtr = (char *)((uint32_t)tftpData->filename + filenameLength);
+    strncpy(transferModePtr, transferMode, transferModeLength);
+
+    EthernetSendPacket(packet, packetSize);
+
+    return sourcePort;
+}
+
+// source port is used to keep track of different transactions
+// TODO: Seems like Qemu and VirtualBox don't support writing files via TFTP so I can't finish this :(
+uint16_t TFTP_WriteFile(uint32_t serverIP, char *filename, char *transferMode, uint8_t *sourceMAC)
+{
+    TFTP_RequestHeader *tftpData;
+    size_t filenameLength = strlen(filename) + 1; // length of filename plus null terminator
+    size_t transferModeLength = strlen(transferMode) + 1;
+
+    // packet size is 2 bytes (for the opcode) plus length of filename plus length of transferMode (both strings are zero terminated)
+    uint16_t packetSize = (uint16_t)(sizeof(tftpData->opcode) + filenameLength + transferModeLength);
+    uint16_t dataSize = packetSize;
+    uint16_t sourcePort = 1235; // TODO: should be a random number (I think)
+
+                                // set some globals that will keep track of the transaction
+    transactionID = sourcePort;
+    transferInProgress = true;
+    nextFilePointer = tftpFileBuffer;
+    currentBlockNumber = 0; // TFTP Starts with block number 1
+    tftpFileSize = 0;
+    tftpServerIP = serverIP;
+    transferError = false;
+
+    // create the packet to send
+    Ethernet_Header *packet = UDP_Create_Packet(serverIP, sourcePort, TFTP_PORT, &packetSize, sourceMAC, &tftpData);
+
+    memset(tftpData, 0, dataSize);
+    tftpData->opcode = TFTP_OP_WRITE_REQUEST;
+
     strncpy(tftpData->filename, filename, filenameLength - 1);
     char *transferModePtr = (char *)((uint32_t)tftpData->filename + filenameLength);
     strncpy(transferModePtr, transferMode, transferModeLength);

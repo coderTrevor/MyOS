@@ -20,6 +20,7 @@
 #define SYSCALL_EXIT_APP            244
 #define SYSCALL_TIME_UPTIME_MS      243
 #define SYSCALL_READ_FROM_KEYBOARD  242
+#define SYSCALL_DISPATCH_NEW_TASK   241
 
 void SystemCallExit();
 #define exit SystemCallExit

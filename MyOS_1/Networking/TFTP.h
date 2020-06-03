@@ -92,3 +92,4 @@ uint16_t TFTP_RequestFile(uint32_t serverIP, char *filename, char *transferMode,
 
 void TFTP_ProcessPacket(TFTP_Header *packet, uint16_t sourcePort, uint16_t destinationPort, uint16_t packetLength, uint8_t *sourceMAC);
 
+uint16_t TFTP_WriteFile(uint32_t serverIP, char *filename, char *transferMode, uint8_t *sourceMAC);

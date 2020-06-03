@@ -12,6 +12,7 @@
 #include "../Timers/System_Clock.h"
 #include "../Graphics/Display_HAL.h"
 #include "../myos_io.h"
+#include "../Tasks/Context.h"
 
 unsigned long interrupts_fired;
 
@@ -111,6 +112,67 @@ void _declspec(naked) default_exception_handler(void)
     popad
     iretd
     }*/
+}
+
+uint32_t espVal;
+uint32_t *pReturnVal;
+TASK_STACK_LAYOUT *pNewTask;
+
+// In calling this interrupt handler, we can keep track of how much the stack grows starting at oldStackStart and
+// ending at espVal (remembering that the stack grows downward, so espVal < oldStackStart). Then we can copy those
+// bytes to the new stack, and when we swap in the new stack in our PIT interrupt handler, it will have the same
+// data already pushed onto it, ready to be popped off at the end of the interrupt handler.
+uint32_t _declspec(naked) dispatch_new_task_interrupt_handler(uint32_t eflags, uint32_t cs, uint32_t newStackBegin, uint32_t oldStackStart)
+{
+    (void)eflags, (void)cs;
+    __asm
+    {
+        // prologue
+        push ebp
+        mov ebp, esp
+
+        pushad
+
+        // Keep track of where the stack starts (ends) for the new task
+        mov[espVal], esp
+    }
+    
+    pNewTask = (TASK_STACK_LAYOUT *)espVal;
+
+    if (debugLevel)
+    {
+        terminal_writestring("eflags: ");
+        terminal_print_ulong_hex(pNewTask->eflags);
+        terminal_writestring("\ncs: ");
+        terminal_print_ulong_hex(pNewTask->cs);
+        pReturnVal = (uint32_t *)(pNewTask->returnAddress);
+        terminal_writestring("\nReturn value: ");
+        terminal_print_ulong_hex((uint32_t)pReturnVal);
+        terminal_newline();
+        terminal_writestring("old Stack Start: ");
+        terminal_print_ulong_hex(oldStackStart);
+        terminal_writestring("\nnew Stack: ");
+        terminal_print_ulong_hex(newStackBegin);
+        terminal_newline();
+        terminal_writestring("\nnew esp: ");
+        terminal_print_ulong_hex(espVal);
+        terminal_newline();
+        terminal_dumpHexAround((uint8_t *)espVal, 32, 192);
+    }
+
+    // copy the task stack to the new stack area
+    memmove((void *)(newStackBegin - sizeof(TASK_STACK_LAYOUT)), pNewTask, sizeof(TASK_STACK_LAYOUT));
+
+    __asm
+    {
+        popad
+
+        // epilogue
+        mov esp, ebp
+        pop ebp
+
+        iretd
+    }
 }
 
 void _declspec(naked) exit_interrupt_handler(int eflags, int cs)
@@ -423,6 +485,22 @@ void _declspec(naked) page_fault_handler(void)
     terminal_writestring(".\nMemory looks like:\n");
     //terminal_dumpHex((uint8_t *)address, 256);
     terminal_dumpHexAround((uint8_t *)address, 128, 128);
+
+    uint32_t regvar;
+    __asm
+    {
+        mov regvar, esp
+    }
+    kprintf("Value of esp: 0x%lX\n", regvar);
+
+    __asm
+    {
+        mov regvar, ebp
+    }
+    kprintf("Value of ebp: 0x%lX\n", regvar);
+
+    kprintf("Memory address accessed: 0x%lX\n", __readcr2());
+
     terminal_writestring("System halted.\n");
 
     for (;;)

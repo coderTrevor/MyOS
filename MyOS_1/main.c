@@ -3,6 +3,7 @@
 #include "Console_VGA.h"
 #include "Console_Serial.h"
 #include "Console_Shell.h"
+#include "Tasks/Context.h"
 #include "GDT.h"
 #include "Drivers/Keyboard.h"
 #include "System_Specific.h"
@@ -111,6 +112,10 @@ void KeStartupPhase2(multiboot_info *multibootInfo)
 {
     // initialize keyboard mapping
     init_key_map();
+
+    // Add kernel to list of tasks
+    tasks[0].inUse = true;
+    strncpy(tasks[0].imageName, "KERNEL PROCESS", sizeof("KERNEL PROCESS"));
 
     // Initialize interrupts
     Interrupts_Init();

@@ -105,8 +105,8 @@ void free(void *ptr)
     printf("   from %s, line %d\n", dbgFreeFilename, dbgFreeLineNumber);
     dbgFreeFilename = noFileName;
     dbgFreeLineNumber = 0;
-    for (;;)
-        __halt();
+    //for (;;)
+    //    __halt();
 #else
     printf("\n");
 #endif
@@ -421,7 +421,7 @@ void* malloc(size_t size)
             freeMemoryArray.inUse[nextFreeMemorySlot] = false;
 
 #ifdef DEBUG_MEM
-            printf("Reusing freed memory from slot %d, (reuse #%d)\n", i, ++reuses);
+            //printf("Reusing freed memory from slot %d, (reuse #%d)\n", i, ++reuses);
 #endif
             return (void *)allocationArray.address[nextAllocationSlot++];
         }
