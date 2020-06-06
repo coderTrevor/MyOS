@@ -169,7 +169,7 @@ void SystemCallPrint(char *msg)
 }
 
 // TODO: return the number of characters printed
-int __cdecl SystemCallPrintf(const char* format, ...)
+int SystemCallPrintf(const char* format, ...)
 {
     va_list va;
     va_start(va, format);

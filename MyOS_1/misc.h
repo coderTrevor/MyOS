@@ -1,4 +1,9 @@
 #pragma once
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -113,3 +118,8 @@ void showAllocations(void);
 char * strrchr(const char *str, int ch);
 
 int toupper(int arg);
+
+
+#ifdef __cplusplus
+};
+#endif /* __cplusplus */

@@ -321,9 +321,30 @@
     <ClCompile Include="MyOS_GUI_Shell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GUI_Window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="font.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI_Object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="spf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_1\CPP_Support.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GUI_Object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI_Window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI_Rect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

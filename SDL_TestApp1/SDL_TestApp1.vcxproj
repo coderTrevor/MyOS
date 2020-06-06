@@ -125,6 +125,8 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
       <OmitFramePointers>true</OmitFramePointers>
+      <CallingConvention>Cdecl</CallingConvention>
+      <ExceptionHandling>false</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Native</SubSystem>
@@ -137,6 +139,7 @@
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(TargetDir)$(TargetFileName)" C:\Users\Administrator\.VirtualBox\TFTP\$(TargetFileName)</Command>
@@ -161,7 +164,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\MyOS_1\Interrupts\System_Calls.c" />
+    <ClCompile Include="..\MyOS_1\CPP_Support.cpp" />
+    <ClCompile Include="..\MyOS_1\Interrupts\System_Calls.c">
+      <CallingConvention Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Cdecl</CallingConvention>
+    </ClCompile>
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\atomic\SDL_atomic.c" />
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\atomic\SDL_spinlock.c" />
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\audio\dummy\SDL_dummyaudio.c" />
@@ -264,7 +270,15 @@
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_yuv.c" />
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\yuv2rgb\yuv_rgb.c" />
     <ClCompile Include="..\MyOS_1\misc.c" />
-    <ClCompile Include="SDL_TestApp1.c" />
+    <ClCompile Include="SDL_TestApp1.cpp">
+      <CallingConvention Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Cdecl</CallingConvention>
+    </ClCompile>
+    <ClCompile Include="TestCpp.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\MyOS_1\CPP_Support.h" />
+    <ClInclude Include="..\MyOS_1\Interrupts\System_Calls.h" />
+    <ClInclude Include="TestCpp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
