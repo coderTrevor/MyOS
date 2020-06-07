@@ -245,6 +245,7 @@
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\dummy\SDL_nullevents.c" />
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\dummy\SDL_nullframebuffer.c" />
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\dummy\SDL_nullvideo.c" />
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\myos\SDL_myosevents.c" />
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\myos\SDL_myosframebuffer.c" />
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\myos\SDL_myosvideo.c" />
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\SDL_blit.c" />

@@ -5435,7 +5435,9 @@ void SDL_free(void *ptr)
         return;
     }
 
+#ifdef DEBUG_MEM
     printf("Freeing %p\n", ptr);
+#endif
     s_mem.free_func(ptr);
     (void)SDL_AtomicDecRef(&s_mem.num_allocations);
 }

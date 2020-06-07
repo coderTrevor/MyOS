@@ -170,6 +170,7 @@ int main(int argc, char* argv[])
 
                 case SDL_KEYDOWN:
                     //switch (event.key.keysym)
+                    CreateTextWindow(lastWindowID++);
                     switch (event.key.keysym.sym)
                     {
                         case SDLK_n:
@@ -224,6 +225,8 @@ int main(int argc, char* argv[])
 
         // Update the surface
         SDL_UpdateWindowSurface(window);
+
+        //SDL_Delay(1);
     }
 
     // Close and destroy the window

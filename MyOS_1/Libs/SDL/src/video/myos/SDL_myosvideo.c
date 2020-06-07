@@ -35,7 +35,7 @@
 #include "../../events/SDL_events_c.h"
 
 #include "SDL_myosvideo.h"
-#include "../dummy/SDL_nullevents_c.h"
+#include "SDL_myosevents_c.h"
 #include "SDL_myosframebuffer_c.h"
 
 #define MYOSVID_DRIVER_NAME "myos"
@@ -77,7 +77,7 @@ MYOS_CreateDevice(int devindex)
     device->VideoInit = MYOS_VideoInit;
     device->VideoQuit = MYOS_VideoQuit;
     device->SetDisplayMode = MYOS_SetDisplayMode;
-    device->PumpEvents = DUMMY_PumpEvents;
+    device->PumpEvents = MYOS_PumpEvents;
     device->CreateWindowFramebuffer = SDL_MYOS_CreateWindowFramebuffer;
     device->UpdateWindowFramebuffer = SDL_MYOS_UpdateWindowFramebuffer;
     device->DestroyWindowFramebuffer = SDL_MYOS_DestroyWindowFramebuffer;
