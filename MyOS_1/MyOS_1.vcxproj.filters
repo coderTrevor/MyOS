@@ -338,6 +338,9 @@
     <ClInclude Include="Tasks\Context.h">
       <Filter>Header Files\Tasks</Filter>
     </ClInclude>
+    <ClInclude Include="Drivers\mouse.h">
+      <Filter>Source Files\Drivers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Referenced_Reading.txt">

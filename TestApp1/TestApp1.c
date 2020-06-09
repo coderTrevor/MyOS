@@ -94,6 +94,13 @@ int main()
     while (true)
     {
         printf("b");
+
+//#ifdef __MYOS
+#if 0
+        MOUSE_STATE mouseState = getMouseState();
+        printf("\n%d, %d\n", mouseState.mouseX, mouseState.mouseY);
+#endif
+
         timeDelayMS(300);
     }
 

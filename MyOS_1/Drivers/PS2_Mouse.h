@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "../Graphics/Display_HAL.h"
+#include "../misc.h"
+#include "mouse.h"
 
 #define PS2_DATA_PORT        0x60
 #define PS2_STATUS_PORT      0x64
@@ -44,14 +46,10 @@
 #define MOUSE_X_OVERFLOW                0x40
 #define MOUSE_Y_OVERFLOW                0x80
 
+extern MOUSE_STATE mouseState;
 
 extern bool mousePresent;
 extern bool fourBytePackets;
-extern int mouseX;
-extern int mouseY;
-extern bool leftButton;
-extern bool middleButton;
-extern bool rightButton;
 
 extern int oldMouseX;
 extern int oldMouseY;

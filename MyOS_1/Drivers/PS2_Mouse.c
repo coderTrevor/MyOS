@@ -12,11 +12,7 @@
 bool mousePresent = false;
 bool fourBytePackets = false;
 
-int mouseX = 0;
-int mouseY = 0;
-bool leftButton = false;
-bool middleButton = false;
-bool rightButton = false;
+MOUSE_STATE mouseState = { 0, 0, false, false, false };
 
 // For restoring the GUI data underneath the cursor
 int oldMouseX = 0;
@@ -90,9 +86,9 @@ void _declspec(naked) Mouse_InterruptHandler()
         if (fourBytePackets)
             packetByte4 = inb(PS2_DATA_PORT);
 
-        leftButton = (packetByte1 & MOUSE_LEFT_BUTTON);
-        middleButton = (packetByte1 & MOUSE_MIDDLE_BUTTON);
-        rightButton = (packetByte1 & MOUSE_RIGHT_BUTTON);
+        mouseState.leftButton = (packetByte1 & MOUSE_LEFT_BUTTON);
+        mouseState.middleButton = (packetByte1 & MOUSE_MIDDLE_BUTTON);
+        mouseState.rightButton = (packetByte1 & MOUSE_RIGHT_BUTTON);
 
         if (!(packetByte1 & MOUSE_ALWAYS_1))
             terminal_writestring("Not 1\n");
@@ -107,22 +103,22 @@ void _declspec(naked) Mouse_InterruptHandler()
             if ((packetByte1 & MOUSE_X_SIGN) == MOUSE_X_SIGN)
                 xDelta |= 0xFFFFFF00;
             
-            mouseX += xDelta;
+            mouseState.mouseX += xDelta;
 
             if ((packetByte1 & MOUSE_Y_SIGN) == MOUSE_Y_SIGN)
                 yDelta |= 0xFFFFFF00;
             
-            mouseY += yDelta;
+            mouseState.mouseY -= yDelta;
 
-            if (mouseX < 0)
-                mouseX = 0;
-            if (mouseX >= MAX_X_RES)
-                mouseX = MAX_X_RES - 1;
+            if (mouseState.mouseX < 0)
+                mouseState.mouseX = 0;
+            if (mouseState.mouseX >= MAX_X_RES)
+                mouseState.mouseX = MAX_X_RES - 1;
 
-            if (mouseY < 0)
-                mouseY = 0;
-            if (mouseY >= MAX_Y_RES)
-                mouseY = MAX_Y_RES - 1;
+            if (mouseState.mouseY < 0)
+                mouseState.mouseY = 0;
+            if (mouseState.mouseY >= MAX_Y_RES)
+                mouseState.mouseY = MAX_Y_RES - 1;
         }
         else
             terminal_writestring("Overflow\n");
@@ -226,8 +222,8 @@ void Mouse_Init(void)
 
     if (!textMode)
     {
-        mouseX = MAX_X_RES / 2;
-        mouseY = MAX_Y_RES / 2;
+        mouseState.mouseX = MAX_X_RES / 2;
+        mouseState.mouseY = MAX_Y_RES / 2;
         oldColor.red = 0;
         oldColor.green = 0;
         oldColor.blue = 0;

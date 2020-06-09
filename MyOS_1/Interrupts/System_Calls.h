@@ -5,6 +5,7 @@
 #include "../Graphics/Display_HAL.h"
 #include "../Libs/SDL/include/SDL_rect.h"
 #include "../myos_io.h"
+#include "../Drivers/mouse.h"
 
 #define SYSCALL_PRINT               255
 #define SYSCALL_PRINTF              254
@@ -21,6 +22,7 @@
 #define SYSCALL_TIME_UPTIME_MS      243
 #define SYSCALL_READ_FROM_KEYBOARD  242
 #define SYSCALL_DISPATCH_NEW_TASK   241
+#define SYSCALL_GET_MOUSE_STATE     240
 
 void SystemCallExit();
 #define exit SystemCallExit
@@ -45,6 +47,9 @@ void SystemCallPageAllocator(unsigned int pages, unsigned int *pPagesAllocated, 
 
 void SystemCallGetGraphicsInfo(bool *graphicsArePresent, int *width, int *height);
 #define getGraphicsInfo SystemCallGetGraphicsInfo
+
+MOUSE_STATE SystemCallGetMouseState();
+#define getMouseState SystemCallGetMouseState
 
 void SystemCallGraphicsBlit(const SDL_Rect *sourceRect, PIXEL_32BIT *image);
 #define graphicsBlit SystemCallGraphicsBlit

@@ -168,6 +168,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\MyOS_1\CPP_Support.cpp" />
+    <ClCompile Include="..\MyOS_1\Graphics\Cursor.c" />
     <ClCompile Include="..\MyOS_1\Interrupts\System_Calls.c" />
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\atomic\SDL_atomic.c" />
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\atomic\SDL_spinlock.c" />

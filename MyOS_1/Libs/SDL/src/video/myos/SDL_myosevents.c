@@ -26,9 +26,12 @@
 
 #include "../../events/SDL_events_c.h"
 #include "../../../Interrupts/System_Calls.h"
+#include "../../../Drivers/mouse.h"
 
 #include "SDL_myosvideo.h"
 #include "SDL_myosevents_c.h"
+
+MOUSE_STATE oldMouseState = { 0, 0, false, false, false };
 
 void
 MYOS_PumpEvents(_THIS)
@@ -61,6 +64,25 @@ MYOS_PumpEvents(_THIS)
             addKeyToQueue(0, scancode);
         }*/
     }
+
+    // Check for mouse motion
+    MOUSE_STATE mouseState = getMouseState();
+    if (mouseState.mouseX != oldMouseState.mouseX
+        || mouseState.mouseY != oldMouseState.mouseY)
+    {
+        // send mouse motion
+        SDL_SendMouseMotion(NULL, 0, SDL_FALSE, mouseState.mouseX, mouseState.mouseY);
+    }
+
+    // Check for mouse buttons down
+    if(mouseState.leftButton != oldMouseState.leftButton
+        || mouseState.middleButton != oldMouseState.middleButton
+        || mouseState.rightButton != oldMouseState.rightButton)
+    {
+        //SDL_SendMouseButton(NULL, 0, 
+    }
+
+    oldMouseState = mouseState;
 }
 
 #endif /* SDL_VIDEO_DRIVER_MYOS */

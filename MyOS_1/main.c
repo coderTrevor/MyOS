@@ -27,6 +27,7 @@
 
 int debugLevel = 0;
 bool showOverlay = true;
+bool cursorEnabled = true;  // Add ability for GUI shell to handle the cursor directly in the future
 
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)
@@ -173,37 +174,34 @@ void KeStartupPhase2(multiboot_info *multibootInfo)
             }
         }
 
-        if (mousePresent)
+        if (mousePresent && showOverlay)
         {
             terminal_writestring_top("                      ", 0);
 
-            if (leftButton)
+            if (mouseState.leftButton)
                 terminal_writestring_top("L", 0);
-            if (middleButton)
+            if (mouseState.middleButton)
                 terminal_writestring_top("M", 1);
-            if (rightButton)
+            if (mouseState.rightButton)
                 terminal_writestring_top("R", 2);
 
-            terminal_print_int_top(mouseX, 3);
+            terminal_print_int_top(mouseState.mouseX, 3);
             terminal_writestring_top(",", 13);
-            terminal_print_int_top(mouseY, 14);
+            terminal_print_int_top(mouseState.mouseY, 14);
 
-            if (!textMode)
+            if (!textMode && cursorEnabled)
             {
-                int cursX = mouseX;
+                int cursX = mouseState.mouseX;
                 if (cursX < 0)
                     cursX = 0;
                 if (cursX >= MAX_X_RES)
                     cursX = MAX_X_RES - 1;
 
-                int cursY = mouseY;
+                int cursY = mouseState.mouseY;
                 if (cursY < 0)
                     cursY = 0;
                 if (cursY >= MAX_Y_RES)
                     cursY = MAX_Y_RES - 1;
-
-                // convert y to screen space
-                cursY = MAX_Y_RES - cursY;
 
                 // Restore backed-up image
                 GraphicsBlit(oldMouseX, oldMouseY, (PIXEL_32BIT *)areaUnderCursor, 16, 16);

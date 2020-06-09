@@ -41,5 +41,8 @@
     <ClCompile Include="..\MyOS_GUI_Shell\spf.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\MyOS_1\Graphics\Cursor.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

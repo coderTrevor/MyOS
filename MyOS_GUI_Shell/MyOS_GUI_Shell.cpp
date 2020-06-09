@@ -11,10 +11,10 @@ extern "C" {
 #include "../MyOS_1/Interrupts/System_Calls.h"
 //#undef _MSVC_VER
 #undef _WIN32
-#define HAVE_LIBC 1
+//#define HAVE_LIBC 0
 #define SDL_ATOMIC_DISABLED 1
-#define SDL_EVENTS_DISABLED 1
-#define SDL_TIMERS_DISABLED 1
+//#define SDL_EVENTS_DISABLED 0
+//#define SDL_TIMERS_DISABLED 0
 #define HAVE_MALLOC 1
 #else
 #include <stdio.h>
@@ -24,6 +24,7 @@ extern "C" {
 
 #include "../MyOS_1/Libs/SDL/include/SDL.h"
 #include "../MyOS_1/Libs/SDL/include/SDL_video.h"
+#include "../MyOS_1/Graphics/Cursor.h"
 
 #include "GUI_Window.h"
 
@@ -50,8 +51,13 @@ int bgBlue = 128;
 #define BG_GREEN_INC    31
 #define BG_BLUE_INC     42
 
+#define CURSOR_X        16
+#define CURSOR_Y        16
+
 SDL_Rect ball = { 0, 0, 20, 20 };
 SDL_Point velocity = { 2, 2 };
+
+SDL_Rect cursorRect = { 0, 0, CURSOR_X, CURSOR_Y };
 
 // This would probably be called with a process' PID
 void CreateTextWindow(uint32_t uniqueID)
@@ -96,6 +102,9 @@ void CreateTextWindow(uint32_t uniqueID)
 // TODO: There are memory leaks that need debugging
 int main(int argc, char* argv[])
 {
+    // re-enable interrupts (TODO: FIXME: What is disabling them??)
+    __asm sti;
+
     SDL_Window *window;                    // Declare a pointer
                                            //The window we'll be rendering to
 
@@ -157,9 +166,49 @@ int main(int argc, char* argv[])
 
     int lastWindowID = 0;
 
+    // Hide the mouse cursor
+    SDL_ShowCursor(SDL_DISABLE);
+
+    // Create a surface for the cursor
+    // TODO: Should we use SDL_CreateSystemCursor()?
+    SDL_Surface *pCursor = SDL_CreateRGBSurface(0, // flags (unused)
+                                    CURSOR_X, // width,
+                                    CURSOR_Y, // height,
+                                    32, // bit-depth
+                                    0xFF000000,  // Rmask (default)
+                                    0x00FF0000,  // Gmask (default)
+                                    0x0000FF00,  // Bmask (default),
+                                    0x000000FF); // Amask*/
+    if (!pCursor)
+    {
+        printf("ERROR: Couldn't create surface for cursor\n");
+    }
+
+    // Fill in cursor image (Not sure why the SDL_memcpy4 isn't working)
+    //SDL_memcpy4(pCursor->pixels, cursorImage, 16 * 16);
+    for (int y = 0; y < 16; ++y)
+    {
+        for (int x = 0; x < 16; ++x)
+        {
+            PIXEL_32BIT originalColor = cursorImage[y][x];
+            uint32_t color = SDL_MapRGBA(pCursor->format, 
+                                         originalColor.red,
+                                         originalColor.green,
+                                         originalColor.blue,
+                                         originalColor.alpha);
+            void *ptr = pCursor->pixels;
+            SDL_memcpy4( (void*)((uint32_t)ptr + (((y * 16) + x) * 4)), &color, 1);
+        }
+    }
+
+    SDL_SetSurfaceBlendMode(pCursor, SDL_BLENDMODE_BLEND);
+
     // Keep drawing everything
     while (!done)
     {
+        // Update cursor position
+        uint32_t mouseButtons = SDL_GetMouseState(&cursorRect.x, &cursorRect.y);
+
         if (SDL_PollEvent(&event))
         {
             switch (event.type)
@@ -223,6 +272,9 @@ int main(int argc, char* argv[])
         if (ball.y > 600 || ball.y < 0)
             velocity.y = -velocity.y;
 
+        // Draw the cursor
+        SDL_BlitSurface(pCursor, NULL, screenSurface, &cursorRect);
+
         // Update the surface
         SDL_UpdateWindowSurface(window);
 
@@ -234,6 +286,7 @@ int main(int argc, char* argv[])
 
     // Free BMP surface
     //printf("Pixels at %p\n", bitmapSurface->pixels);
+    SDL_FreeSurface(pCursor);
     SDL_FreeSurface(bitmapSurface);
     SDL_FreeSurface(screenSurface);
 

@@ -5,7 +5,7 @@
 
 // TODO: Make less ghetto
 #define MAX_TASKS               64
-#define TICKS_PER_TASK          2
+#define TICKS_PER_TASK          1
 #define MAX_IMAGE_NAME_LENGTH   32
 
 typedef struct CONTEXT_INFO

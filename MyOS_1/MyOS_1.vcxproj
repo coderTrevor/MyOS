@@ -333,6 +333,7 @@
     <ClInclude Include="Drivers\e1000.h" />
     <ClInclude Include="Drivers\ISA_DMA.h" />
     <ClInclude Include="Drivers\Keyboard.h" />
+    <ClInclude Include="Drivers\mouse.h" />
     <ClInclude Include="Drivers\PCI_Bus.h" />
     <ClInclude Include="Drivers\PS2_Mouse.h" />
     <ClInclude Include="Drivers\RTL_8139.h" />

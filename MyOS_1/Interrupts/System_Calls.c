@@ -140,6 +140,24 @@ void SystemCallGraphicsBlit(const SDL_Rect *sourceRect, PIXEL_32BIT *image)
     }
 }
 
+// Get mouse state
+MOUSE_STATE SystemCallGetMouseState()
+{
+    const int pointerSize = sizeof(MOUSE_STATE *);
+
+    MOUSE_STATE retVal;
+    MOUSE_STATE *pRetVal = &retVal;
+
+    __asm
+    {
+        push [pRetVal]                  // push argument onto stack
+        int SYSCALL_GET_MOUSE_STATE     // call get_mouse_state_interrupt_handler(MOUSE_STATE *pMouseState)
+        add esp, pointerSize            // restore value of stack pointer
+    }
+
+    return retVal;
+}
+
 // Allocate memory pages
 void SystemCallPageAllocator(unsigned int pages, unsigned int *pPagesAllocated, uint32_t *pReturnVal)
 {

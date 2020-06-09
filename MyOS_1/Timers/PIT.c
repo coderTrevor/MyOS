@@ -67,7 +67,6 @@ bool multiEnable = false;   // TEMPTEMP HACKHACK
 // Interrupt handler for the PIT
 void _declspec(naked) timer_interrupt_handler(void)
 {
-    _disable();
     _asm {
         push ebp
         pushad;

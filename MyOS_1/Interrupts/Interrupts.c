@@ -13,6 +13,7 @@
 #include "../Graphics/Display_HAL.h"
 #include "../myos_io.h"
 #include "../Tasks/Context.h"
+#include "../Drivers/PS2_Mouse.h"
 
 unsigned long interrupts_fired;
 
@@ -364,6 +365,30 @@ void _declspec(naked) get_graphics_interrupt_handler(int eflags, int cs, bool *g
         pop ebx
         pop ebp
 
+        iretd
+    }
+}
+
+void _declspec(naked) get_mouse_state_interrupt_handler(int eflags, int cs, MOUSE_STATE *pMouseState)
+{
+    // supress warning about unused parameters
+    (void)eflags, (void)cs;
+    _asm
+    {
+        push ebp
+        mov ebp, esp
+
+        pushad
+    }
+
+    *pMouseState = mouseState;
+
+    //kprintf("getMouseState\n");
+
+    _asm
+    {
+        popad
+        pop ebp
         iretd
     }
 }

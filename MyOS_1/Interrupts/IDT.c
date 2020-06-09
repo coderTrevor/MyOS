@@ -88,6 +88,9 @@ void IDT_Init(void)
     // Set handler for dispatching a new task
     Set_IDT_Entry((unsigned long)dispatch_new_task_interrupt_handler, SYSCALL_DISPATCH_NEW_TASK);
 
+    // Set handler for getting mouse state
+    Set_IDT_Entry((unsigned long)get_mouse_state_interrupt_handler, SYSCALL_GET_MOUSE_STATE);
+
     /* fill the IDT descriptor */
     IDT_ptr.base = (uint32_t)IDT;
     IDT_ptr.size = (sizeof(IDT_ENTRY) * 256);

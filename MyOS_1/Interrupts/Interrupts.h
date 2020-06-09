@@ -6,6 +6,7 @@
 #include "../Libs/SDL/include/SDL_rect.h"
 #include "../Graphics/Display_HAL.h"
 #include "../myos_io.h"
+#include "../Drivers/mouse.h"
 
 #define HARDWARE_INTERRUPTS_BASE     0x20
 
@@ -30,6 +31,8 @@ void fseek_interrupt_handler(int eflags, int cs, FILE *stream, long int offset, 
 void ftell_interrupt_handler(int eflags, int cs, FILE *stream, long int *pRetVal);
 
 void get_graphics_interrupt_handler(int eflags, int cs, bool *graphicsInitialized, int *width, int *height);
+
+void get_mouse_state_interrupt_handler(int eflags, int cs, MOUSE_STATE *pMouseState);
 
 void gpf_exception_handler(void);
 

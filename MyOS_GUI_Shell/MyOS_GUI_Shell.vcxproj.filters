@@ -339,6 +339,9 @@
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\myos\SDL_myosevents.c">
       <Filter>Source Files\SDL</Filter>
     </ClCompile>
+    <ClCompile Include="..\MyOS_1\Graphics\Cursor.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GUI_Object.h">
