@@ -52,17 +52,6 @@ MYOS_PumpEvents(_THIS)
             SDL_SendKeyboardKey(SDL_RELEASED, scancode);
         else
             SDL_SendKeyboardKey(SDL_PRESSED, scancode);
-        //printf("scancode:%x pressed:%d\n", scancode, 0 == keyRelease);
-        //timeDelayMS(200);
-
-        /*if (0 == keyRelease)
-        {
-            addKeyToQueue(1, scancode);
-        }
-        else
-        {
-            addKeyToQueue(0, scancode);
-        }*/
     }
 
     // Check for mouse motion
@@ -74,12 +63,30 @@ MYOS_PumpEvents(_THIS)
         SDL_SendMouseMotion(NULL, 0, SDL_FALSE, mouseState.mouseX, mouseState.mouseY);
     }
 
-    // Check for mouse buttons down
-    if(mouseState.leftButton != oldMouseState.leftButton
-        || mouseState.middleButton != oldMouseState.middleButton
-        || mouseState.rightButton != oldMouseState.rightButton)
+    // Check for mouse buttons changing
+    // left mouse button
+    if (mouseState.leftButton != oldMouseState.leftButton)
     {
-        //SDL_SendMouseButton(NULL, 0, 
+        if (mouseState.leftButton)
+            SDL_SendMouseButton(NULL, 0, SDL_PRESSED, SDL_BUTTON_LEFT);
+        else
+            SDL_SendMouseButton(NULL, 0, SDL_RELEASED, SDL_BUTTON_LEFT);
+    }
+    // middle mouse button
+    if (mouseState.middleButton != oldMouseState.middleButton)
+    {
+        if (mouseState.middleButton)
+            SDL_SendMouseButton(NULL, 0, SDL_PRESSED, SDL_BUTTON_MIDDLE);
+        else
+            SDL_SendMouseButton(NULL, 0, SDL_RELEASED, SDL_BUTTON_MIDDLE);
+    }
+    // right mouse button
+    if (mouseState.rightButton != oldMouseState.rightButton)
+    {
+        if (mouseState.rightButton)
+            SDL_SendMouseButton(NULL, 0, SDL_PRESSED, SDL_BUTTON_RIGHT);
+        else
+            SDL_SendMouseButton(NULL, 0, SDL_RELEASED, SDL_BUTTON_RIGHT);
     }
 
     oldMouseState = mouseState;

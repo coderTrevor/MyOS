@@ -60,7 +60,7 @@ SDL_Point velocity = { 2, 2 };
 SDL_Rect cursorRect = { 0, 0, CURSOR_X, CURSOR_Y };
 
 // This would probably be called with a process' PID
-void CreateTextWindow(uint32_t uniqueID)
+GUI_Window *CreateTextWindow(uint32_t uniqueID)
 {
     // find the first unused entry in the windowList
     for (int i = 0; i < MAX_GUI_WINDOWS; ++i)
@@ -92,21 +92,23 @@ void CreateTextWindow(uint32_t uniqueID)
             bgRed %= 255;
             bgGreen %= 255;
             bgBlue %= 255;
-            return;
+            return windowList[i];
         }
     }
 
     printf("ERROR: Couldn't find any free window slots!\n");
+    return NULL;
 }
 
 // TODO: There are memory leaks that need debugging
 int main(int argc, char* argv[])
 {
+#ifdef __MYOS
+
     // re-enable interrupts (TODO: FIXME: What is disabling them??)
     __asm sti;
 
     // disable shell display elements
-#ifdef __MYOS
     hideShellDisplay();
 #endif
 
@@ -216,6 +218,10 @@ int main(int argc, char* argv[])
 
         if (SDL_PollEvent(&event))
         {
+            GUI_Window *pWindow;
+            SDL_Color red = { 255, 0, 0 };
+            SDL_Color green = { 0, 255, 0 };
+
             switch (event.type)
             {
                 case SDL_USEREVENT:
@@ -237,7 +243,18 @@ int main(int argc, char* argv[])
                     break;
 
                 case SDL_MOUSEBUTTONDOWN:
-                    // TODO
+                    pWindow = CreateTextWindow(lastWindowID++);
+
+                    switch (event.button.button)
+                    {
+                        case SDL_BUTTON_LEFT:
+                            pWindow->SetBackgroundColor(red);
+                            break;
+
+                        case SDL_BUTTON_MIDDLE:
+                            pWindow->SetBackgroundColor(green);
+                            break;
+                    };
                     break;
 
                 case SDL_QUIT:
