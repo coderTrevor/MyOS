@@ -457,6 +457,26 @@ void _declspec(naked) graphics_blit_interrupt_handler(int eflags, int cs, const 
     }
 }
 
+void _declspec(naked) hide_shell_display_interrupt_handler(int eflags, int cs)
+{
+    // supress warning about unused parameters
+    (void)eflags, (void)cs;
+    _asm
+    {
+        push ebp
+        mov ebp, esp
+    }
+
+    showOverlay = false;
+    cursorEnabled = false;
+    
+    _asm
+    {
+        pop ebp
+        iretd
+    }
+}
+
 void  _declspec(naked) page_allocator_interrupt_handler(int eflags, int cs, unsigned int pages, unsigned int *pPagesAllocated, uint32_t *pRetVal)
 {
     // supress warning about unused parameters

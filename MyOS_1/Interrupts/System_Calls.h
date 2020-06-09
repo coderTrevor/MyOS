@@ -23,6 +23,7 @@
 #define SYSCALL_READ_FROM_KEYBOARD  242
 #define SYSCALL_DISPATCH_NEW_TASK   241
 #define SYSCALL_GET_MOUSE_STATE     240
+#define SYSCALL_HIDE_SHELL_DISPLAY  239
 
 void SystemCallExit();
 #define exit SystemCallExit
@@ -53,6 +54,9 @@ MOUSE_STATE SystemCallGetMouseState();
 
 void SystemCallGraphicsBlit(const SDL_Rect *sourceRect, PIXEL_32BIT *image);
 #define graphicsBlit SystemCallGraphicsBlit
+
+void SystemCallHideShellDisplay();
+#define hideShellDisplay SystemCallHideShellDisplay
 
 void SystemCallPrint(char *str);
 

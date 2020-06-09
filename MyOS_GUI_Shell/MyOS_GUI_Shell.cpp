@@ -105,6 +105,11 @@ int main(int argc, char* argv[])
     // re-enable interrupts (TODO: FIXME: What is disabling them??)
     __asm sti;
 
+    // disable shell display elements
+#ifdef __MYOS
+    hideShellDisplay();
+#endif
+
     SDL_Window *window;                    // Declare a pointer
                                            //The window we'll be rendering to
 

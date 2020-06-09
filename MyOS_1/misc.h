@@ -56,6 +56,7 @@ extern unsigned int nextFreeMemorySlot;
 
 extern int debugLevel;
 extern bool showOverlay;
+extern bool cursorEnabled;
 
 void* calloc(size_t num, size_t size);
 

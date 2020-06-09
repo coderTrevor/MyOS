@@ -158,6 +158,12 @@ MOUSE_STATE SystemCallGetMouseState()
     return retVal;
 }
 
+// Hide shell elements
+void SystemCallHideShellDisplay()
+{
+    __asm int SYSCALL_HIDE_SHELL_DISPLAY // call hide_shell_display_interrupt_handler()
+}
+
 // Allocate memory pages
 void SystemCallPageAllocator(unsigned int pages, unsigned int *pPagesAllocated, uint32_t *pReturnVal)
 {

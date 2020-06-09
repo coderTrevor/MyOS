@@ -91,6 +91,9 @@ void IDT_Init(void)
     // Set handler for getting mouse state
     Set_IDT_Entry((unsigned long)get_mouse_state_interrupt_handler, SYSCALL_GET_MOUSE_STATE);
 
+    // Set handler for hiding shell display elements
+    Set_IDT_Entry((unsigned long)hide_shell_display_interrupt_handler, SYSCALL_HIDE_SHELL_DISPLAY);
+
     /* fill the IDT descriptor */
     IDT_ptr.base = (uint32_t)IDT;
     IDT_ptr.size = (sizeof(IDT_ENTRY) * 256);
