@@ -25,6 +25,8 @@ public:
     virtual void PaintToSurface(SDL_Surface *pTargetSurface) {}
     virtual bool MouseOver(int relX, int relY) { return true; }
     
+    virtual bool PointInBounds(int x, int y);
+
 //protected:
     GUI_Rect dimensions;
 

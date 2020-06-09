@@ -59,6 +59,68 @@ SDL_Point velocity = { 2, 2 };
 
 SDL_Rect cursorRect = { 0, 0, CURSOR_X, CURSOR_Y };
 
+// Keep track of a stack of windows
+// (Not a stack in the computer science sense, but in the sense that windows can overlap other windows)
+struct GUI_WINDOW_STACK_ENTRY;
+typedef struct GUI_WINDOW_STACK_ENTRY
+{
+    GUI_Window *pThisWin;
+    GUI_WINDOW_STACK_ENTRY *pUnderneath;
+    GUI_WINDOW_STACK_ENTRY *pAbove;
+} GUI_WINDOW_STACK_ENTRY;
+
+GUI_WINDOW_STACK_ENTRY windowStack[MAX_GUI_WINDOWS] = { 0, 0, 0 };
+GUI_WINDOW_STACK_ENTRY *pStackTop = NULL;// &windowStack[0];
+
+// Search the stack of windows, top to buttom to see whic window the mouse is hovering over
+GUI_WINDOW_STACK_ENTRY *FindWindowFromPoint(int x, int y)
+{
+    GUI_WINDOW_STACK_ENTRY *pCurrent = pStackTop;
+
+    while (pCurrent && pCurrent->pThisWin)
+    {
+        if (pCurrent->pThisWin->PointInBounds(x, y))
+            return pCurrent;
+
+        pCurrent = pCurrent->pUnderneath;
+    }
+    
+    return NULL;
+}
+
+void BringWindowToFront(GUI_WINDOW_STACK_ENTRY *pEntry)
+{
+    if (pStackTop == pEntry)
+        return;
+
+    // bridge the hole left by this window
+    if (pEntry->pAbove)
+        pEntry->pAbove->pUnderneath = pEntry->pUnderneath;
+
+    if (pEntry->pUnderneath)
+        pEntry->pUnderneath->pAbove = pEntry->pAbove;
+
+    // previous stack top will be below this entry
+    pStackTop->pAbove = pEntry;
+    pEntry->pUnderneath = pStackTop;
+    pEntry->pAbove = NULL;
+
+    pStackTop = pEntry;
+}
+
+GUI_WINDOW_STACK_ENTRY *GetBottomWindow()
+{
+    if (!pStackTop)
+        return NULL;
+
+    GUI_WINDOW_STACK_ENTRY *pCurrent = pStackTop;
+
+    while (pCurrent->pUnderneath)
+        pCurrent = pCurrent->pUnderneath;
+
+    return pCurrent;
+}
+
 // This would probably be called with a process' PID
 GUI_Window *CreateTextWindow(uint32_t uniqueID)
 {
@@ -92,6 +154,21 @@ GUI_Window *CreateTextWindow(uint32_t uniqueID)
             bgRed %= 255;
             bgGreen %= 255;
             bgBlue %= 255;
+
+            // Put this window in a stack entry and make it the topmost window
+            windowStack[i].pThisWin = windowList[i];
+            windowStack[i].pAbove = NULL;
+
+            if (pStackTop && pStackTop->pThisWin)
+            {
+                windowStack[i].pUnderneath = pStackTop;
+                pStackTop->pAbove = &windowStack[i];
+            }
+            else
+                windowStack[i].pUnderneath = NULL;
+
+            pStackTop = &windowStack[i];
+
             return windowList[i];
         }
     }
@@ -165,8 +242,10 @@ int main(int argc, char* argv[])
     uint32_t green = SDL_MapRGB(screenSurface->format, 0x00, 0xFF, 0x7F);
 
     // Create a GUI_Window
-    GUI_Window bigWindow(200, 200, 200, 200);
+    //GUI_Window bigWindow(200, 200, 200, 200);
 
+///    windowStack[0].pThisWin = &bigWindow;
+    
     bool done = false;
 
     SDL_Event event;
@@ -216,9 +295,11 @@ int main(int argc, char* argv[])
         // Update cursor position
         uint32_t mouseButtons = SDL_GetMouseState(&cursorRect.x, &cursorRect.y);
 
+        GUI_WINDOW_STACK_ENTRY *pStackEntryUnderCursor = FindWindowFromPoint(cursorRect.x, cursorRect.y);
+        
         if (SDL_PollEvent(&event))
         {
-            GUI_Window *pWindow;
+            //GUI_Window *pWindow;
             SDL_Color red = { 255, 0, 0 };
             SDL_Color green = { 0, 255, 0 };
 
@@ -243,16 +324,20 @@ int main(int argc, char* argv[])
                     break;
 
                 case SDL_MOUSEBUTTONDOWN:
-                    pWindow = CreateTextWindow(lastWindowID++);
+                    //pWindow = CreateTextWindow(lastWindowID++);
 
                     switch (event.button.button)
                     {
                         case SDL_BUTTON_LEFT:
-                            pWindow->SetBackgroundColor(red);
+                            //pWindow->SetBackgroundColor(red);
+                            if (pStackEntryUnderCursor)
+                                BringWindowToFront(pStackEntryUnderCursor);// ->pThisWin->SetBackgroundColor(red);
                             break;
 
-                        case SDL_BUTTON_MIDDLE:
-                            pWindow->SetBackgroundColor(green);
+                        case SDL_BUTTON_RIGHT:
+                            if (pStackEntryUnderCursor)
+                                pStackEntryUnderCursor->pThisWin->SetBackgroundColor(green);
+                            //pWindow->SetBackgroundColor(green);
                             break;
                     };
                     break;
@@ -276,12 +361,21 @@ int main(int argc, char* argv[])
         }
 
         // draw all of the windows
-        bigWindow.PaintToSurface(screenSurface);
+//        bigWindow.PaintToSurface(screenSurface);
 
-        for (int i = 0; i < MAX_GUI_WINDOWS; ++i)
+        /*for (int i = 0; i < MAX_GUI_WINDOWS; ++i)
         {
             if(windowList[i])
                 windowList[i]->PaintToSurface(screenSurface);
+        }*/
+
+        GUI_WINDOW_STACK_ENTRY *nextWindowEntry = GetBottomWindow();
+        while (nextWindowEntry)
+        {
+            if (nextWindowEntry->pThisWin)
+                nextWindowEntry->pThisWin->PaintToSurface(screenSurface);
+
+            nextWindowEntry = nextWindowEntry->pAbove;
         }
 
         // draw a bouncing ball

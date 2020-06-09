@@ -14,6 +14,17 @@ GUI_Object::~GUI_Object()
 {
 }
 
+bool GUI_Object::PointInBounds(int x, int y)
+{
+    if (x < dimensions.left
+       || y < dimensions.top
+       || x > dimensions.left + dimensions.width
+       || y > dimensions.top + dimensions.height)
+        return false;
+
+    return true;
+}
+
 void GUI_Object::DrawVerticalLine(SDL_Surface *pSurface, int x, int startY, int endY, SDL_Color lineColor)
 {
     uint32_t color = SDL_MapRGB(pSurface->format, lineColor.r, lineColor.g, lineColor.b);

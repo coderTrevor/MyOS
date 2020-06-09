@@ -713,7 +713,7 @@ void Shell_Process_command(void)
         }
 
         // TODO: Switch to display HAL once that's implemented
-        BGA_SetResolution(800, 600, 32);
+        BGA_SetResolution(GRAPHICS_WIDTH, GRAPHICS_HEIGHT, 32);
 
         // Fill screen with color so we know it worked
         GraphicsFillScreen(0, 0, 0);
