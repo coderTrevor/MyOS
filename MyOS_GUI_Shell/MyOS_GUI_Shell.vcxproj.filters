@@ -342,6 +342,12 @@
     <ClCompile Include="..\MyOS_1\Graphics\Cursor.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GUI_MessageBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI_Control.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GUI_Object.h">
@@ -351,6 +357,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GUI_Rect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI_Control.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI_MessageBox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

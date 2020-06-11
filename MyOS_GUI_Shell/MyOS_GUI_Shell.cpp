@@ -27,6 +27,8 @@ extern "C" {
 #include "../MyOS_1/Graphics/Cursor.h"
 
 #include "GUI_Window.h"
+#include "GUI_MessageBox.h"
+
 
 #define MAX_GUI_WINDOWS 256 /*TEMP HACK*/
 GUI_Window *windowList[MAX_GUI_WINDOWS] = { NULL };
@@ -64,7 +66,7 @@ SDL_Rect cursorRect = { 0, 0, CURSOR_X, CURSOR_Y };
 struct GUI_WINDOW_STACK_ENTRY;
 typedef struct GUI_WINDOW_STACK_ENTRY
 {
-    GUI_Window *pThisWin;
+    GUI_Window *pWindow;
     GUI_WINDOW_STACK_ENTRY *pUnderneath;
     GUI_WINDOW_STACK_ENTRY *pAbove;
 } GUI_WINDOW_STACK_ENTRY;
@@ -77,9 +79,9 @@ GUI_WINDOW_STACK_ENTRY *FindWindowFromPoint(int x, int y)
 {
     GUI_WINDOW_STACK_ENTRY *pCurrent = pStackTop;
 
-    while (pCurrent && pCurrent->pThisWin)
+    while (pCurrent && pCurrent->pWindow)
     {
-        if (pCurrent->pThisWin->PointInBounds(x, y))
+        if (pCurrent->pWindow->PointInBounds(x, y))
             return pCurrent;
 
         pCurrent = pCurrent->pUnderneath;
@@ -88,17 +90,27 @@ GUI_WINDOW_STACK_ENTRY *FindWindowFromPoint(int x, int y)
     return NULL;
 }
 
+void RemoveWindowFromStack(GUI_WINDOW_STACK_ENTRY *pEntry)
+{
+    // bridge the hole left by this window being removed
+    if (pEntry->pAbove)
+        pEntry->pAbove->pUnderneath = pEntry->pUnderneath;
+
+    if (pEntry->pUnderneath)
+        pEntry->pUnderneath->pAbove = pEntry->pAbove;
+
+    // Check if this window was on top
+    if (pStackTop == pEntry)
+        pStackTop = pEntry->pUnderneath;
+}
+
 void BringWindowToFront(GUI_WINDOW_STACK_ENTRY *pEntry)
 {
     if (pStackTop == pEntry)
         return;
 
     // bridge the hole left by this window
-    if (pEntry->pAbove)
-        pEntry->pAbove->pUnderneath = pEntry->pUnderneath;
-
-    if (pEntry->pUnderneath)
-        pEntry->pUnderneath->pAbove = pEntry->pAbove;
+    RemoveWindowFromStack(pEntry);
 
     // previous stack top will be below this entry
     pStackTop->pAbove = pEntry;
@@ -121,6 +133,23 @@ GUI_WINDOW_STACK_ENTRY *GetBottomWindow()
     return pCurrent;
 }
 
+void AddWindowToStack(GUI_Window *window, GUI_WINDOW_STACK_ENTRY *pStackEntry)
+{
+    // Put this window in a stack entry and make it the topmost window
+    pStackEntry->pWindow = window;
+    pStackEntry->pAbove = NULL;
+
+    if (pStackTop && pStackTop->pWindow)
+    {
+        pStackEntry->pUnderneath = pStackTop;
+        pStackTop->pAbove = pStackEntry;
+    }
+    else
+        pStackEntry->pUnderneath = NULL;
+
+    pStackTop = pStackEntry;
+}
+
 // This would probably be called with a process' PID
 GUI_Window *CreateTextWindow(uint32_t uniqueID)
 {
@@ -129,7 +158,7 @@ GUI_Window *CreateTextWindow(uint32_t uniqueID)
     {
         if (!windowList[i])
         {
-            windowList[i] = new GUI_Window(nextX, nextY, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH);
+            windowList[i] = new GUI_Window(nextX, nextY, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, "New Window");
             // TODO: Check for NULL
             windowIDs[i] = uniqueID;
             
@@ -155,19 +184,7 @@ GUI_Window *CreateTextWindow(uint32_t uniqueID)
             bgGreen %= 255;
             bgBlue %= 255;
 
-            // Put this window in a stack entry and make it the topmost window
-            windowStack[i].pThisWin = windowList[i];
-            windowStack[i].pAbove = NULL;
-
-            if (pStackTop && pStackTop->pThisWin)
-            {
-                windowStack[i].pUnderneath = pStackTop;
-                pStackTop->pAbove = &windowStack[i];
-            }
-            else
-                windowStack[i].pUnderneath = NULL;
-
-            pStackTop = &windowStack[i];
+            AddWindowToStack(windowList[i], &windowStack[i]);
 
             return windowList[i];
         }
@@ -175,6 +192,47 @@ GUI_Window *CreateTextWindow(uint32_t uniqueID)
 
     printf("ERROR: Couldn't find any free window slots!\n");
     return NULL;
+}
+
+// Display MessageBox
+// TODO: don't require any memory allocation so we can show out-of-memory errors
+void MessageBox(char *messageText, char *windowTitle)
+{
+    for (int i = 0; i < MAX_GUI_WINDOWS; ++i)
+    {
+        if (!windowList[i])
+        {
+            windowList[i] = new GUI_MessageBox(messageText, windowTitle);
+            AddWindowToStack(windowList[i], &windowStack[i]);
+            return;
+        }
+    }
+    printf("No free spot for window\n");
+    for (;;)
+        __halt();
+}
+
+// Called by windows when they want to be destroyed
+void Shell_Destroy_Window(GUI_Window *pWindow)
+{
+    if (!pWindow)
+        return;
+
+    // Find window index
+    for (int i = 0; i < MAX_GUI_WINDOWS; ++i)
+    {
+        if (windowList[i] == pWindow)
+        {
+            windowList[i] = NULL;
+
+            RemoveWindowFromStack(&windowStack[i]);
+            windowStack[i].pAbove = windowStack[i].pUnderneath = NULL;
+            windowStack[i].pWindow = NULL;
+            break;
+        }
+    }
+
+    delete pWindow;
 }
 
 // TODO: There are memory leaks that need debugging
@@ -244,7 +302,7 @@ int main(int argc, char* argv[])
     // Create a GUI_Window
     //GUI_Window bigWindow(200, 200, 200, 200);
 
-///    windowStack[0].pThisWin = &bigWindow;
+///    windowStack[0].pWindow = &bigWindow;
     
     bool done = false;
 
@@ -312,10 +370,12 @@ int main(int argc, char* argv[])
                 case SDL_KEYDOWN:
                     //switch (event.key.keysym)
                     CreateTextWindow(lastWindowID++);
+
+                    MessageBox("Here's a test message", "Test Message");
                     switch (event.key.keysym.sym)
                     {
                         case SDLK_n:
-                            CreateTextWindow(lastWindowID++);
+                            //CreateTextWindow(lastWindowID++);
                             break;
                         case SDLK_ESCAPE:
                             done = true;
@@ -331,12 +391,17 @@ int main(int argc, char* argv[])
                         case SDL_BUTTON_LEFT:
                             //pWindow->SetBackgroundColor(red);
                             if (pStackEntryUnderCursor)
-                                BringWindowToFront(pStackEntryUnderCursor);// ->pThisWin->SetBackgroundColor(red);
+                            {
+                                BringWindowToFront(pStackEntryUnderCursor);// ->pWindow->SetBackgroundColor(red);
+                                GUI_Window *pWindow = pStackEntryUnderCursor->pWindow;
+                                pWindow->OnClick(cursorRect.x - pWindow->dimensions.left, cursorRect.y - pWindow->dimensions.top);
+                            }
                             break;
 
                         case SDL_BUTTON_RIGHT:
                             if (pStackEntryUnderCursor)
-                                pStackEntryUnderCursor->pThisWin->SetBackgroundColor(green);
+                                Shell_Destroy_Window(pStackEntryUnderCursor->pWindow);
+                                //    pStackEntryUnderCursor->pWindow->SetBackgroundColor(green);
                             //pWindow->SetBackgroundColor(green);
                             break;
                     };
@@ -372,8 +437,8 @@ int main(int argc, char* argv[])
         GUI_WINDOW_STACK_ENTRY *nextWindowEntry = GetBottomWindow();
         while (nextWindowEntry)
         {
-            if (nextWindowEntry->pThisWin)
-                nextWindowEntry->pThisWin->PaintToSurface(screenSurface);
+            if (nextWindowEntry->pWindow)
+                nextWindowEntry->pWindow->PaintToSurface(screenSurface);
 
             nextWindowEntry = nextWindowEntry->pAbove;
         }

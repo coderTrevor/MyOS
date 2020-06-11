@@ -146,13 +146,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\MyOS_GUI_Shell\GUI_Button.h" />
+    <ClInclude Include="..\MyOS_GUI_Shell\GUI_Control.h" />
+    <ClInclude Include="..\MyOS_GUI_Shell\GUI_MessageBox.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_Object.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_Rect.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_Window.h" />
+    <ClInclude Include="..\MyOS_GUI_Shell\MyOS_GUI_Shell.h" />
+    <ClInclude Include="..\MyOS_GUI_Shell\SDL_picofont.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\MyOS_1\Graphics\Cursor.c" />
     <ClCompile Include="..\MyOS_GUI_Shell\font.c" />
+    <ClCompile Include="..\MyOS_GUI_Shell\GUI_Button.cpp" />
+    <ClCompile Include="..\MyOS_GUI_Shell\GUI_Control.cpp" />
+    <ClCompile Include="..\MyOS_GUI_Shell\GUI_MessageBox.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_Object.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_Window.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\MyOS_GUI_Shell.cpp" />

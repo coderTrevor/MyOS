@@ -271,6 +271,8 @@
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\yuv2rgb\yuv_rgb.c" />
     <ClCompile Include="..\MyOS_1\misc.c" />
     <ClCompile Include="font.c" />
+    <ClCompile Include="GUI_Control.cpp" />
+    <ClCompile Include="GUI_MessageBox.cpp" />
     <ClCompile Include="GUI_Object.cpp" />
     <ClCompile Include="GUI_Window.cpp" />
     <ClCompile Include="MyOS_GUI_Shell.cpp">
@@ -279,6 +281,8 @@
     <ClCompile Include="spf.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GUI_Control.h" />
+    <ClInclude Include="GUI_MessageBox.h" />
     <ClInclude Include="GUI_Object.h" />
     <ClInclude Include="GUI_Rect.h" />
     <ClInclude Include="GUI_Window.h" />

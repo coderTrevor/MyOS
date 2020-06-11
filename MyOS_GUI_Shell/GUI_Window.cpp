@@ -3,6 +3,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 #include "GUI_Window.h"
+#include "MyOS_GUI_Shell.h"
 
 #ifdef __MYOS
 #include "../MyOS_1/Interrupts/System_Calls.h"
@@ -26,14 +27,48 @@ void GUI_Window::CreateSurface()
         return;
      //   printf("Error! Couldn't create RGB surface for window!\n");
 
-    backgroundColor.r = backgroundColor.b = 50;
-    backgroundColor.b = 255;
+    backgroundColor.r = backgroundColor.b = 205;
+    backgroundColor.b = 205;
     DrawWindow();
 }
 
 void GUI_Window::PaintToSurface(SDL_Surface *pTargetSurface)
 {
+    // TEMP
+    for (int i = 0; i < MAX_WINDOW_CONTROLS; ++i)
+    {
+        if (pControls[i])
+            pControls[i]->PaintToSurface(pSurface);
+    }
+
     SDL_BlitSurface(pSurface, NULL, pTargetSurface, dimensions.GetSDL_Rect());
+}
+
+void GUI_Window::ControlClicked(uint32_t controlID)
+{
+    if (controlID == SYSTEM_MENU_CLOSE_BUTTON_ID)
+    {
+        // TODO: Send exit signal / message to any associated app
+
+        // Tell the shell to destroy this window
+        Shell_Destroy_Window(this);
+    }
+}
+
+void GUI_Window::OnClick(int relX, int relY)
+{
+    if (relX < 0 || relY < 0 || relX > dimensions.width || relY > dimensions.height)
+    {
+        printf("Window OnClick() called outside of range!\n");
+        return;
+    }
+    
+    // Pass the click onto each control
+    for (int i = 0; i < MAX_WINDOW_CONTROLS; ++i)
+    {
+        if (pControls[i] && pControls[i]->PointInBounds(relX, relY))
+            pControls[i]->OnClick(relX - pControls[i]->dimensions.left, relY - pControls[i]->dimensions.top);
+    }
 }
 
 void GUI_Window::SetBackgroundColor(SDL_Color color)

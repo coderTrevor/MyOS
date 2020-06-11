@@ -126,10 +126,17 @@ SDL_Surface* FNT_RenderMax(const char* text, unsigned int len, SDL_Color color)
 	}
 
 	SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, (color.r + 0x7e) % 0xff, (color.g + 0x7e) % 0xff, (color.b + 0x7e) % 0xff));
-	/*SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 0x0d, 0xea, 0xd0));*/
+
+    SDL_SetPaletteColors(surface->format->palette, colors, 0, 2);
+
+    //SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 0x0d, 0xea, 0xd0));
 
 	//SDL_SetColors(surface, colors, 0, 2);
+    /*SDL_SetColors(screen, color, 0, intColors);
 
+With:
+SDL_ SDL_SetPaletteColors(screen->format->palette, color, 0, intColors);*/
+    
 
 	if(SDL_MUSTLOCK(surface)){
 		SDL_LockSurface(surface);

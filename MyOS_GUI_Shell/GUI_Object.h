@@ -3,6 +3,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#include "SDL_picofont.h"
 #include "GUI_Rect.h"
 
 #ifdef __MYOS
@@ -12,9 +13,12 @@ extern "C" {
 #endif
 
 #define SYSTEM_MENU_HEIGHT 24
-#define SYSTEM_MENU_COLOR_R 128
-#define SYSTEM_MENU_COLOR_G 128
+#define SYSTEM_MENU_COLOR_R 110
+#define SYSTEM_MENU_COLOR_G 160
 #define SYSTEM_MENU_COLOR_B 255
+
+const SDL_Color SDL_BLACK = { 0, 0, 0, 255 };
+const SDL_Color SDL_DEFAULT_BUTTON_COLOR = { 200, 200, 200, 255 };
 
 class GUI_Object
 {
@@ -23,8 +27,9 @@ public:
     ~GUI_Object();
 
     virtual void PaintToSurface(SDL_Surface *pTargetSurface) {}
-    virtual bool MouseOver(int relX, int relY) { return true; }
-    
+    virtual bool MouseOver(int relX, int relY) { return false; }
+    virtual void OnClick(int relX, int relY) {}
+    virtual void OnDrag(int startRelX, int startRelY, int relX, int relY) {}
     virtual bool PointInBounds(int x, int y);
 
 //protected:

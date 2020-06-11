@@ -3,7 +3,6 @@ extern "C" {
 #endif /* __cplusplus */
 
 #include "GUI_Object.h"
-#include "SDL_picofont.h"
 
 GUI_Object::GUI_Object()
 {

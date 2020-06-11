@@ -1,0 +1,46 @@
+#include "GUI_Button.h"
+
+GUI_Button::GUI_Button(const char * buttonText, uint32_t controlID, GUI_Window * pOwner)
+    : GUI_Control(pOwner, controlID)
+{
+    this->buttonText = SDL_strdup(buttonText);
+    this->controlID = controlID;
+
+    // Create the surface for the text
+    SDL_Surface *pFontSurface = FNT_Render(buttonText, SDL_BLACK);
+
+    // Create the surface for the button
+    pSurface = SDL_CreateRGBSurface(0, // Flags
+                                    pFontSurface->w + (GUI_BUTTON_TEXT_MARGIN * 2), // Width
+                                    pFontSurface->h + (GUI_BUTTON_TEXT_MARGIN * 2), // Height
+                                    32, // Depth
+                                    0, 0, 0, // R, G, and B masks (default)
+                                    0x000000FF);    // alpha mask
+
+    // Fill Surface with the default button color
+    uint32_t buttonColor = SDL_MapRGB(pSurface->format,
+                                      SDL_DEFAULT_BUTTON_COLOR.r,
+                                      SDL_DEFAULT_BUTTON_COLOR.g,
+                                      SDL_DEFAULT_BUTTON_COLOR.b);
+    SDL_FillRect(pSurface, NULL, buttonColor);
+
+    // Draw font on button    
+    SDL_Rect dstRect = { GUI_BUTTON_TEXT_MARGIN, GUI_BUTTON_TEXT_MARGIN, pFontSurface->w, pFontSurface->h };
+    SDL_BlitSurface(pFontSurface, NULL, pSurface, &dstRect);
+
+    SDL_FreeSurface(pFontSurface);
+
+    // Draw border around the button
+    DrawBox(pSurface, 0, 0, pSurface->w - 1, pSurface->h - 1, SDL_BLACK);
+
+    // Center the box on the window
+    dimensions.width = pSurface->w;
+    dimensions.height = pSurface->h;
+    dimensions.left = (pOwner->dimensions.width / 2) - (dimensions.width / 2);
+    dimensions.top = (pOwner->dimensions.height / 2) - (dimensions.height / 2);
+}
+
+void GUI_Button::PaintToSurface(SDL_Surface *pTargetSurface)
+{
+    SDL_BlitSurface(pSurface, NULL, pTargetSurface, dimensions.GetSDL_Rect());
+}
