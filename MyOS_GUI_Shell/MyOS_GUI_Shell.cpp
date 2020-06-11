@@ -60,6 +60,7 @@ SDL_Rect ball = { 0, 0, 20, 20 };
 SDL_Point velocity = { 2, 2 };
 
 SDL_Rect cursorRect = { 0, 0, CURSOR_X, CURSOR_Y };
+SDL_Point oldMousePos;
 
 // Keep track of a stack of windows
 // (Not a stack in the computer science sense, but in the sense that windows can overlap other windows)
@@ -305,6 +306,8 @@ int main(int argc, char* argv[])
 ///    windowStack[0].pWindow = &bigWindow;
     
     bool done = false;
+    bool dragging = false;
+    GUI_Window *pDraggedWindow = NULL;
 
     SDL_Event event;
 
@@ -383,6 +386,22 @@ int main(int argc, char* argv[])
                     };
                     break;
 
+                case SDL_MOUSEBUTTONUP:
+                    if (event.button.button == SDL_BUTTON_LEFT)
+                        dragging = false;
+
+                    break;
+
+                case SDL_MOUSEMOTION:
+                    if (dragging && pDraggedWindow)
+                    {
+                        pDraggedWindow->OnDrag(oldMousePos.x, oldMousePos.y, cursorRect.x, cursorRect.y);
+                        oldMousePos.x = cursorRect.x;
+                        oldMousePos.y = cursorRect.y;
+                    }
+
+                    break;
+
                 case SDL_MOUSEBUTTONDOWN:
                     //pWindow = CreateTextWindow(lastWindowID++);
 
@@ -395,7 +414,13 @@ int main(int argc, char* argv[])
                                 BringWindowToFront(pStackEntryUnderCursor);// ->pWindow->SetBackgroundColor(red);
                                 GUI_Window *pWindow = pStackEntryUnderCursor->pWindow;
                                 pWindow->OnClick(cursorRect.x - pWindow->dimensions.left, cursorRect.y - pWindow->dimensions.top);
+                                pDraggedWindow = pWindow;
                             }
+                            else
+                                pDraggedWindow = NULL;
+
+                            oldMousePos = { cursorRect.x, cursorRect.y };
+                            dragging = true;
                             break;
 
                         case SDL_BUTTON_RIGHT:

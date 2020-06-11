@@ -25,6 +25,18 @@ void operator delete(void *p)
     dbg_release(p);
 }
 
+void operator delete(void *p, size_t size)
+{
+    (void)size;
+
+    if (p == 0) {
+        return;
+    }
+
+    // Release allocated memory
+    dbg_release(p);
+}
+
 void operator delete[](void *p)
 {
     if (p == 0) {

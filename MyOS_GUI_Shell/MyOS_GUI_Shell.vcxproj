@@ -271,6 +271,7 @@
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\yuv2rgb\yuv_rgb.c" />
     <ClCompile Include="..\MyOS_1\misc.c" />
     <ClCompile Include="font.c" />
+    <ClCompile Include="GUI_Button.cpp" />
     <ClCompile Include="GUI_Control.cpp" />
     <ClCompile Include="GUI_MessageBox.cpp" />
     <ClCompile Include="GUI_Object.cpp" />

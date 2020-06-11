@@ -71,6 +71,12 @@ void GUI_Window::OnClick(int relX, int relY)
     }
 }
 
+void GUI_Window::OnDrag(int startRelX, int startRelY, int relX, int relY)
+{
+    dimensions.left += relX - startRelX;
+    dimensions.top += relY - startRelY;
+}
+
 void GUI_Window::SetBackgroundColor(SDL_Color color)
 {
     backgroundColor = color;

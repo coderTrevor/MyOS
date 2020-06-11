@@ -40,6 +40,8 @@ public:
 
     void OnClick(int relX, int relY);
 
+    void OnDrag(int startRelX, int startRelY, int relX, int relY);
+
     void SetBackgroundColor(SDL_Color color);
 
     SDL_Surface *GetSurface() { return pSurface; }
