@@ -275,6 +275,7 @@
     <ClCompile Include="GUI_Control.cpp" />
     <ClCompile Include="GUI_MessageBox.cpp" />
     <ClCompile Include="GUI_Object.cpp" />
+    <ClCompile Include="GUI_Taskbar.cpp" />
     <ClCompile Include="GUI_Window.cpp" />
     <ClCompile Include="MyOS_GUI_Shell.cpp">
       <CallingConvention Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Cdecl</CallingConvention>
@@ -286,6 +287,7 @@
     <ClInclude Include="GUI_MessageBox.h" />
     <ClInclude Include="GUI_Object.h" />
     <ClInclude Include="GUI_Rect.h" />
+    <ClInclude Include="GUI_Taskbar.h" />
     <ClInclude Include="GUI_Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

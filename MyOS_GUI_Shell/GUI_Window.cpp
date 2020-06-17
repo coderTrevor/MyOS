@@ -55,6 +55,13 @@ void GUI_Window::ControlClicked(uint32_t controlID)
     }
 }
 
+// Fill the entire window with a color
+void GUI_Window::FillSurface(SDL_Color color)
+{
+    uint32_t col = SDL_MapRGB(pSurface->format, color.r, color.g, color.b);
+    SDL_FillRect(pSurface, NULL, col);
+}
+
 void GUI_Window::OnClick(int relX, int relY)
 {
     if (relX < 0 || relY < 0 || relX > dimensions.width || relY > dimensions.height)
@@ -67,7 +74,10 @@ void GUI_Window::OnClick(int relX, int relY)
     for (int i = 0; i < MAX_WINDOW_CONTROLS; ++i)
     {
         if (pControls[i] && pControls[i]->PointInBounds(relX, relY))
+        {
             pControls[i]->OnClick(relX - pControls[i]->dimensions.left, relY - pControls[i]->dimensions.top);
+            pClickedControl = pControls[i];
+        }
     }
 }
 
@@ -75,6 +85,12 @@ void GUI_Window::OnDrag(int startRelX, int startRelY, int relX, int relY)
 {
     dimensions.left += relX - startRelX;
     dimensions.top += relY - startRelY;
+}
+
+void GUI_Window::OnMouseUp(int relX, int relY)
+{
+    if (pClickedControl)
+        pClickedControl->OnMouseUp(relX - pClickedControl->dimensions.left, relY - pClickedControl->dimensions.top);
 }
 
 void GUI_Window::SetBackgroundColor(SDL_Color color)
@@ -86,15 +102,14 @@ void GUI_Window::SetBackgroundColor(SDL_Color color)
 void GUI_Window::DrawWindow()
 {
     // Draw the background
-    SDL_FillRect(pSurface, NULL, SDL_MapRGB(pSurface->format, backgroundColor.r, backgroundColor.g, backgroundColor.b));
+    //SDL_FillRect(pSurface, NULL, SDL_MapRGB(pSurface->format, backgroundColor.r, backgroundColor.g, backgroundColor.b));
+    FillSurface(backgroundColor);
 
     // Draw the system menu at the top
     DrawSystemMenu(pSurface, windowName);
 
     // Draw a black outline around the background
-    SDL_Color black;
-    black.r = black.g = black.b = 0;
-    DrawBox(pSurface, 0, 0, dimensions.width - 1, dimensions.height - 1, black);
+    Draw3D_Box(pSurface, 0, 0, dimensions.width, dimensions.height);
 }
 
 #ifdef __cplusplus

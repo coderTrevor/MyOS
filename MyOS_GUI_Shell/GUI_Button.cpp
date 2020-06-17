@@ -31,7 +31,7 @@ GUI_Button::GUI_Button(const char * buttonText, uint32_t controlID, GUI_Window *
     SDL_FreeSurface(pFontSurface);
 
     // Draw border around the button
-    DrawBox(pSurface, 0, 0, pSurface->w - 1, pSurface->h - 1, SDL_BLACK);
+    Draw3D_Box(pSurface, 0, 0, pSurface->w, pSurface->h);
 
     // Center the box on the window
     dimensions.width = pSurface->w;
@@ -43,4 +43,20 @@ GUI_Button::GUI_Button(const char * buttonText, uint32_t controlID, GUI_Window *
 void GUI_Button::PaintToSurface(SDL_Surface *pTargetSurface)
 {
     SDL_BlitSurface(pSurface, NULL, pTargetSurface, dimensions.GetSDL_Rect());
+}
+
+void GUI_Button::OnClick(int relX, int relY)
+{
+    Draw3D_InsetBox(pSurface, 0, 0, dimensions.width, dimensions.height);
+
+    PaintToSurface(pOwner->pSurface);
+
+    pOwner->ControlClicked(controlID);
+}
+
+void GUI_Button::OnMouseUp(int relX, int relY)
+{
+    Draw3D_Box(pSurface, 0, 0, dimensions.width, dimensions.height);
+
+    PaintToSurface(pOwner->pSurface);
 }

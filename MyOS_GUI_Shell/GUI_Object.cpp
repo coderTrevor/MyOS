@@ -45,6 +45,28 @@ void GUI_Object::DrawHorizontalLine(SDL_Surface *pSurface, int startX, int endX,
     SDL_memset4(pPixels, color, endX - startX);
 }
 
+void GUI_Object::Draw3D_Box(SDL_Surface * pSurface, int x, int y, int width, int height)
+{
+    // Draw a white border on the top and left edges
+    DrawVerticalLine(pSurface, x, y, y + height - 1, SDL_WHITE);
+    DrawHorizontalLine(pSurface, x, x + width - 1, y, SDL_WHITE);
+
+    // Draw a black border around the bottom and right edges
+    DrawVerticalLine(pSurface, x + width - 1, y, y + height - 1, SDL_BLACK);
+    DrawHorizontalLine(pSurface, x + 1, x + width - 1, y + height - 1, SDL_BLACK);
+}
+
+void GUI_Object::Draw3D_InsetBox(SDL_Surface * pSurface, int x, int y, int width, int height)
+{
+    // Draw a white border on the top and left edges
+    DrawVerticalLine(pSurface, x, y, y + height - 1, SDL_BLACK);
+    DrawHorizontalLine(pSurface, x, x + width - 1, y, SDL_BLACK);
+
+    // Draw a black border around the bottom and right edges
+    DrawVerticalLine(pSurface, x + width - 1, y, y + height - 1, SDL_WHITE);
+    DrawHorizontalLine(pSurface, x + 1, x + width - 1, y + height - 1, SDL_WHITE);
+}
+
 void GUI_Object::DrawBox(SDL_Surface *pSurface, int x, int y, int width, int height, SDL_Color lineColor)
 {
     DrawHorizontalLine(pSurface, x, x + width, y, lineColor);
@@ -85,7 +107,8 @@ void GUI_Object::DrawSystemMenu(SDL_Surface *pSurface, char *windowName)
     SDL_Rect boxRect = { boxLeft, boxTop, boxWidth, boxHeight };
     uint32_t red = SDL_MapRGB(pSurface->format, 255, 120, 120 );
     SDL_FillRect(pSurface, &boxRect, red);
-    DrawBox(pSurface, boxLeft, boxTop, boxWidth, boxHeight, black);
+    //DrawBox(pSurface, boxLeft, boxTop, boxWidth, boxHeight, black);
+    Draw3D_Box(pSurface, boxLeft, boxTop, boxWidth, boxHeight);
 
     pFont = FNT_Render("X", black);
     boxRect.x += 6;

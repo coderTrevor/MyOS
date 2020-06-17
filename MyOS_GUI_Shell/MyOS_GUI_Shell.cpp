@@ -28,7 +28,7 @@ extern "C" {
 
 #include "GUI_Window.h"
 #include "GUI_MessageBox.h"
-
+#include "GUI_Taskbar.h"
 
 #define MAX_GUI_WINDOWS 256 /*TEMP HACK*/
 GUI_Window *windowList[MAX_GUI_WINDOWS] = { NULL };
@@ -52,6 +52,10 @@ int bgBlue = 128;
 #define BG_RED_INC      22
 #define BG_GREEN_INC    31
 #define BG_BLUE_INC     42
+GUI_Taskbar *pTaskbar;
+#define DELETION_QUEUE_SIZE 16
+GUI_Window *pDeletionQueue[DELETION_QUEUE_SIZE]; // UGLY HACK
+int nextDeletionQueueIndex = 0;
 
 #define CURSOR_X        16
 #define CURSOR_Y        16
@@ -61,6 +65,8 @@ SDL_Point velocity = { 2, 2 };
 
 SDL_Rect cursorRect = { 0, 0, CURSOR_X, CURSOR_Y };
 SDL_Point oldMousePos;
+
+GUI_Window *pDraggedWindow = NULL;
 
 // Keep track of a stack of windows
 // (Not a stack in the computer science sense, but in the sense that windows can overlap other windows)
@@ -195,6 +201,28 @@ GUI_Window *CreateTextWindow(uint32_t uniqueID)
     return NULL;
 }
 
+// This is kind of hacky and maybe I'll find a better way in the future.
+// Windows can request their own removal, but if they're deleted at that point, execution will return to deleted code
+void DeleteAllWindowsInQueue()
+{
+    for (int i = 0; i < nextDeletionQueueIndex; ++i)
+        delete pDeletionQueue[i];
+
+    nextDeletionQueueIndex = 0;
+}
+
+// Add a GUI_Window to the deletion queue
+void DeleteWindow(GUI_Window *pWindow)
+{
+    if (nextDeletionQueueIndex > DELETION_QUEUE_SIZE)
+    {
+        printf("Can't delete any more windows, Queue is full!!\n");
+        return;
+    }
+
+    pDeletionQueue[nextDeletionQueueIndex++] = pWindow;
+}
+
 // Display MessageBox
 // TODO: don't require any memory allocation so we can show out-of-memory errors
 void MessageBox(char *messageText, char *windowTitle)
@@ -232,8 +260,13 @@ void Shell_Destroy_Window(GUI_Window *pWindow)
             break;
         }
     }
+    
+    // Check if this window is being dragged / waiting for a MouseUp event
+    if (pDraggedWindow == pWindow)
+        pDraggedWindow = NULL;
 
-    delete pWindow;
+    // Add window to deletion queue
+    DeleteWindow(pWindow);
 }
 
 // TODO: There are memory leaks that need debugging
@@ -307,7 +340,6 @@ int main(int argc, char* argv[])
     
     bool done = false;
     bool dragging = false;
-    GUI_Window *pDraggedWindow = NULL;
 
     SDL_Event event;
 
@@ -350,6 +382,9 @@ int main(int argc, char* argv[])
 
     SDL_SetSurfaceBlendMode(pCursor, SDL_BLENDMODE_BLEND);
 
+    // Create Taskbar
+    pTaskbar = new GUI_Taskbar(screenSurface->w, screenSurface->h);
+
     // Keep drawing everything
     while (!done)
     {
@@ -389,7 +424,8 @@ int main(int argc, char* argv[])
                 case SDL_MOUSEBUTTONUP:
                     if (event.button.button == SDL_BUTTON_LEFT)
                         dragging = false;
-
+                    if (pDraggedWindow)
+                        pDraggedWindow->OnMouseUp(cursorRect.x - pDraggedWindow->dimensions.left, cursorRect.y - pDraggedWindow->dimensions.top);
                     break;
 
                 case SDL_MOUSEMOTION:
@@ -409,12 +445,18 @@ int main(int argc, char* argv[])
                     {
                         case SDL_BUTTON_LEFT:
                             //pWindow->SetBackgroundColor(red);
-                            if (pStackEntryUnderCursor)
+                            // Is the taskbar being clicked?
+                            if (cursorRect.y >= pTaskbar->dimensions.top)
+                            {
+                                pTaskbar->OnClick(cursorRect.x, cursorRect.y - pTaskbar->dimensions.top);
+                                pDraggedWindow = pTaskbar;
+                            }
+                            else if (pStackEntryUnderCursor)
                             {
                                 BringWindowToFront(pStackEntryUnderCursor);// ->pWindow->SetBackgroundColor(red);
                                 GUI_Window *pWindow = pStackEntryUnderCursor->pWindow;
-                                pWindow->OnClick(cursorRect.x - pWindow->dimensions.left, cursorRect.y - pWindow->dimensions.top);
                                 pDraggedWindow = pWindow;
+                                pWindow->OnClick(cursorRect.x - pWindow->dimensions.left, cursorRect.y - pWindow->dimensions.top);
                             }
                             else
                                 pDraggedWindow = NULL;
@@ -478,11 +520,17 @@ int main(int argc, char* argv[])
         if (ball.y > 600 || ball.y < 0)
             velocity.y = -velocity.y;
 
+        // Draw the Taskbar
+        pTaskbar->PaintToSurface(screenSurface);
+
         // Draw the cursor
         SDL_BlitSurface(pCursor, NULL, screenSurface, &cursorRect);
 
         // Update the surface
         SDL_UpdateWindowSurface(window);
+
+        // Delete all windows in deletion queue
+        DeleteAllWindowsInQueue();
 
         //SDL_Delay(1);
     }

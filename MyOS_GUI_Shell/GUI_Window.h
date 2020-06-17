@@ -34,24 +34,32 @@ public:
 
         for (int i = 0; i < MAX_WINDOW_CONTROLS; ++i)
             pControls[i] = NULL;
+
+        pClickedControl = NULL;
     }
 
     virtual void ControlClicked(uint32_t controlID);
 
+    void DrawWindow();
+
+    void FillSurface(SDL_Color color);
+
     void OnClick(int relX, int relY);
 
     void OnDrag(int startRelX, int startRelY, int relX, int relY);
+
+    void OnMouseUp(int relX, int relY);
 
     void SetBackgroundColor(SDL_Color color);
 
     SDL_Surface *GetSurface() { return pSurface; }
     void PaintToSurface(SDL_Surface *pTargetSurface);
 
+    SDL_Surface *pSurface;
 protected:
     void GUI_Window::CreateSurface();
-    SDL_Surface *pSurface;
     SDL_Color backgroundColor;
-    void DrawWindow();
     char windowName[MAX_WINDOW_NAME_LENGTH];
     GUI_Control *pControls[MAX_WINDOW_CONTROLS];
+    GUI_Control *pClickedControl;
 };

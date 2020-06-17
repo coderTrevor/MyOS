@@ -15,6 +15,9 @@ public:
     }
 
     void PaintToSurface(SDL_Surface * pTargetSurface);
+    virtual void OnClick(int relX, int relY);
+
+    virtual void OnMouseUp(int relX, int relY);
 
 protected:
     char *buttonText;
