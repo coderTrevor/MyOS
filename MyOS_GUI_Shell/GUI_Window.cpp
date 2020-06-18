@@ -75,8 +75,8 @@ void GUI_Window::OnClick(int relX, int relY)
     {
         if (pControls[i] && pControls[i]->PointInBounds(relX, relY))
         {
-            pControls[i]->OnClick(relX - pControls[i]->dimensions.left, relY - pControls[i]->dimensions.top);
             pClickedControl = pControls[i];
+            pControls[i]->OnClick(relX - pControls[i]->dimensions.left, relY - pControls[i]->dimensions.top);
         }
     }
 }

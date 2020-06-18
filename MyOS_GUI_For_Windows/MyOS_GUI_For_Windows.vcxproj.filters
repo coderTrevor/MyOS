@@ -39,6 +39,9 @@
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_Button.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\MyOS_GUI_Shell\GUI_Taskbar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\MyOS_GUI_Shell\MyOS_GUI_Shell.cpp">
@@ -66,6 +69,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_Control.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_GUI_Shell\GUI_Taskbar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -8,6 +8,7 @@ class GUI_Button : public GUI_Control
 {
 public:
     GUI_Button(const char *buttonText, uint32_t controlID, GUI_Window *pOwner);
+    GUI_Button(const char *buttonText, uint32_t controlID, GUI_Window *pOwner, GUI_Rect dimensions);
     
     ~GUI_Button()
     {

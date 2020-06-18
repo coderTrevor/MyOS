@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 #include <stdbool.h>
 #include <stdint.h>
 #include "../Graphics/Display_HAL.h"
@@ -71,3 +75,8 @@ void SystemCallTimeDelayMS(uint32_t milliSeconds);
 
 uint32_t SystemCallTimeGetUptimeMS();
 #define timeGetUptimeMS SystemCallTimeGetUptimeMS
+
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */

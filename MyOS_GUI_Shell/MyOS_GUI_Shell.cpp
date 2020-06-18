@@ -70,14 +70,6 @@ GUI_Window *pDraggedWindow = NULL;
 
 // Keep track of a stack of windows
 // (Not a stack in the computer science sense, but in the sense that windows can overlap other windows)
-struct GUI_WINDOW_STACK_ENTRY;
-typedef struct GUI_WINDOW_STACK_ENTRY
-{
-    GUI_Window *pWindow;
-    GUI_WINDOW_STACK_ENTRY *pUnderneath;
-    GUI_WINDOW_STACK_ENTRY *pAbove;
-} GUI_WINDOW_STACK_ENTRY;
-
 GUI_WINDOW_STACK_ENTRY windowStack[MAX_GUI_WINDOWS] = { 0, 0, 0 };
 GUI_WINDOW_STACK_ENTRY *pStackTop = NULL;// &windowStack[0];
 
@@ -109,6 +101,34 @@ void RemoveWindowFromStack(GUI_WINDOW_STACK_ENTRY *pEntry)
     // Check if this window was on top
     if (pStackTop == pEntry)
         pStackTop = pEntry->pUnderneath;
+}
+
+// TODO: Not sure I like this / not sure windowID helps anything vs using pointers directly
+void BringWindowID_ToFront(uint32_t windowID)
+{
+    // find window pointer associated with window ID
+    for (int i = 0; i < MAX_GUI_WINDOWS; ++i)
+    {
+        if (windowIDs[i] == windowID)
+        {
+            GUI_Window *pWindow = windowList[i];
+
+            // find stack entry associated with window ID
+            for (int j = 0; j < MAX_GUI_WINDOWS; ++j)
+            {
+                if (windowStack[j].pWindow == pWindow)
+                {
+                    BringWindowToFront(&windowStack[j]);
+                    return;
+                }
+            }
+
+            printf("Couldn't find stack entry associated with window pointer!!\n");
+            return;
+        }
+    }
+
+    printf("Couldn't find window matching Window ID!\n");
 }
 
 void BringWindowToFront(GUI_WINDOW_STACK_ENTRY *pEntry)
@@ -193,6 +213,8 @@ GUI_Window *CreateTextWindow(uint32_t uniqueID)
 
             AddWindowToStack(windowList[i], &windowStack[i]);
 
+            pTaskbar->AddWindow(uniqueID, windowList[i]);
+
             return windowList[i];
         }
     }
@@ -257,6 +279,8 @@ void Shell_Destroy_Window(GUI_Window *pWindow)
             RemoveWindowFromStack(&windowStack[i]);
             windowStack[i].pAbove = windowStack[i].pUnderneath = NULL;
             windowStack[i].pWindow = NULL;
+
+            pTaskbar->RemoveWindow(windowIDs[i]);
             break;
         }
     }
@@ -457,6 +481,16 @@ int main(int argc, char* argv[])
                                 GUI_Window *pWindow = pStackEntryUnderCursor->pWindow;
                                 pDraggedWindow = pWindow;
                                 pWindow->OnClick(cursorRect.x - pWindow->dimensions.left, cursorRect.y - pWindow->dimensions.top);
+
+                                // Find windowID from window
+                                for (int i = 0; i < MAX_GUI_WINDOWS; ++i)
+                                {
+                                    if (windowList[i] == pWindow)
+                                    {
+                                        pTaskbar->WindowActivated(windowIDs[i]);
+                                        break;
+                                    }
+                                }
                             }
                             else
                                 pDraggedWindow = NULL;

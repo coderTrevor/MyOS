@@ -72,6 +72,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);C:\Users\Administrator\Downloads\SDL2-devel-2.0.9-VC\SDL2-2.0.9\include</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86;C:\Users\Administrator\Downloads\SDL2-devel-2.0.9-VC\SDL2-2.0.9\lib\x86</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -95,6 +97,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>sdl2.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -151,6 +154,7 @@
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_MessageBox.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_Object.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_Rect.h" />
+    <ClInclude Include="..\MyOS_GUI_Shell\GUI_Taskbar.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_Window.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\MyOS_GUI_Shell.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\SDL_picofont.h" />
@@ -162,6 +166,7 @@
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_Control.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_MessageBox.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_Object.cpp" />
+    <ClCompile Include="..\MyOS_GUI_Shell\GUI_Taskbar.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_Window.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\MyOS_GUI_Shell.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\spf.c" />

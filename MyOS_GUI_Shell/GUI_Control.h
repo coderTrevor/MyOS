@@ -18,9 +18,9 @@ public:
 
     virtual void OnDrag(int relClickX, int relClickY, int relDestX, int relDestY) {};
 
+    uint32_t controlID;
 protected:
     GUI_Window *pOwner;
-    uint32_t controlID;
 };
 
 // version of GUI_Control that will call external functions when public methods are called

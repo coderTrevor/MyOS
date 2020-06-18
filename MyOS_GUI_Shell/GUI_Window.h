@@ -5,7 +5,7 @@
 
 #define MAX_WINDOW_NAME_LENGTH  64
 #define SYSTEM_MENU_CLOSE_BUTTON_ID (uint32_t)-1
-#define MAX_WINDOW_CONTROLS     8   /* TEMP */
+#define MAX_WINDOW_CONTROLS     24   /* TEMP */
 
 class GUI_Control;
 
@@ -56,10 +56,10 @@ public:
     void PaintToSurface(SDL_Surface *pTargetSurface);
 
     SDL_Surface *pSurface;
+    GUI_Control *pClickedControl;
+    char windowName[MAX_WINDOW_NAME_LENGTH];
 protected:
     void GUI_Window::CreateSurface();
     SDL_Color backgroundColor;
-    char windowName[MAX_WINDOW_NAME_LENGTH];
     GUI_Control *pControls[MAX_WINDOW_CONTROLS];
-    GUI_Control *pClickedControl;
 };
