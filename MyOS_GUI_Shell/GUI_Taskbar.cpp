@@ -61,7 +61,54 @@ void GUI_Taskbar::AddWindow(uint32_t windowID, GUI_Window *pWindow)
                                  GUI_TASKBAR_HEIGHT - (GUI_TASKBAR_BUTTON_MARGINS * 2) };
 
     pControls[i] = new GUI_TaskbarButton(pWindow->windowName, windowID, this, buttonPlacement);
+
+    // TODO: Don't calculate the position and size of button above just to redo it here:
+    ButtonsChanged();
+
     WindowActivated(windowID);
+}
+
+// TODO: Don't allow too many buttons / allow for multiple "panes" of buttons
+void GUI_Taskbar::ButtonsChanged()
+{
+    //printf("%d buttons\n", windowButtons);
+    
+    // We need to redraw the taskbar background to erase the old buttons
+    FillSurface(backgroundColor);
+
+    // Draw a 3d border
+    Draw3D_Box(pSurface, 0, 0, dimensions.width, dimensions.height);
+
+    if (!windowButtons)
+        return;
+
+    // Recalculate size and positions of buttons
+
+    // Determine maximum size of each button based on how many buttons there are and how wide the taskbar is
+
+    // We'll start drawing after the Start button
+    int leftX = pControls[0]->dimensions.left + pControls[0]->dimensions.width + GUI_TASKBAR_BUTTON_MARGINS;
+
+    int width = dimensions.width - GUI_TASKBAR_BUTTON_MARGINS - leftX;
+
+    int pixelsPerButton = width / windowButtons;
+    pixelsPerButton -= GUI_TASKBAR_BUTTON_MARGINS;
+
+    if (pixelsPerButton > GUI_TASKBAR_BUTTON_MAX_WIDTH)
+        pixelsPerButton = GUI_TASKBAR_BUTTON_MAX_WIDTH;
+      
+    // Assign a new size and position to each button after the start button
+    for (int i = 1; i < MAX_WINDOW_CONTROLS; ++i)
+    {
+        if (!pControls[i])
+            continue;
+
+        pControls[i]->dimensions.left = leftX;
+        pControls[i]->dimensions.width = pixelsPerButton;
+        pControls[i]->Resize(pControls[i]->dimensions);
+
+        leftX += pixelsPerButton + GUI_TASKBAR_BUTTON_MARGINS;
+    }
 }
 
 void GUI_Taskbar::ControlClicked(uint32_t controlID)
@@ -107,18 +154,14 @@ void GUI_Taskbar::RemoveWindow(uint32_t windowID)
                 pClickedControl = NULL;
 
             delete pButton;
+
+            --windowButtons;
+
+            ButtonsChanged();
             
             break;
         }
     }
-
-    // We need to redraw the taskbar background to erase the old button
-    FillSurface(backgroundColor);
-
-    // Draw a 3d border
-    Draw3D_Box(pSurface, 0, 0, dimensions.width, dimensions.height);
-
-    --windowButtons;
 }
 
 void GUI_Taskbar::WindowActivated(uint32_t windowID)
@@ -126,7 +169,7 @@ void GUI_Taskbar::WindowActivated(uint32_t windowID)
     // Find the control ID
     for (int i = 1; i < MAX_WINDOW_CONTROLS; ++i)
     {
-        if (pControls[i]->controlID == windowID)
+        if (pControls[i] && pControls[i]->controlID == windowID)
         {
             // if there's an active window button that's not the same button, de-highlight it
             if (pActiveWindowButton && pActiveWindowButton != (GUI_TaskbarButton *)pControls[i])

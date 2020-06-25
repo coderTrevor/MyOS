@@ -15,8 +15,8 @@ public:
 
     virtual void OnHover(int relX, int relY) {};
     virtual void OnClick(int relX, int relY);
-
     virtual void OnDrag(int relClickX, int relClickY, int relDestX, int relDestY) {};
+    virtual void Resize(GUI_Rect newDimensions) { dimensions = newDimensions; }
 
     uint32_t controlID;
 protected:

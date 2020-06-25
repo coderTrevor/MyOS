@@ -1088,11 +1088,6 @@ static size_t _ntoa_long(out_fct_type out, char* buffer, size_t idx, size_t maxl
     return _ntoa_format(out, buffer, idx, maxlen, buf, len, negative, (unsigned int)base, prec, width, flags);
 }
 
-int vsnprintf_(char* buffer, size_t count, const char* format, va_list va)
-{
-    return _vsnprintf(_out_buffer, buffer, count, format, va);
-}
-
 static int _vsnprintf(out_fct_type out, char* buffer, const size_t maxlen, const char* format, va_list va)
 {
     unsigned int flags, width, precision, n;
@@ -1373,6 +1368,11 @@ static int _vsnprintf(out_fct_type out, char* buffer, const size_t maxlen, const
 
     // return written chars without terminating \0
     return (int)idx;
+}
+
+int vsnprintf_(char* buffer, size_t count, const char* format, va_list va)
+{
+    return _vsnprintf(_out_buffer, buffer, count, format, va);
 }
 
 int snprintf_(char* buffer, size_t count, const char* format, ...)

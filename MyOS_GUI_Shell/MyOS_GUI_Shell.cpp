@@ -280,7 +280,12 @@ void Shell_Destroy_Window(GUI_Window *pWindow)
             windowStack[i].pAbove = windowStack[i].pUnderneath = NULL;
             windowStack[i].pWindow = NULL;
 
-            pTaskbar->RemoveWindow(windowIDs[i]);
+            if (windowIDs[i])
+            {
+                pTaskbar->RemoveWindow(windowIDs[i]);
+                windowIDs[i] = 0;
+            }
+
             break;
         }
     }
@@ -321,7 +326,8 @@ int main(int argc, char* argv[])
         SDL_WINDOWPOS_UNDEFINED,           // initial y position
         800,                               // width, in pixels (ignored)
         600,                               // height, in pixels (ignored
-        SDL_WINDOW_FULLSCREEN_DESKTOP      // Make the window the same size as the desktop
+        0
+        //SDL_WINDOW_FULLSCREEN_DESKTOP      // Make the window the same size as the desktop
     );
 
     // Check that the window was successfully created
@@ -367,7 +373,7 @@ int main(int argc, char* argv[])
 
     SDL_Event event;
 
-    int lastWindowID = 0;
+    int lastWindowID = 1;
 
     // Hide the mouse cursor
     SDL_ShowCursor(SDL_DISABLE);
@@ -518,13 +524,16 @@ int main(int argc, char* argv[])
         }
 
         // draw the "background"
-        if (bitmapSurface)
+        /*if (bitmapSurface)
         {
             // Blit bitmap to window
             SDL_BlitScaled(bitmapSurface, NULL, screenSurface, NULL);
 
             //SDL_Delay(3000);  // Pause execution for 3000 milliseconds, for example
-        }
+        }*/
+
+        // Fill the background with black instead of an image for a little while
+        SDL_FillRect(screenSurface, NULL, RGB_BLACK);
 
         // draw all of the windows
 //        bigWindow.PaintToSurface(screenSurface);

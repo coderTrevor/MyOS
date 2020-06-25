@@ -17,10 +17,12 @@ public:
 
     void PaintToSurface(SDL_Surface * pTargetSurface);
     virtual void OnClick(int relX, int relY);
-
     virtual void OnMouseUp(int relX, int relY);
+    void Resize(GUI_Rect newDimensions);    // TODO: Make dimensions a private variable
 
 protected:
+    SDL_Surface *CreateSurface();
+
     char *buttonText;
     SDL_Surface *pSurface;
 };

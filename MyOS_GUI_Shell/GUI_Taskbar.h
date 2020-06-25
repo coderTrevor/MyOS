@@ -30,6 +30,7 @@ public:
     ~GUI_Taskbar();
 
     void AddWindow(uint32_t windowID, GUI_Window *pWindow);
+    void ButtonsChanged();
     void ControlClicked(uint32_t controlID);
     void OnDrag(int startRelX, int startRelY, int relX, int relY);
     void RemoveWindow(uint32_t windowID);

@@ -18,6 +18,7 @@ extern "C" {
 #define SYSTEM_MENU_COLOR_B 255
 
 const SDL_Color SDL_BLACK = { 0, 0, 0, 255 };
+const uint32_t  RGB_BLACK = 0x000000;
 const SDL_Color SDL_WHITE = { 255, 255, 255, 255 };
 const SDL_Color SDL_DEFAULT_BUTTON_COLOR = { 200, 200, 200, 255 };
 
