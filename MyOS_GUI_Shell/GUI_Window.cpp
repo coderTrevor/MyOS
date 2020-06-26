@@ -27,8 +27,8 @@ void GUI_Window::CreateSurface()
         return;
      //   printf("Error! Couldn't create RGB surface for window!\n");
 
-    backgroundColor.r = backgroundColor.b = 205;
-    backgroundColor.b = 205;
+    backgroundColor = { 205, 205, 205, 255 };
+
     DrawWindow();
 }
 
@@ -102,7 +102,6 @@ void GUI_Window::SetBackgroundColor(SDL_Color color)
 void GUI_Window::DrawWindow()
 {
     // Draw the background
-    //SDL_FillRect(pSurface, NULL, SDL_MapRGB(pSurface->format, backgroundColor.r, backgroundColor.g, backgroundColor.b));
     FillSurface(backgroundColor);
 
     // Draw the system menu at the top

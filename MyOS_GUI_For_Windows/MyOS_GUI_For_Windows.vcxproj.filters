@@ -42,9 +42,6 @@
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_Taskbar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\MyOS_GUI_Shell\GUI_Kernel_Messages.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\MyOS_GUI_Shell\MyOS_GUI_Shell.cpp">
@@ -75,6 +72,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_Taskbar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_GUI_Shell\GUI_TerminalWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_GUI_Shell\GUI_Kernel_Shell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

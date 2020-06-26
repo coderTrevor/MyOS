@@ -12,17 +12,19 @@ class GUI_Control;
 class GUI_Window : public GUI_Object
 {
 public:
-    GUI_Window(GUI_Rect size, char *name)
+    GUI_Window(GUI_Rect size, const char *name)
     {
         dimensions = size;
-        SDL_strlcpy(windowName, name, MAX_WINDOW_NAME_LENGTH);
+        SDL_strlcpy(windowName, name, MAX_WINDOW_NAME_LENGTH - 1);
         CreateSurface();
 
         for (int i = 0; i < MAX_WINDOW_CONTROLS; ++i)
             pControls[i] = NULL;
+
+        pClickedControl = NULL;
     }
 
-    GUI_Window(int top, int left, int width, int height, char *name)
+    GUI_Window(int top, int left, int width, int height, const char *name)
     {
         dimensions.top = top;
         dimensions.left = left;

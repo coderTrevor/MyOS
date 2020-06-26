@@ -29,6 +29,8 @@ extern "C" {
 #include "GUI_Window.h"
 #include "GUI_MessageBox.h"
 #include "GUI_Taskbar.h"
+#include "GUI_Kernel_Shell.h"
+#include "GUI_TerminalWindow.h"
 
 #define MAX_GUI_WINDOWS 256 /*TEMP HACK*/
 GUI_Window *windowList[MAX_GUI_WINDOWS] = { NULL };
@@ -56,6 +58,7 @@ GUI_Taskbar *pTaskbar;
 #define DELETION_QUEUE_SIZE 16
 GUI_Window *pDeletionQueue[DELETION_QUEUE_SIZE]; // UGLY HACK
 int nextDeletionQueueIndex = 0;
+int lastWindowID = 1;
 
 #define CURSOR_X        16
 #define CURSOR_Y        16
@@ -178,19 +181,21 @@ void AddWindowToStack(GUI_Window *window, GUI_WINDOW_STACK_ENTRY *pStackEntry)
 }
 
 // This would probably be called with a process' PID
-GUI_Window *CreateTextWindow(uint32_t uniqueID)
+GUI_Window *CreateTextWindow(uint32_t uniqueID, const char *windowName)
 {
     // find the first unused entry in the windowList
     for (int i = 0; i < MAX_GUI_WINDOWS; ++i)
     {
         if (!windowList[i])
         {
-            windowList[i] = new GUI_Window(nextX, nextY, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, "New Window");
+            windowList[i] = new GUI_TerminalWindow(windowName);
+                //new GUI_Window(nextX, nextY, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, windowName);
+            
             // TODO: Check for NULL
             windowIDs[i] = uniqueID;
             
             // Advance position of next window
-            nextX += WINDOW_X_INC;
+            /*nextX += WINDOW_X_INC;
             nextX %= MAX_WINDOW_X;
             nextY += WINDOW_Y_INC;
             nextY %= MAX_WINDOW_Y;
@@ -209,7 +214,7 @@ GUI_Window *CreateTextWindow(uint32_t uniqueID)
 
             bgRed %= 255;
             bgGreen %= 255;
-            bgBlue %= 255;
+            bgBlue %= 255;*/
 
             AddWindowToStack(windowList[i], &windowStack[i]);
 
@@ -221,6 +226,19 @@ GUI_Window *CreateTextWindow(uint32_t uniqueID)
 
     printf("ERROR: Couldn't find any free window slots!\n");
     return NULL;
+}
+
+GUI_Rect NewWindowPosition(int width, int height)
+{
+    GUI_Rect windowPos = { nextY, nextX, width, height };
+
+    // Advance position of next window
+    nextX += WINDOW_X_INC;
+    nextX %= MAX_WINDOW_X;
+    nextY += WINDOW_Y_INC;
+    nextY %= MAX_WINDOW_Y;
+
+    return windowPos;
 }
 
 // This is kind of hacky and maybe I'll find a better way in the future.
@@ -254,7 +272,7 @@ void MessageBox(char *messageText, char *windowTitle)
         if (!windowList[i])
         {
             windowList[i] = new GUI_MessageBox(messageText, windowTitle);
-            AddWindowToStack(windowList[i], &windowStack[i]);
+            AddWindowToStack(windowList[i], &windowStack[i]);            
             return;
         }
     }
@@ -349,7 +367,8 @@ int main(int argc, char* argv[])
     SDL_Delay(500);  // Pause execution for 500 milliseconds, for example
     */
                      // Load BMP
-    char *filename = "kghrwide.bmp";
+    //char *filename = "kghrwide.bmp";
+    char *filename = "kg2.bmp";
 #if __MYOS__
     filename = "kg2.bmp";
 #endif
@@ -372,8 +391,6 @@ int main(int argc, char* argv[])
     bool dragging = false;
 
     SDL_Event event;
-
-    int lastWindowID = 1;
 
     // Hide the mouse cursor
     SDL_ShowCursor(SDL_DISABLE);
@@ -415,6 +432,13 @@ int main(int argc, char* argv[])
     // Create Taskbar
     pTaskbar = new GUI_Taskbar(screenSurface->w, screenSurface->h);
 
+#ifdef __MYOS
+    // Tell the kernel how to talk to us
+    registerGuiCallback(GUI_Kernel_Callback);
+#endif
+
+    //GUI_Kernel_Callback(0, 0, NULL);
+
     // Keep drawing everything
     while (!done)
     {
@@ -437,9 +461,9 @@ int main(int argc, char* argv[])
 
                 case SDL_KEYDOWN:
                     //switch (event.key.keysym)
-                    CreateTextWindow(lastWindowID++);
+                    CreateTextWindow(lastWindowID++, "New Window");
 
-                    MessageBox("Here's a test message", "Test Message");
+                    //MessageBox("Here's a test message", "Test Message");
                     switch (event.key.keysym.sym)
                     {
                         case SDLK_n:
@@ -524,16 +548,16 @@ int main(int argc, char* argv[])
         }
 
         // draw the "background"
-        /*if (bitmapSurface)
+        if (bitmapSurface)
         {
             // Blit bitmap to window
             SDL_BlitScaled(bitmapSurface, NULL, screenSurface, NULL);
 
             //SDL_Delay(3000);  // Pause execution for 3000 milliseconds, for example
-        }*/
+        }
 
         // Fill the background with black instead of an image for a little while
-        SDL_FillRect(screenSurface, NULL, RGB_BLACK);
+        //SDL_FillRect(screenSurface, NULL, RGB_BLACK);
 
         // draw all of the windows
 //        bigWindow.PaintToSurface(screenSurface);
