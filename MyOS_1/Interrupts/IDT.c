@@ -94,6 +94,9 @@ void IDT_Init(void)
     // Set handler for hiding shell display elements
     Set_IDT_Entry((unsigned long)hide_shell_display_interrupt_handler, SYSCALL_HIDE_SHELL_DISPLAY);
 
+    // Set handler for the GUI telling the kernel how to send the GUI messages
+    Set_IDT_Entry((unsigned long)gui_register_callback_interrupt_handler, SYSCALL_REGISTER_GUI_CALLBACK);
+
     /* fill the IDT descriptor */
     IDT_ptr.base = (uint32_t)IDT;
     IDT_ptr.size = (sizeof(IDT_ENTRY) * 256);

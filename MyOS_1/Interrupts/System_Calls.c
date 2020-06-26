@@ -76,6 +76,18 @@ size_t SystemCallFRead(void * bufPtr, size_t elemSize, size_t count, FILE * stre
     return retVal;
 }
 
+void SystemCallRegisterGuiCallback(GUI_CALLBACK guiCallback)
+{
+    const int pointerSize = sizeof(GUI_CALLBACK);
+
+    __asm
+    {
+        push [guiCallback]                  // push argument onto stack
+        int SYSCALL_REGISTER_GUI_CALLBACK   // call gui_register_callback_interrupt_handler(guiCallback)
+        add esp, pointerSize                // restore value of stack pointer
+    }
+}
+
 int SystemCallFSeek(FILE * stream, long int off, int origin)
 {
     int retVal;

@@ -64,6 +64,12 @@
     <Filter Include="Header Files\Tasks">
       <UniqueIdentifier>{b27b41e5-298f-4e04-9dea-743123199d72}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\GUI">
+      <UniqueIdentifier>{441e1d72-2ac6-46dd-b47e-a3a9f01acb81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GUI">
+      <UniqueIdentifier>{ed1bb142-e86a-48ef-85ae-82740aea315c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="paging.c">
@@ -200,6 +206,9 @@
     </ClCompile>
     <ClCompile Include="Tasks\Dispatcher.c">
       <Filter>Source Files\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI_Kernel.c">
+      <Filter>Source Files\GUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -340,6 +349,12 @@
     </ClInclude>
     <ClInclude Include="Drivers\mouse.h">
       <Filter>Source Files\Drivers</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI_Kernel.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI_Messages.h">
+      <Filter>Header Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

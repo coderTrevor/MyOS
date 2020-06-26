@@ -299,6 +299,7 @@
     <ClCompile Include="Graphics\font.c" />
     <ClCompile Include="Graphics\Graphical_Terminal.c" />
     <ClCompile Include="Graphics\picofont.c" />
+    <ClCompile Include="GUI_Kernel.c" />
     <ClCompile Include="Interrupts\IDT.c" />
     <ClCompile Include="Interrupts\Interrupts.c" />
     <ClCompile Include="Interrupts\PIC.c" />
@@ -350,6 +351,8 @@
     <ClInclude Include="Graphics\Display_HAL.h" />
     <ClInclude Include="Graphics\Graphical_Terminal.h" />
     <ClInclude Include="Graphics\picofont.h" />
+    <ClInclude Include="GUI_Kernel.h" />
+    <ClInclude Include="GUI_Messages.h" />
     <ClInclude Include="Interrupts\IDT.h" />
     <ClInclude Include="Interrupts\Interrupts.h" />
     <ClInclude Include="Interrupts\PIC.h" />

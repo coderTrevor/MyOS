@@ -10,6 +10,7 @@ extern "C" {
 #include "../Libs/SDL/include/SDL_rect.h"
 #include "../myos_io.h"
 #include "../Drivers/mouse.h"
+#include "../GUI_Kernel.h"
 
 #define SYSCALL_PRINT               255
 #define SYSCALL_PRINTF              254
@@ -28,6 +29,7 @@ extern "C" {
 #define SYSCALL_DISPATCH_NEW_TASK   241
 #define SYSCALL_GET_MOUSE_STATE     240
 #define SYSCALL_HIDE_SHELL_DISPLAY  239
+#define SYSCALL_REGISTER_GUI_CALLBACK   238
 
 void SystemCallExit();
 #define exit SystemCallExit
@@ -66,6 +68,9 @@ void SystemCallPrint(char *str);
 
 bool SystemCallReadFromKeyboard(uint16_t *key);
 #define readFromKeyboard SystemCallReadFromKeyboard
+
+void SystemCallRegisterGuiCallback(GUI_CALLBACK guiCallback);
+#define registerGuiCallback SystemCallRegisterGuiCallback
 
 #define printf SystemCallPrintf
 int __cdecl SystemCallPrintf(const char* format, ...);

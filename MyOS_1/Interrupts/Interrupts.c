@@ -14,6 +14,7 @@
 #include "../myos_io.h"
 #include "../Tasks/Context.h"
 #include "../Drivers/PS2_Mouse.h"
+#include "../GUI_Kernel.h"
 
 unsigned long interrupts_fired;
 
@@ -450,6 +451,40 @@ void _declspec(naked) graphics_blit_interrupt_handler(int eflags, int cs, const 
 
     _asm
     {
+        // epilogue
+        pop ebp
+
+        iretd
+    }
+}
+
+void _declspec(naked) gui_register_callback_interrupt_handler(int eflags, int cs, GUI_CALLBACK callbackFunc)
+{
+    // supress warning about unused parameters
+    (void)eflags, (void)cs, (void)callbackFunc;
+
+    _asm
+    {
+        // prologue
+        push ebp
+        mov ebp, esp
+        pushad
+    }
+
+    ++interrupts_fired;
+
+    if (debugLevel)
+        terminal_writestring("GUI register callback interrupt handler fired.\n");
+
+    // TODO IMPORTANT The GUI application should be mapped to kernel space
+
+    guiCallback = callbackFunc;
+
+    GUI_CallbackAdded();
+
+    _asm
+    {
+        popad
         // epilogue
         pop ebp
 

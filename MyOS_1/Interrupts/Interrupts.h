@@ -7,6 +7,7 @@
 #include "../Graphics/Display_HAL.h"
 #include "../myos_io.h"
 #include "../Drivers/mouse.h"
+#include "../GUI_Kernel.h"
 
 #define HARDWARE_INTERRUPTS_BASE     0x20
 
@@ -37,6 +38,8 @@ void get_mouse_state_interrupt_handler(int eflags, int cs, MOUSE_STATE *pMouseSt
 void gpf_exception_handler(void);
 
 void graphics_blit_interrupt_handler(int eflags, int cs, const SDL_Rect *sourceRect, PIXEL_32BIT *image);
+
+void gui_register_callback_interrupt_handler(int eflags, int cs, GUI_CALLBACK callbackFunc);
 
 void hide_shell_display_interrupt_handler(int eflags, int cs);
 

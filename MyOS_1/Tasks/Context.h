@@ -21,6 +21,7 @@ typedef struct CONTEXT_INFO
     char imageName[MAX_IMAGE_NAME_LENGTH];
     bool inUse;
     bool exclusive; // True to disable switching to any other tasks
+    uint32_t PID;
     // ? What else?
 } CONTEXT_INFO, PROCESS_CONTROL_BLOCK;
 
@@ -51,6 +52,8 @@ extern PROCESS_CONTROL_BLOCK tasks[MAX_TASKS];
 //extern READY_QUEUE_ENTRY readyQueuePool[MAX_TASKS];
 extern int ticksLeftInTask;
 extern int currentTask;
+
+extern uint32_t nextPID;
 
 extern bool multiEnable; // TEMPTEMP
 
