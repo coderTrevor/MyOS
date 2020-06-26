@@ -117,6 +117,7 @@ void KeStartupPhase2(multiboot_info *multibootInfo)
     // Add kernel to list of tasks
     tasks[0].inUse = true;
     strncpy(tasks[0].imageName, "KERNEL PROCESS", sizeof("KERNEL PROCESS"));
+    tasks[0].PID = nextPID - 1;
 
     // Initialize interrupts
     Interrupts_Init();
@@ -129,7 +130,7 @@ void KeStartupPhase2(multiboot_info *multibootInfo)
     //Mouse_Init();
 
     // Execute autoexec.bat (if it exists)
-    //Autoexec();
+    Autoexec();
 
     // Say Hello
     terminal_writestring("Hello world!\n");
