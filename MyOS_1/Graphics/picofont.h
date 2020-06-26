@@ -20,8 +20,8 @@
 #define FNT_ROWSPACING  3
 
 // put some margins around the borders
-#define FNT_LEFTRIGHTMARGIN 3
-#define FNT_TOPBOTTOMMARGIN    3
+#define FNT_LEFTRIGHTMARGIN     3
+#define FNT_TOPBOTTOMMARGIN     3
 
 typedef struct
 {

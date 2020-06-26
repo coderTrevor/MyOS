@@ -752,7 +752,11 @@ void _declspec(naked) printf_interrupt_handler(int eflags, int cs, const char *f
         terminal_writestring("printf interrupt handler fired.\n");
     
     // Here's where printf actually happens
-    vprintf_(fmt, va);
+    if (guiCallback)
+        GUI_printf(fmt, va);
+    else
+        vprintf_(fmt, va);
+
     
     _asm
     {

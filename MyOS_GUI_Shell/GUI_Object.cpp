@@ -100,18 +100,44 @@ void GUI_Object::DrawSystemMenu(SDL_Surface *pSurface, char *windowName)
 
     // Draw the system boxes
     int margin = 4;
-    int boxHeight = SYSTEM_MENU_HEIGHT - margin;
+    int boxHeight = SYSTEM_MENU_HEIGHT - margin + 1;
     int boxWidth = boxHeight;
     int boxTop = (margin / 2);
-    int boxLeft = dimensions.width - boxWidth - margin;
+    int boxLeft = dimensions.width - boxWidth - margin + 2;
     SDL_Rect boxRect = { boxLeft, boxTop, boxWidth, boxHeight };
     uint32_t red = SDL_MapRGB(pSurface->format, 255, 120, 120 );
     SDL_FillRect(pSurface, &boxRect, red);
-    //DrawBox(pSurface, boxLeft, boxTop, boxWidth, boxHeight, black);
     Draw3D_Box(pSurface, boxLeft, boxTop, boxWidth, boxHeight);
 
     pFont = FNT_Render("X", black);
-    boxRect.x += 6;
+    boxRect.x += 7;
+    boxRect.y += 7;
+    SDL_BlitSurface(pFont, NULL, pSurface, &boxRect);
+    SDL_FreeSurface(pFont);
+
+
+    boxLeft = boxLeft - boxWidth - 2;
+    boxRect = { boxLeft, boxTop, boxWidth, boxHeight };
+    SDL_FillRect(pSurface, &boxRect, SDL_MapRGB(pSurface->format, 205, 205, 205));
+    Draw3D_Box(pSurface, boxLeft, boxTop, boxWidth, boxHeight);
+
+    pFont = FNT_Render("[", black);
+    boxRect.x += 4;
+    boxRect.y += 7;
+    SDL_BlitSurface(pFont, NULL, pSurface, &boxRect);
+    boxRect.x += 4;
+    SDL_FreeSurface(pFont);
+    pFont = FNT_Render("]", black);
+    SDL_BlitSurface(pFont, NULL, pSurface, &boxRect);
+    SDL_FreeSurface(pFont);
+
+    boxLeft = boxLeft - boxWidth - 2;
+    boxRect = { boxLeft, boxTop, boxWidth, boxHeight };
+    SDL_FillRect(pSurface, &boxRect, SDL_MapRGB(pSurface->format, 205, 205, 205));
+    Draw3D_Box(pSurface, boxLeft, boxTop, boxWidth, boxHeight);
+
+    pFont = FNT_Render("_", black);
+    boxRect.x += 7;
     boxRect.y += 7;
     SDL_BlitSurface(pFont, NULL, pSurface, &boxRect);
     SDL_FreeSurface(pFont);

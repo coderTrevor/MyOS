@@ -52,7 +52,14 @@ public:
 
     void OnMouseUp(int relX, int relY);
 
+    virtual void Resize(GUI_Rect newDimensions);
+
     void SetBackgroundColor(SDL_Color color);
+
+    virtual void SendWindowText(const char *text)
+    {
+        (void)text; // text sent to GUI_Window base class is ignored
+    }
 
     SDL_Surface *GetSurface() { return pSurface; }
     void PaintToSurface(SDL_Surface *pTargetSurface);

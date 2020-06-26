@@ -163,6 +163,17 @@ GUI_WINDOW_STACK_ENTRY *GetBottomWindow()
     return pCurrent;
 }
 
+GUI_Window *GetWindowFromID(uint32_t uniqueID)
+{
+    for (int i = 0; i < MAX_GUI_WINDOWS; ++i)
+    {
+        if (windowIDs[i] == uniqueID)
+            return windowList[i];
+    }
+
+    return NULL;
+}
+
 void AddWindowToStack(GUI_Window *window, GUI_WINDOW_STACK_ENTRY *pStackEntry)
 {
     // Put this window in a stack entry and make it the topmost window

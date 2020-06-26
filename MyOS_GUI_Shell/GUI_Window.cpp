@@ -93,6 +93,17 @@ void GUI_Window::OnMouseUp(int relX, int relY)
         pClickedControl->OnMouseUp(relX - pClickedControl->dimensions.left, relY - pClickedControl->dimensions.top);
 }
 
+void GUI_Window::Resize(GUI_Rect newDimensions)
+{
+    SDL_FreeSurface(pSurface);
+
+    dimensions = newDimensions;
+
+    CreateSurface();
+
+    DrawWindow();
+}
+
 void GUI_Window::SetBackgroundColor(SDL_Color color)
 {
     backgroundColor = color;

@@ -1,8 +1,25 @@
+#include <stdarg.h>
 #include "GUI_Kernel.h"
 #include "GUI_Messages.h"
 #include "Tasks/Context.h"
+#include "printf.h"
 
 GUI_CALLBACK guiCallback = NULL;
+
+// Send a formatted text string to the console window for the currently running application
+int GUI_printf(const char *format, va_list va)
+{
+    GUI_CONSOLE_PRINT_DATA param;
+    char outString[MAX_GUI_CONSOLE_STRING_LENGTH];
+
+    int returnValue = vsnprintf(outString, MAX_GUI_CONSOLE_STRING_LENGTH, format, va);
+
+    param.textString = outString;
+
+    (*guiCallback)(tasks[currentTask].PID, GUI_MSG_CONSOLE_PRINT, &param);
+
+    return returnValue;
+}
 
 void GUI_CallbackAdded()
 {
