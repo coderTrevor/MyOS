@@ -16,6 +16,8 @@ uint32_t *pageDir;
 uint32_t pagingNextAvailableMemory; // physical address of the next available page
 uint32_t paging4MPagesAvailable;    // number of 4M physical memory pages available to be mapped
 
+uint32_t nextPageDirectory; // TEMPTEMP where the next created page directory will be stored
+
 // Allocates a number of 4-megabyte, consecutive pages. Why 4 megs? Because that's how MyOS rolls.
 // We're just going to stick with identity mapping for now. Why? Because that's how MyOS rolls.
 // Returns a pointer to the virtual address of the first allocated page or NULL if there was a problem.
@@ -60,4 +62,21 @@ void KPageAllocator(unsigned int pages, unsigned int *pPagesAllocated, uint32_t 
         pagingNextAvailableMemory += FOUR_MEGABYTES;
         ++(*pPagesAllocated);
     }
+}
+
+bool Paging_Print_Page_Table(PAGE_DIRECTORY_ENTRY *thePageDir)
+{
+    bool done;
+    done = true;
+
+    kprintf("Page table entries:\nLogical -> Physical  -- flags\n");
+    kprintf("continuing\n");
+    for (int i = 0; i < 1024; ++i)
+    {
+        if (!(thePageDir[i] & PAGE_ENTRY_PRESENT))
+            continue;
+        done = false;
+        kprintf("0x%X -> 0x%X   - 0x%X\n", i * FOUR_MEGABYTES, thePageDir[i] & 0xFFFFF000, thePageDir[i] & 0xFFF);
+    }
+    return done;
 }

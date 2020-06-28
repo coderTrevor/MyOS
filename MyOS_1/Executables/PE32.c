@@ -137,8 +137,11 @@ bool loadAndRunPE(uint8_t *executableDestination, DOS_Header *mzAddress, const c
         terminal_newline();
     }
 
-    if(multiEnable)
-        DispatchNewTask((uint32_t)entryPoint, 0x20000, imageName, exclusive);
+    if (multiEnable)
+    {
+        // TEMP: use kernel page directory
+        DispatchNewTask((uint32_t)entryPoint, __readcr3(), 0x20000, imageName, exclusive);
+    }
     else
     {        
         /*_asm {

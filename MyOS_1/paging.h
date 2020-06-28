@@ -14,8 +14,8 @@ typedef /*__declspec(align(4096))*/ uint32_t PAGE_TABLE_ENTRY;
 #define PAGE_ENTRY_WRITABLE         4
 
 #define DIRECTORY_ENTRY_PRESENT          1
-#define DIRECTORY_ENTRY_USER_ACCESSIBLE  2
-#define DIRECTORY_ENTRY_WRITABLE         4
+#define DIRECTORY_ENTRY_WRITABLE         2
+#define DIRECTORY_ENTRY_USER_ACCESSIBLE  4
 #define DIRECTORY_ENTRY_4MB              0x80
 
 #define FOUR_MEGABYTES              0x400000
@@ -25,6 +25,7 @@ extern uint32_t *pageDir;
 
 extern uint32_t pagingNextAvailableMemory;
 extern uint32_t paging4MPagesAvailable;
+extern uint32_t nextPageDirectory; // TEMPTEMP
 
 typedef uint32_t ULONG_PTR;
 
@@ -66,7 +67,7 @@ inline void Paging_Enable(multiboot_info *multibootInfo)
     // Setup identity mapping for the four megabytes starting at megabyte 8
     pageDirectory[2] = (PAGE_DIRECTORY_ENTRY)((uint32_t)0x800000 | DIRECTORY_ENTRY_PRESENT | DIRECTORY_ENTRY_WRITABLE | DIRECTORY_ENTRY_4MB | DIRECTORY_ENTRY_USER_ACCESSIBLE);
 
-    // Identity map the next four megs
+    // Identity map the next four megs (this is used by the GUI shell)
     pageDirectory[3] = (PAGE_DIRECTORY_ENTRY)((uint32_t)0xC00000 | DIRECTORY_ENTRY_PRESENT | DIRECTORY_ENTRY_WRITABLE | DIRECTORY_ENTRY_4MB | DIRECTORY_ENTRY_USER_ACCESSIBLE);
 
     // Identity map the next four megs
@@ -115,8 +116,12 @@ inline void Paging_Enable(multiboot_info *multibootInfo)
     pageDir = pageDirectory;
 
     // determine available pages
-    //pagingNextAvailableMemory = FOUR_MEGABYTES * 3; // Next available page will (likely) start at 12 Megs
-    pagingNextAvailableMemory = FOUR_MEGABYTES * 4; // TEMP: Next available page will (likely) start at 16 Megs
+    pagingNextAvailableMemory = FOUR_MEGABYTES * 5; // TEMP: Next available page will (likely) start at 20 Megs
     // We'll assume we have 64 megs available
     paging4MPagesAvailable = 16; // TODO: Calculate based on the memory map Grub gave us
+
+    // TEMPTEMP: put page directories between 16 - 20 megs
+    nextPageDirectory = FOUR_MEGABYTES * 4;
 }
+
+bool Paging_Print_Page_Table(PAGE_DIRECTORY_ENTRY *thePageDir);

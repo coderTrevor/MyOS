@@ -58,6 +58,6 @@ extern uint32_t nextPID;
 
 extern bool multiEnable; // TEMPTEMP
 
-void DispatchNewTask(uint32_t programStart, uint32_t stackSize, const char *imageName, bool exclusive);
+void DispatchNewTask(uint32_t programStart, uint32_t newPageDirectory, uint32_t stackSize, const char *imageName, bool exclusive);
 
 void SwitchTask(uint32_t taskIndex);
