@@ -1,6 +1,7 @@
 #include "Context.h"
 #include "../printf.h"
 #include "../Interrupts/System_Calls.h"
+#include "../paging.h"
 
 PROCESS_CONTROL_BLOCK tasks[64] = { 0 };
 READY_QUEUE_ENTRY *readyQueueHead = NULL;
@@ -12,7 +13,7 @@ uint32_t nextPID = 1000;
 // This must be global so we can access it while playing with the stack in ways the compiler can't predict
 uint32_t stackPtr;
 
-void DispatchNewTask(uint32_t programStart, uint32_t newPageDirectory, uint32_t stackSize, const char *imageName, bool exclusive)
+void DispatchNewTask(uint32_t programStart, PAGE_DIRECTORY_ENTRY *newPageDirectory, uint32_t stackSize, const char *imageName, bool exclusive)
 {
     // disable interrupts
     __asm cli
@@ -62,7 +63,7 @@ void DispatchNewTask(uint32_t programStart, uint32_t newPageDirectory, uint32_t 
     strncpy(tasks[taskSlot].imageName, imageName, MAX_IMAGE_NAME_LENGTH - 1);
     tasks[taskSlot].inUse = true;
     tasks[taskSlot].PID = nextPID++;
-    tasks[taskSlot].cr3 = newPageDirectory;
+    tasks[taskSlot].cr3 = (uint32_t)newPageDirectory;
 
     // Create ready queue entry
     READY_QUEUE_ENTRY *queueEntry;

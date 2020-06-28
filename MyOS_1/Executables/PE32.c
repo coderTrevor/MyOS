@@ -5,7 +5,7 @@
 #include "../Terminal.h"
 #include "../printf.h"
 #include "../Tasks/Context.h"
-
+#include "../paging.h"
 
 jmp_buf peReturnBuf;
 
@@ -81,6 +81,26 @@ bool loadAndRunPE(uint8_t *executableDestination, DOS_Header *mzAddress, const c
         }
     }
 
+    // Disable interrupts
+    _disable();
+
+    // Get a new page directory for the new task
+    PAGE_DIRECTORY_ENTRY *newPageDirectory;
+
+    // GUI.exe shares the kernel's page directory
+    if ((uint32_t)executableDestination != 0xC00000)
+    {
+        newPageDirectory = (PAGE_DIRECTORY_ENTRY *)nextPageDirectory;
+        nextPageDirectory += sizeof(PAGE_DIRECTORY_ENTRY) * 1024;
+
+        // Copy the kernel's page table to this new page table
+        memcpy((void*)newPageDirectory, pageDir, sizeof(PAGE_DIRECTORY_ENTRY) * 1024);
+
+        //Paging_Print_Page_Table(newPageDirectory);
+    }
+    else
+        newPageDirectory = pageDir;
+
     // TEMPTEMP - zero out 5 0x1000 sections of memory (tailored to TestApp1.exe)
     memset(executableDestination, 0, 0x5000);
 
@@ -140,10 +160,13 @@ bool loadAndRunPE(uint8_t *executableDestination, DOS_Header *mzAddress, const c
     if (multiEnable)
     {
         // TEMP: use kernel page directory
-        DispatchNewTask((uint32_t)entryPoint, __readcr3(), 0x20000, imageName, exclusive);
+        DispatchNewTask((uint32_t)entryPoint, newPageDirectory, 0x20000, imageName, exclusive);
     }
     else
-    {        
+    {   
+        // Re-enable interrupts
+        _enable();
+
         /*_asm {
             // Setup the program's stack
             mov [espVal], esp

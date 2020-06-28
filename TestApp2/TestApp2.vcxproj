@@ -130,11 +130,12 @@
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
-      <BaseAddress>0xC00000</BaseAddress>
+      <BaseAddress>0x800000</BaseAddress>
       <EntryPointSymbol>main</EntryPointSymbol>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <StackReserveSize>0x100000</StackReserveSize>
       <StackCommitSize>0x100000</StackCommitSize>
+      <FixedBaseAddress>true</FixedBaseAddress>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(TargetDir)$(TargetFileName)" C:\Users\Administrator\.VirtualBox\TFTP\$(TargetFileName)</Command>

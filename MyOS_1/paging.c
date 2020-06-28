@@ -2,7 +2,8 @@
 #include "Paging.h"
 #include "Console_VGA.h"
 #include <stdint.h>
-#include "Interrupts\System_Calls.h"
+#include "Interrupts/System_Calls.h"
+#include "Tasks/Context.h"
 
 // Allocate space for paging structures. We need enough space for three arrays with 0x1000 32-bit entries each.
 // Each array must be aligned on a 0x1000-byte boundary.
@@ -27,6 +28,13 @@ uint32_t nextPageDirectory; // TEMPTEMP where the next created page directory wi
 // TODO: Make multi-threading safe
 void KPageAllocator(unsigned int pages, unsigned int *pPagesAllocated, uint32_t *pRetVal)
 {
+    // Ensure interrupts are disabled
+    __asm
+    {
+        pushf
+        cli
+    }
+
     *pPagesAllocated = 0;
 
     // make sure there's enough pages available
@@ -49,12 +57,30 @@ void KPageAllocator(unsigned int pages, unsigned int *pPagesAllocated, uint32_t 
 
     uint32_t nextPage = pagingNextAvailableMemory / FOUR_MEGABYTES;
 
+    // Get the page directory we'll be using
+    PAGE_DIRECTORY_ENTRY *pageDirectory = (PAGE_DIRECTORY_ENTRY *)tasks[currentTask].cr3;
+
     // Add each page to the page directory
     for (size_t allocated = 0; allocated < pages; ++allocated)
     {
         // Add the current page to the page directory
-        pageDir[nextPage] = ((nextPage * FOUR_MEGABYTES)
+        pageDirectory[nextPage] = ((nextPage * FOUR_MEGABYTES)
             | DIRECTORY_ENTRY_PRESENT | DIRECTORY_ENTRY_USER_ACCESSIBLE | DIRECTORY_ENTRY_WRITABLE | DIRECTORY_ENTRY_4MB);
+
+        // If we're mapping this into the kernel space, we need to copy that mapping into every running task
+        if (pageDirectory == pageDir)
+        {
+            for (int i = 0; i < MAX_TASKS; ++i)
+            {
+                if (!tasks[i].inUse || tasks[i].cr3 == pageDir)
+                    continue;
+
+                PAGE_DIRECTORY_ENTRY *otherPageDir = (PAGE_DIRECTORY_ENTRY *)tasks[i].cr3;
+
+                otherPageDir[nextPage] = ((nextPage * FOUR_MEGABYTES)
+                                           | DIRECTORY_ENTRY_PRESENT | DIRECTORY_ENTRY_USER_ACCESSIBLE | DIRECTORY_ENTRY_WRITABLE | DIRECTORY_ENTRY_4MB);
+            }
+        }
         
         // update pointers and stuff
         ++nextPage;
@@ -62,6 +88,11 @@ void KPageAllocator(unsigned int pages, unsigned int *pPagesAllocated, uint32_t 
         pagingNextAvailableMemory += FOUR_MEGABYTES;
         ++(*pPagesAllocated);
     }
+
+    //kprintf("Task: %s\n", tasks[currentTask].imageName);
+    //Paging_Print_Page_Table(pageDirectory);
+
+    __asm popf
 }
 
 bool Paging_Print_Page_Table(PAGE_DIRECTORY_ENTRY *thePageDir)

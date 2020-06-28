@@ -558,7 +558,9 @@ void _declspec(naked) page_fault_handler(void)
 
     terminal_fill(' ', VGA_COLOR_WHITE, VGA_COLOR_BLUE);
 
-    terminal_writestring("Page Fault handler fired.\nError code ");
+    terminal_writestring("Page Fault handler fired by ");
+    terminal_writestring(tasks[currentTask].imageName);
+    terminal_writestring(".\nError code ");
     terminal_print_ulong_hex(errorCode);
     terminal_writestring("\nOffending instruction at ");
     terminal_print_ulong_hex(address);

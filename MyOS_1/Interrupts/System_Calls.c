@@ -187,7 +187,7 @@ void SystemCallPageAllocator(unsigned int pages, unsigned int *pPagesAllocated, 
         push pReturnVal
         push pPagesAllocated
         push pages
-        int  SYSCALL_PAGE_ALLOCATOR  // call PageAllocator(pagesToAllocate, pPagesAllocated, pReturnVal);
+        int  SYSCALL_PAGE_ALLOCATOR  // call page_allocator_interrupt_handler(pagesToAllocate, pPagesAllocated, pReturnVal);
         add esp, pointerSize         // restore value of stack pointer
     }
 }

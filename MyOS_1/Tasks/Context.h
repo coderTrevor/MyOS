@@ -2,6 +2,7 @@
 #include "../misc.h"
 #include "../printf.h"
 #include <stdint.h>
+#include "../paging.h"
 
 // TODO: Make less ghetto
 #define MAX_TASKS               64
@@ -58,6 +59,6 @@ extern uint32_t nextPID;
 
 extern bool multiEnable; // TEMPTEMP
 
-void DispatchNewTask(uint32_t programStart, uint32_t newPageDirectory, uint32_t stackSize, const char *imageName, bool exclusive);
+void DispatchNewTask(uint32_t programStart, PAGE_DIRECTORY_ENTRY *newPageDirectory, uint32_t stackSize, const char *imageName, bool exclusive);
 
 void SwitchTask(uint32_t taskIndex);
