@@ -22,6 +22,7 @@ typedef struct CONTEXT_INFO
     bool inUse;
     bool exclusive; // True to disable switching to any other tasks
     uint32_t PID;
+    uint32_t cr3;
     // ? What else?
 } CONTEXT_INFO, PROCESS_CONTROL_BLOCK;
 

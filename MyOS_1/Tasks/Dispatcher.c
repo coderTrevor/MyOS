@@ -99,7 +99,7 @@ void DispatchNewTask(uint32_t programStart, uint32_t stackSize, const char *imag
         push [stackPtr]
         int SYSCALL_DISPATCH_NEW_TASK   // call dispatch_new_task_interrupt_handler(eflags, cs, stackPtr, esp)
         add esp, 8
-    }   
+    }
 
     // Update the task's "stack image" to represent values appropriate for the new task
     TASK_STACK_LAYOUT *pNewTask = (TASK_STACK_LAYOUT *)((unsigned long)stackPtr - sizeof(TASK_STACK_LAYOUT));    
@@ -110,6 +110,7 @@ void DispatchNewTask(uint32_t programStart, uint32_t stackSize, const char *imag
 
     tasks[taskSlot].ESP = (uint32_t)pNewTask;
     tasks[taskSlot].exclusive = exclusive;
+    tasks[taskSlot].cr3 = __readcr3();  // TEMPTEMP: Give the new task the same page table as the kernel
 
     // If a GUI shell is running, tell it about the new process
     if (guiCallback)

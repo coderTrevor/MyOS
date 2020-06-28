@@ -85,11 +85,12 @@ void _declspec(naked) timer_interrupt_handler(void)
         if (ticksLeftInTask <= 0 && multiEnable)
         {
             if(debugLevel)
-                kprintf("Saving %s\n", tasks[currentTask].imageName);
+                kprintf("Saving %s.", tasks[currentTask].imageName);
 
             // Save current context
             _asm mov[espVal], esp            
             tasks[currentTask].ESP = espVal;
+            tasks[currentTask].cr3 = __readcr3();
 
             oldTaskIndex = currentTask;
 
@@ -114,12 +115,15 @@ void _declspec(naked) timer_interrupt_handler(void)
             else
             {
                 readyQueueHead->taskIndex = oldTaskIndex;
-            }            
+            }
 
             if(debugLevel)
-                kprintf("Switching to %s\n", tasks[currentTask].imageName);
+                kprintf(" Switching to %s\n", tasks[currentTask].imageName);
 
             ticksLeftInTask = TICKS_PER_TASK;
+
+            // switch to the new task's page tables
+            __writecr3(tasks[currentTask].cr3);
 
             // Get the stack pointer of the next waiting task and make that the stack
             espVal = tasks[currentTask].ESP;
