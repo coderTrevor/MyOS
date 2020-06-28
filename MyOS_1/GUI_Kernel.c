@@ -29,10 +29,15 @@ void GUI_CallbackAdded()
         if (!tasks[i].inUse)
             continue;
 
-        // Construct the message data
-        GUI_NEW_CONSOLE_APP_DATA data;
-        data.appName = tasks[i].imageName;
-
-        (*guiCallback)(tasks[i].PID, GUI_MSG_NEW_CONSOLE_APP, &data);
+        GUI_CreateConsoleWindowForApp(i);
     }
+}
+
+void GUI_CreateConsoleWindowForApp(uint32_t taskNumber)
+{
+    // Construct the message data
+    GUI_NEW_CONSOLE_APP_DATA data;
+    data.appName = tasks[taskNumber].imageName;
+
+    (*guiCallback)(tasks[taskNumber].PID, GUI_MSG_NEW_CONSOLE_APP, &data);
 }

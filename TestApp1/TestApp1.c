@@ -86,10 +86,14 @@ int main()
     }
     printf("0x%lX\n", spvar);*/
 
+    timeDelayMS(500);
+
     printf("Hello World from an .exe using a system call%s\nDid you know that the answer to life, the universe, and everything is %d?\n", " and printf()!", 42);
    // exit();
 
     //printf("This code will never be executed because of the call to exit()\n");
+
+    printf("Now printing a series of b's to test multitasking...\n");
 
     while (true)
     {

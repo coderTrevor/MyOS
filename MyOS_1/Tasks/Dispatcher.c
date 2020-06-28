@@ -1,6 +1,7 @@
 #include "Context.h"
 #include "../printf.h"
 #include "../Interrupts/System_Calls.h"
+#include "../GUI_Kernel.h"
 
 PROCESS_CONTROL_BLOCK tasks[64] = { 0 };
 READY_QUEUE_ENTRY *readyQueueHead = NULL;
@@ -109,6 +110,12 @@ void DispatchNewTask(uint32_t programStart, uint32_t stackSize, const char *imag
 
     tasks[taskSlot].ESP = (uint32_t)pNewTask;
     tasks[taskSlot].exclusive = exclusive;
+
+    // If a GUI shell is running, tell it about the new process
+    if (guiCallback)
+    {
+        GUI_CreateConsoleWindowForApp(taskSlot);
+    }
 
     if (debugLevel)
     {

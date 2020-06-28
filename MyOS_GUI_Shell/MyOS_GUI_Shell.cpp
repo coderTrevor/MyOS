@@ -472,7 +472,7 @@ int main(int argc, char* argv[])
 
                 case SDL_KEYDOWN:
                     //switch (event.key.keysym)
-                    CreateTextWindow(lastWindowID++, "New Window");
+                    //CreateTextWindow(lastWindowID++, "New Window");
 
                     //MessageBox("Here's a test message", "Test Message");
                     switch (event.key.keysym.sym)

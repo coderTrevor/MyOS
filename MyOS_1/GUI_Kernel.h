@@ -12,3 +12,5 @@ void GUI_CallbackAdded();
 
 // Sends the formatted text string to the running GUI application
 int  GUI_printf(const char *format, va_list va);
+
+void GUI_CreateConsoleWindowForApp(uint32_t taskNumber);
