@@ -118,7 +118,7 @@ void KeStartupPhase2(multiboot_info *multibootInfo)
     tasks[0].inUse = true;
     strncpy(tasks[0].imageName, "KERNEL PROCESS", sizeof("KERNEL PROCESS"));
     tasks[0].PID = nextPID - 1;
-    tasks[0].cr3 = pageDir;
+    tasks[0].cr3 = (uint32_t)pageDir;
 
     // Initialize interrupts
     Interrupts_Init();

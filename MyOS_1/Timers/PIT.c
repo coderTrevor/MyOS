@@ -123,7 +123,8 @@ void _declspec(naked) timer_interrupt_handler(void)
             ticksLeftInTask = TICKS_PER_TASK;
 
             // switch to the new task's page tables
-            __writecr3(tasks[currentTask].cr3);
+            if(tasks[currentTask].cr3 != __readcr3())
+                __writecr3(tasks[currentTask].cr3);
 
             // Get the stack pointer of the next waiting task and make that the stack
             espVal = tasks[currentTask].ESP;

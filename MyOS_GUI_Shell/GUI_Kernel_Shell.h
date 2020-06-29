@@ -8,6 +8,9 @@ extern "C" {
 
 // Used to define the interface between the Kernel and the GUI Shell (on the shell side)
 
+#define \
+GUI_BASE_ADDRESS 0xC00000
+
 // Called by the kernel to send messages to the GUI
 void GUI_Kernel_Callback(uint32_t PID, uint32_t messageType, void *pData);
 

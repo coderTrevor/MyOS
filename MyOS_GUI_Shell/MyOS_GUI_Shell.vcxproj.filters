@@ -386,5 +386,8 @@
     <ClInclude Include="GUI_TerminalWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MyOS_GUI_Shell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

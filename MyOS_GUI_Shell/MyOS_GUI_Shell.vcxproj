@@ -133,7 +133,7 @@
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
-      <BaseAddress>0xC00000</BaseAddress>
+      <BaseAddress>@GUI_Kernel_Shell.h,GUI_BASE_ADDRESS</BaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <MapFileName>GUI.map</MapFileName>
       <MapExports>true</MapExports>
@@ -141,6 +141,7 @@
       <EntryPointSymbol>main</EntryPointSymbol>
       <GenerateMapFile>true</GenerateMapFile>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <FixedBaseAddress>true</FixedBaseAddress>
     </Link>
     <PostBuildEvent>
       <Message>Copying GUI.exe to TFTP directory</Message>
@@ -294,6 +295,7 @@
     <ClInclude Include="GUI_Taskbar.h" />
     <ClInclude Include="GUI_TerminalWindow.h" />
     <ClInclude Include="GUI_Window.h" />
+    <ClInclude Include="MyOS_GUI_Shell.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

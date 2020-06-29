@@ -72,7 +72,7 @@ void KPageAllocator(unsigned int pages, unsigned int *pPagesAllocated, uint32_t 
         {
             for (int i = 0; i < MAX_TASKS; ++i)
             {
-                if (!tasks[i].inUse || tasks[i].cr3 == pageDir)
+                if (!tasks[i].inUse || tasks[i].cr3 == (uint32_t)pageDir)
                     continue;
 
                 PAGE_DIRECTORY_ENTRY *otherPageDir = (PAGE_DIRECTORY_ENTRY *)tasks[i].cr3;

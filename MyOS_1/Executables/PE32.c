@@ -6,6 +6,7 @@
 #include "../printf.h"
 #include "../Tasks/Context.h"
 #include "../paging.h"
+#include "../../MyOS_GUI_Shell/GUI_Kernel_Shell.h"
 
 jmp_buf peReturnBuf;
 
@@ -86,9 +87,10 @@ bool loadAndRunPE(uint8_t *executableDestination, DOS_Header *mzAddress, const c
 
     // Get a new page directory for the new task
     PAGE_DIRECTORY_ENTRY *newPageDirectory;
-
-    // GUI.exe shares the kernel's page directory
-    if ((uint32_t)executableDestination != 0xC00000)
+    uint32_t physicalLocation = (uint32_t)executableDestination;
+    
+    // Create a new page directory unless we're loading the GUI, because GUI.exe shares the kernel's page directory and uses a hardcoded address
+    if ((uint32_t)executableDestination != GUI_BASE_ADDRESS)
     {
         newPageDirectory = (PAGE_DIRECTORY_ENTRY *)nextPageDirectory;
         nextPageDirectory += sizeof(PAGE_DIRECTORY_ENTRY) * 1024;
@@ -96,13 +98,29 @@ bool loadAndRunPE(uint8_t *executableDestination, DOS_Header *mzAddress, const c
         // Copy the kernel's page table to this new page table
         memcpy((void*)newPageDirectory, pageDir, sizeof(PAGE_DIRECTORY_ENTRY) * 1024);
 
+        // Allocate a page of memory for the new application
+        unsigned int pagesAllocated;
+        KPageAllocator(1, &pagesAllocated, &physicalLocation);
+        if (!pagesAllocated)
+        {
+            kprintf("Unable to allocate memory for %s", imageName);
+            _enable();
+            return false;
+        }
+
+        //kprintf("Got a page of memory at 0x%X\n", physicalLocation);
+
+        // Map the page of memory into the process' page directory
+        newPageDirectory[(uint32_t)executableDestination / FOUR_MEGABYTES] = physicalLocation
+                                                            | DIRECTORY_ENTRY_PRESENT | DIRECTORY_ENTRY_WRITABLE | DIRECTORY_ENTRY_4MB | DIRECTORY_ENTRY_USER_ACCESSIBLE;
+
         //Paging_Print_Page_Table(newPageDirectory);
     }
     else
         newPageDirectory = pageDir;
 
     // TEMPTEMP - zero out 5 0x1000 sections of memory (tailored to TestApp1.exe)
-    memset(executableDestination, 0, 0x5000);
+    memset(physicalLocation, 0, 0x5000);
 
     // Get the address of the first section
     IMAGE_SECTION_HEADER *sectionHeader = (IMAGE_SECTION_HEADER*)((uint32_t)directory + sizeof(IMAGE_DATA_DIRECTORY));
@@ -120,7 +138,7 @@ bool loadAndRunPE(uint8_t *executableDestination, DOS_Header *mzAddress, const c
         }
 
         // Determine the destination of the current section
-        uint8_t *sectionDest = (uint8_t*)((uint32_t)executableDestination + sectionHeader->mVirtualAddress);
+        uint8_t *sectionDest = (uint8_t*)((uint32_t)physicalLocation + sectionHeader->mVirtualAddress);
         if (debugLevel)
         {
             terminal_writestring("Virtual address of section: ");
