@@ -75,6 +75,13 @@ void GUI_Object::DrawBox(SDL_Surface *pSurface, int x, int y, int width, int hei
     DrawVerticalLine(pSurface, x, y, y + height, lineColor);
 }
 
+// Fill a surface with a color
+void GUI_Object::FillSurface(SDL_Surface * pSurface, SDL_Color color)
+{
+    uint32_t col = SDL_MapRGB(pSurface->format, color.r, color.g, color.b);
+    SDL_FillRect(pSurface, NULL, col);
+}
+
 void GUI_Object::DrawSystemMenu(SDL_Surface *pSurface, char *windowName)
 {
     // Fill in a bar at the top

@@ -6,6 +6,8 @@
 #include "GUI_Taskbar.h"
 #include "GUI_Button.h"
 
+void StartMenuHandler(int choice)
+{}
 
 GUI_Taskbar::GUI_Taskbar(uint32_t desktopWidth, uint32_t desktopHeight) : 
     GUI_Window(desktopHeight - GUI_TASKBAR_HEIGHT, 0, desktopWidth, GUI_TASKBAR_HEIGHT, "Taskbar")
@@ -23,6 +25,10 @@ GUI_Taskbar::GUI_Taskbar(uint32_t desktopWidth, uint32_t desktopHeight) :
     // Add a "Start" button control
     pControls[0] = new GUI_Button("MyOS", GUI_TASKBAR_START_ID, this);
     pControls[0]->dimensions.left = GUI_TASKBAR_BUTTON_MARGINS;
+
+    // Create the start menu
+    pStartMenu = new GUI_PopupMenu(this, StartMenuHandler, ABOVE_AND_RIGHT_OF_ORIGIN);
+    pStartMenu->AddMenuItem("Run", 0);
 
     windowButtons = 0;
     pActiveWindowButton = NULL;
@@ -115,6 +121,8 @@ void GUI_Taskbar::ControlClicked(uint32_t controlID)
 {
     if (controlID != GUI_TASKBAR_START_ID)
     {
+        pStartMenu->shown = false;
+
         if (pActiveWindowButton)
             pActiveWindowButton->UnClick();
 
@@ -129,12 +137,23 @@ void GUI_Taskbar::ControlClicked(uint32_t controlID)
     else
     {
         // start clicked
+        if (!pStartMenu->shown)
+            pStartMenu->ShowMenu({ GUI_TASKBAR_BUTTON_MARGINS, dimensions.top });
+        else
+            pStartMenu->shown = false;
     }
 }
 
 void GUI_Taskbar::OnDrag(int startRelX, int startRelY, int relX, int relY)
 {
     // Don't allow the taskbar itself to be dragged
+}
+
+void GUI_Taskbar::PaintToSurface(SDL_Surface * pTargetSurface)
+{
+    GUI_Window::PaintToSurface(pTargetSurface);
+
+    pStartMenu->PaintToSurface(pTargetSurface);
 }
 
 void GUI_Taskbar::RemoveWindow(uint32_t windowID)

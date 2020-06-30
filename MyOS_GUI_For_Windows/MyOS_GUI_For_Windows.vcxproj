@@ -153,6 +153,7 @@
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_Control.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_MessageBox.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_Object.h" />
+    <ClInclude Include="..\MyOS_GUI_Shell\GUI_PopupMenu.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_Rect.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_Taskbar.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_Window.h" />
@@ -167,6 +168,7 @@
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_Kernel_Shell.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_MessageBox.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_Object.cpp" />
+    <ClCompile Include="..\MyOS_GUI_Shell\GUI_PopupMenu.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_Taskbar.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_TerminalWindow.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_Window.cpp" />

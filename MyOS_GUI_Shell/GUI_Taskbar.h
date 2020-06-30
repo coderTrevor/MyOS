@@ -2,6 +2,7 @@
 #include "MyOS_GUI_Shell.h"
 #include "GUI_Window.h"
 #include "GUI_Button.h"
+#include "GUI_PopupMenu.h"
 
 #define GUI_TASKBAR_HEIGHT              32
 #define GUI_TASKBAR_BUTTON_MARGINS      4
@@ -33,12 +34,13 @@ public:
     void ButtonsChanged();
     void ControlClicked(uint32_t controlID);
     void OnDrag(int startRelX, int startRelY, int relX, int relY);
+    void PaintToSurface(SDL_Surface *pTargetSurface);
     void RemoveWindow(uint32_t windowID);
     void WindowActivated(uint32_t windowID);
 
 protected:
     int windowButtons;
-
     GUI_TaskbarButton *pActiveWindowButton;
+    GUI_PopupMenu *pStartMenu;
 };
 

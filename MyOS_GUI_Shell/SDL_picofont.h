@@ -4,6 +4,7 @@
 
    File authors:
       Fredrik Hultin
+      With Modifications for MyOS by Trevor Thompson
 
    License: GPLv2
 */
@@ -20,6 +21,17 @@ extern "C" {
 #else
 #include <SDL.h>
 #endif
+
+
+#define FNT_FONTHEIGHT  8
+#define FNT_FONTWIDTH   8
+
+// put same space between rows to improve readability
+#define FNT_ROWSPACING  3
+
+// put some margins around the borders
+#define FNT_LEFTRIGHTMARGIN     3
+#define FNT_TOPBOTTOMMARGIN     3
 
 SDL_Surface* FNT_Render(const char* text, SDL_Color color);
 SDL_Surface* FNT_RenderMax(const char* text, unsigned int len, SDL_Color color);

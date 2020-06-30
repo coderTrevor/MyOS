@@ -40,9 +40,10 @@ int __cdecl main(int argc, char* argv[])
         "An SDL2 window",                  // window title
         SDL_WINDOWPOS_UNDEFINED,           // initial x position
         SDL_WINDOWPOS_UNDEFINED,           // initial y position
-        800,                               // width, in pixels (ignored)
-        600,                               // height, in pixels (ignored
-        SDL_WINDOW_FULLSCREEN_DESKTOP      // Make the window the same size as the desktop
+        640,                               // width, in pixels (ignored)
+        480,                               // height, in pixels (ignored
+        0
+        //SDL_WINDOW_FULLSCREEN_DESKTOP      // Make the window the same size as the desktop
     );
 
     // Check that the window was successfully created
@@ -63,7 +64,7 @@ int __cdecl main(int argc, char* argv[])
     // Update the surface
     SDL_UpdateWindowSurface(window);
 
-    SDL_Delay(500);  // Pause execution for 500 milliseconds, for example
+    SDL_Delay(100);  // Pause execution for 500 milliseconds, for example
 
     // Load BMP
     char *filename = "kghrwide.bmp";
@@ -85,7 +86,7 @@ int __cdecl main(int argc, char* argv[])
         // Update the surface
         SDL_UpdateWindowSurface(window);
 
-        SDL_Delay(3000);  // Pause execution for 3000 milliseconds, for example
+        SDL_Delay(300);  // Pause execution for 3000 milliseconds, for example
     }
 
     // Close and destroy the window

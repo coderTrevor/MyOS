@@ -46,6 +46,7 @@ protected:
     void Draw3D_Box(SDL_Surface *pSurface, int x, int y, int width, int height);
     void Draw3D_InsetBox(SDL_Surface * pSurface, int x, int y, int width, int height);
     void DrawBox(SDL_Surface *pSurface, int x, int y, int width, int height, SDL_Color lineColor);
+    void FillSurface(SDL_Surface *pSurface, SDL_Color color);
 };
 
 #ifdef __cplusplus

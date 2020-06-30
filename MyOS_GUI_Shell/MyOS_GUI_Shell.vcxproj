@@ -278,6 +278,7 @@
     <ClCompile Include="GUI_Kernel_Shell.cpp" />
     <ClCompile Include="GUI_MessageBox.cpp" />
     <ClCompile Include="GUI_Object.cpp" />
+    <ClCompile Include="GUI_PopupMenu.cpp" />
     <ClCompile Include="GUI_Taskbar.cpp" />
     <ClCompile Include="GUI_TerminalWindow.cpp" />
     <ClCompile Include="GUI_Window.cpp" />
@@ -291,6 +292,7 @@
     <ClInclude Include="GUI_Kernel_Shell.h" />
     <ClInclude Include="GUI_MessageBox.h" />
     <ClInclude Include="GUI_Object.h" />
+    <ClInclude Include="GUI_PopupMenu.h" />
     <ClInclude Include="GUI_Rect.h" />
     <ClInclude Include="GUI_Taskbar.h" />
     <ClInclude Include="GUI_TerminalWindow.h" />
