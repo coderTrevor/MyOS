@@ -35,12 +35,13 @@ public:
     void ControlClicked(uint32_t controlID);
     void OnDrag(int startRelX, int startRelY, int relX, int relY);
     void PaintToSurface(SDL_Surface *pTargetSurface);
+    //bool PointInBounds(int x, int y);
     void RemoveWindow(uint32_t windowID);
     void WindowActivated(uint32_t windowID);
+    GUI_PopupMenu *pStartMenu;
 
 protected:
     int windowButtons;
     GUI_TaskbarButton *pActiveWindowButton;
-    GUI_PopupMenu *pStartMenu;
 };
 

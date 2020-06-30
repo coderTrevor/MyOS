@@ -22,6 +22,7 @@ const SDL_Color SDL_DARKGRAY    = { 40, 40, 40, 255 };
 const uint32_t  RGB_BLACK = 0x000000;
 const SDL_Color SDL_WHITE = { 255, 255, 255, 255 };
 const SDL_Color SDL_DEFAULT_BUTTON_COLOR = { 200, 200, 200, 255 };
+const SDL_Color SDL_SYS_MENU_COLOR = { SYSTEM_MENU_COLOR_R, SYSTEM_MENU_COLOR_G, SYSTEM_MENU_COLOR_B, 255 };
 
 class GUI_Object
 {

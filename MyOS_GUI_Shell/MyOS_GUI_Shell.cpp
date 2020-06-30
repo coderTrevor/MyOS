@@ -500,6 +500,12 @@ int main(int argc, char* argv[])
                         oldMousePos.x = cursorRect.x;
                         oldMousePos.y = cursorRect.y;
                     }
+                    else
+                    {
+                        if (pTaskbar->pStartMenu->PointInBounds(cursorRect.x, cursorRect.y))
+                            pTaskbar->pStartMenu->MouseOver(cursorRect.x - pTaskbar->pStartMenu->dimensions.left,
+                                                            cursorRect.y - pTaskbar->pStartMenu->dimensions.top);
+                    }
 
                     break;
 
@@ -515,6 +521,12 @@ int main(int argc, char* argv[])
                             {
                                 pTaskbar->OnClick(cursorRect.x, cursorRect.y - pTaskbar->dimensions.top);
                                 pDraggedWindow = pTaskbar;
+                            }
+                            // What about the start menu?
+                            else if (pTaskbar->pStartMenu->PointInBounds(cursorRect.x, cursorRect.y))
+                            {
+                                pTaskbar->pStartMenu->OnClick(cursorRect.x - pTaskbar->pStartMenu->dimensions.left,
+                                                              cursorRect.y - pTaskbar->pStartMenu->dimensions.top);
                             }
                             else if (pStackEntryUnderCursor)
                             {

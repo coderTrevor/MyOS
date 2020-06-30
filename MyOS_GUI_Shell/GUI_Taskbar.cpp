@@ -28,6 +28,9 @@ GUI_Taskbar::GUI_Taskbar(uint32_t desktopWidth, uint32_t desktopHeight) :
 
     // Create the start menu
     pStartMenu = new GUI_PopupMenu(this, StartMenuHandler, ABOVE_AND_RIGHT_OF_ORIGIN);
+
+    pStartMenu->AddMenuItem("Option 1", 1);
+    pStartMenu->AddMenuItem("Option 2", 2);
     pStartMenu->AddMenuItem("Run", 0);
 
     windowButtons = 0;
@@ -155,6 +158,19 @@ void GUI_Taskbar::PaintToSurface(SDL_Surface * pTargetSurface)
 
     pStartMenu->PaintToSurface(pTargetSurface);
 }
+
+// TODO: For now we assume the taskbar is always in the same position
+/*bool GUI_Taskbar::PointInBounds(int x, int y)
+{
+    if (GUI_Object::PointInBounds(x, y))
+        return true;
+
+    // Check start menu
+    if (pStartMenu->shown && pStartMenu->PointInBounds(x, y))
+        return true;
+
+    return false;
+}*/
 
 void GUI_Taskbar::RemoveWindow(uint32_t windowID)
 {
