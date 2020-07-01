@@ -32,6 +32,29 @@ void GUI_Window::CreateSurface()
     DrawWindow();
 }
 
+void GUI_Window::SetFocus(int controlID)
+{
+    // Ignore if this control alread has the focus
+    if (focusedControlIndex >= 0 && pControls[focusedControlIndex]->controlID == controlID)
+        return;
+
+    // Unfocus the previously focused control
+    if (focusedControlIndex >= 0)
+        pControls[focusedControlIndex]->LoseFocus();
+        
+    // Find the control with the given ID and focus it
+    for (int i = 0; i < MAX_WINDOW_CONTROLS; ++i)
+    {
+        if (pControls[i] && pControls[i]->controlID == controlID)
+        {
+            focusedControlIndex = i;
+            return;
+        }
+    }
+
+    MessageBox("Couldn't find a matching control for SetFocus", "ERROR");
+}
+
 void GUI_Window::PaintToSurface(SDL_Surface *pTargetSurface)
 {
     // TEMP
@@ -42,6 +65,14 @@ void GUI_Window::PaintToSurface(SDL_Surface *pTargetSurface)
     }
 
     SDL_BlitSurface(pSurface, NULL, pTargetSurface, dimensions.GetSDL_Rect());
+}
+
+void GUI_Window::UpdateCursor()
+{
+    if (focusedControlIndex < 0)
+        return;
+
+    pControls[focusedControlIndex]->UpdateCursor();
 }
 
 void GUI_Window::ControlClicked(uint32_t controlID)
@@ -60,6 +91,14 @@ void GUI_Window::FillSurface(SDL_Color color)
 {
     uint32_t col = SDL_MapRGB(pSurface->format, color.r, color.g, color.b);
     SDL_FillRect(pSurface, NULL, col);
+}
+
+void GUI_Window::LoseFocus()
+{
+    if (focusedControlIndex < 0)
+        return;
+
+    pControls[focusedControlIndex]->LoseFocus();
 }
 
 void GUI_Window::OnClick(int relX, int relY)

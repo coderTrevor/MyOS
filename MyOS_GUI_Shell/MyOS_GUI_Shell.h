@@ -14,6 +14,8 @@ typedef struct GUI_WINDOW_STACK_ENTRY
     GUI_WINDOW_STACK_ENTRY *pAbove;
 } GUI_WINDOW_STACK_ENTRY;
 
+void AddNewWindow(GUI_Window *pWindow);
+void AddWindowToStack(GUI_Window *window, GUI_WINDOW_STACK_ENTRY *pStackEntry);
 void BringWindowID_ToFront(uint32_t windowID);
 void BringWindowToFront(GUI_WINDOW_STACK_ENTRY *pEntry);
 GUI_Window *CreateTextWindow(uint32_t uniqueID, const char *windowName);

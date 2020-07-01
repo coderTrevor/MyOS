@@ -155,6 +155,7 @@
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_Object.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_PopupMenu.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_Rect.h" />
+    <ClInclude Include="..\MyOS_GUI_Shell\GUI_RunWindow.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_Taskbar.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_Window.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\MyOS_GUI_Shell.h" />
@@ -165,10 +166,12 @@
     <ClCompile Include="..\MyOS_GUI_Shell\font.c" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_Button.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_Control.cpp" />
+    <ClCompile Include="..\MyOS_GUI_Shell\GUI_EditControl.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_Kernel_Shell.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_MessageBox.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_Object.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_PopupMenu.cpp" />
+    <ClCompile Include="..\MyOS_GUI_Shell\GUI_RunWindow.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_Taskbar.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_TerminalWindow.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_Window.cpp" />

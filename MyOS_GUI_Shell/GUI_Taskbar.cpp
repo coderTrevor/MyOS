@@ -5,9 +5,23 @@
 #endif
 #include "GUI_Taskbar.h"
 #include "GUI_Button.h"
+#include "GUI_RunWindow.h"
 
 void StartMenuHandler(int choice)
-{}
+{
+    switch (choice)
+    {
+        case 0:
+            new GUI_RunWindow();
+            break;
+        case 1:
+            MessageBox("Option 1 clicked", "Click");
+            break;
+        case 2:
+            MessageBox("Option 2 clicked", "Click");
+            break;
+    }
+}
 
 GUI_Taskbar::GUI_Taskbar(uint32_t desktopWidth, uint32_t desktopHeight) : 
     GUI_Window(desktopHeight - GUI_TASKBAR_HEIGHT, 0, desktopWidth, GUI_TASKBAR_HEIGHT, "Taskbar")

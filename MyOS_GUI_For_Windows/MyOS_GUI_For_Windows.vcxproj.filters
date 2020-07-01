@@ -45,6 +45,9 @@
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_PopupMenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\MyOS_GUI_Shell\GUI_RunWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\MyOS_GUI_Shell\MyOS_GUI_Shell.cpp">
@@ -84,6 +87,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_PopupMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_GUI_Shell\GUI_RunWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyOS_GUI_Shell\GUI_EditControl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -123,6 +123,24 @@ bool GUI_PopupMenu::MouseOver(int relX, int relY)
     return true;
 }
 
+void GUI_PopupMenu::OnClick(int relX, int relY)
+{
+    if (relX < 0 || relY < 0 || relX > dimensions.width || relY > dimensions.height)
+    {
+        MessageBox("Menu called with mouse out of position\n", "ERROR");
+        return;
+    }
+
+    // Get the selection
+    int heightPerOption = dimensions.height / choices;
+    int selection = relY / heightPerOption;
+
+    // Call the callback with the ID for this selection
+    (*handlerCallback)(choiceIDs[selection]);
+
+    shown = false;
+}
+
 void GUI_PopupMenu::PaintToSurface(SDL_Surface * pTargetSurface)
 {
     if (!shown)

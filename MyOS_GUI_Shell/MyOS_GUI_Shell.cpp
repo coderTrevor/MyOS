@@ -76,6 +76,15 @@ GUI_Window *pDraggedWindow = NULL;
 GUI_WINDOW_STACK_ENTRY windowStack[MAX_GUI_WINDOWS] = { 0, 0, 0 };
 GUI_WINDOW_STACK_ENTRY *pStackTop = NULL;// &windowStack[0];
 
+uint32_t previousTime;  // system time of last loop iteration in milliseconds
+#define CURSOR_BLINK_MS 450
+int timeBeforeCursorBlink = CURSOR_BLINK_MS;
+
+// TODO: implement SDL_GetTicks
+#ifndef timeGetUptimeMS
+#define timeGetUptimeMS SDL_GetTicks
+#endif
+
 // Search the stack of windows, top to buttom to see whic window the mouse is hovering over
 GUI_WINDOW_STACK_ENTRY *FindWindowFromPoint(int x, int y)
 {
@@ -104,6 +113,27 @@ void RemoveWindowFromStack(GUI_WINDOW_STACK_ENTRY *pEntry)
     // Check if this window was on top
     if (pStackTop == pEntry)
         pStackTop = pEntry->pUnderneath;
+}
+
+void AddNewWindow(GUI_Window * pWindow)
+{
+    // find the first unused entry in the windowList
+    for (int i = 0; i < MAX_GUI_WINDOWS; ++i)
+    {
+        if (!windowList[i])
+        {
+            windowList[i] = pWindow;
+            windowIDs[i] = ++lastWindowID;
+
+            AddWindowToStack(windowList[i], &windowStack[i]);
+
+            pTaskbar->AddWindow(lastWindowID, windowList[i]);
+            
+            return;
+        }
+    }
+
+    printf("ERROR: Couldn't find any free window slots!\n");
 }
 
 // TODO: Not sure I like this / not sure windowID helps anything vs using pointers directly
@@ -283,7 +313,7 @@ void MessageBox(char *messageText, char *windowTitle)
         if (!windowList[i])
         {
             windowList[i] = new GUI_MessageBox(messageText, windowTitle);
-            AddWindowToStack(windowList[i], &windowStack[i]);            
+            AddWindowToStack(windowList[i], &windowStack[i]);
             return;
         }
     }
@@ -450,6 +480,8 @@ int main(int argc, char* argv[])
 
     //GUI_Kernel_Callback(0, 0, NULL);
 
+    previousTime = timeGetUptimeMS();
+
     // Keep drawing everything
     while (!done)
     {
@@ -458,6 +490,21 @@ int main(int argc, char* argv[])
 
         GUI_WINDOW_STACK_ENTRY *pStackEntryUnderCursor = FindWindowFromPoint(cursorRect.x, cursorRect.y);
         
+        // Check if cursor needs to blink
+        uint32_t ticks = timeGetUptimeMS();
+        timeBeforeCursorBlink -= (ticks - previousTime);
+
+        if (timeBeforeCursorBlink < 0)
+        {
+            if (pStackTop)
+                pStackTop->pWindow->UpdateCursor();
+
+            timeBeforeCursorBlink += CURSOR_BLINK_MS;
+        }
+
+        previousTime = ticks;
+        
+
         if (SDL_PollEvent(&event))
         {
             //GUI_Window *pWindow;

@@ -275,10 +275,12 @@
     <ClCompile Include="font.c" />
     <ClCompile Include="GUI_Button.cpp" />
     <ClCompile Include="GUI_Control.cpp" />
+    <ClCompile Include="GUI_EditControl.cpp" />
     <ClCompile Include="GUI_Kernel_Shell.cpp" />
     <ClCompile Include="GUI_MessageBox.cpp" />
     <ClCompile Include="GUI_Object.cpp" />
     <ClCompile Include="GUI_PopupMenu.cpp" />
+    <ClCompile Include="GUI_RunWindow.cpp" />
     <ClCompile Include="GUI_Taskbar.cpp" />
     <ClCompile Include="GUI_TerminalWindow.cpp" />
     <ClCompile Include="GUI_Window.cpp" />
@@ -289,11 +291,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GUI_Control.h" />
+    <ClInclude Include="GUI_EditControl.h" />
     <ClInclude Include="GUI_Kernel_Shell.h" />
     <ClInclude Include="GUI_MessageBox.h" />
     <ClInclude Include="GUI_Object.h" />
     <ClInclude Include="GUI_PopupMenu.h" />
     <ClInclude Include="GUI_Rect.h" />
+    <ClInclude Include="GUI_RunWindow.h" />
     <ClInclude Include="GUI_Taskbar.h" />
     <ClInclude Include="GUI_TerminalWindow.h" />
     <ClInclude Include="GUI_Window.h" />

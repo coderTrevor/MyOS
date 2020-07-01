@@ -22,6 +22,7 @@ public:
             pControls[i] = NULL;
 
         pClickedControl = NULL;
+        focusedControlIndex = -1;
     }
 
     GUI_Window(int top, int left, int width, int height, const char *name)
@@ -38,6 +39,7 @@ public:
             pControls[i] = NULL;
 
         pClickedControl = NULL;
+        focusedControlIndex = -1;
     }
 
     virtual void ControlClicked(uint32_t controlID);
@@ -45,6 +47,8 @@ public:
     void DrawWindow();
 
     void FillSurface(SDL_Color color);
+
+    virtual void LoseFocus();
 
     void OnClick(int relX, int relY);
 
@@ -61,8 +65,14 @@ public:
         (void)text; // text sent to GUI_Window base class is ignored
     }
 
+    void SetFocus(int controlID);
+
     SDL_Surface *GetSurface() { return pSurface; }
+    
     void PaintToSurface(SDL_Surface *pTargetSurface);
+
+    void UpdateCursor();
+
 
     SDL_Surface *pSurface;
     GUI_Control *pClickedControl;
@@ -71,4 +81,5 @@ protected:
     void GUI_Window::CreateSurface();
     SDL_Color backgroundColor;
     GUI_Control *pControls[MAX_WINDOW_CONTROLS];
+    int focusedControlIndex;
 };

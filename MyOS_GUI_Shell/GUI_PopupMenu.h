@@ -26,6 +26,7 @@ public:
     void CreateSurface();
     void Draw(int selectedChoice);
     bool MouseOver(int relX, int relY);
+    void OnClick(int relX, int relY);
     void PaintToSurface(SDL_Surface *pTargetSurface);
     void RegisterMenuHandler(MENU_HANDLER handler);
     void ShowMenu(SDL_Point origin);

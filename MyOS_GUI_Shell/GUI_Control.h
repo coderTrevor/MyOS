@@ -13,10 +13,13 @@ public:
         this->controlID = controlID;
     }
 
-    virtual void OnHover(int relX, int relY) {};
+    virtual void LoseFocus() {}
+    virtual void GainFocus() {}
+    virtual void OnHover(int relX, int relY) {}
     virtual void OnClick(int relX, int relY);
-    virtual void OnDrag(int relClickX, int relClickY, int relDestX, int relDestY) {};
+    virtual void OnDrag(int relClickX, int relClickY, int relDestX, int relDestY) {}
     virtual void Resize(GUI_Rect newDimensions) { dimensions = newDimensions; }
+    virtual void UpdateCursor() {}
 
     uint32_t controlID;
 protected:
