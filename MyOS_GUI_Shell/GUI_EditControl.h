@@ -12,6 +12,7 @@ public:
     void LoseFocus();
     void OnClick(int relX, int relY);
     void PaintToSurface(SDL_Surface *pTargetSurface);
+    void SendChar(char c);
     void UpdateCursor();
 
     SDL_Surface *pSurface;

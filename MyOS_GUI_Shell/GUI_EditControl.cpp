@@ -52,6 +52,26 @@ void GUI_EditControl::PaintToSurface(SDL_Surface * pTargetSurface)
     SDL_BlitSurface(pSurface, NULL, pTargetSurface, dimensions.GetSDL_Rect());
 }
 
+void GUI_EditControl::SendChar(char c)
+{
+    char str[2] = { 0 };
+    str[0] = c;
+
+
+    if(cursorBlinkOn)
+        DrawVerticalLine(pSurface, cursorX, 1, dimensions.height - 2, SDL_WHITE);
+
+    SDL_Surface *pFont = FNT_Render(str, SDL_BLACK);
+
+    SDL_Rect dest = { cursorX, FNT_TOPBOTTOMMARGIN, pFont->w, pFont->h };
+
+    SDL_BlitSurface(pFont, NULL, pSurface, &dest);
+
+    SDL_FreeSurface(pFont);
+    
+    cursorX += FNT_FONTWIDTH;
+}
+
 void GUI_EditControl::UpdateCursor()
 {
     cursorBlinkOn = !cursorBlinkOn;

@@ -60,6 +60,8 @@ public:
 
     void SetBackgroundColor(SDL_Color color);
 
+    void SendChar(char c);
+
     virtual void SendWindowText(const char *text)
     {
         (void)text; // text sent to GUI_Window base class is ignored

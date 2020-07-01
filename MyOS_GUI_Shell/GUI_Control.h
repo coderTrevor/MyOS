@@ -19,6 +19,7 @@ public:
     virtual void OnClick(int relX, int relY);
     virtual void OnDrag(int relClickX, int relClickY, int relDestX, int relDestY) {}
     virtual void Resize(GUI_Rect newDimensions) { dimensions = newDimensions; }
+    virtual void SendChar(char c) {}
     virtual void UpdateCursor() {}
 
     uint32_t controlID;

@@ -149,6 +149,14 @@ void GUI_Window::SetBackgroundColor(SDL_Color color)
     DrawWindow();
 }
 
+void GUI_Window::SendChar(char c)
+{
+    if (focusedControlIndex < 0)
+        return;
+
+    pControls[focusedControlIndex]->SendChar(c);
+}
+
 void GUI_Window::DrawWindow()
 {
     // Draw the background

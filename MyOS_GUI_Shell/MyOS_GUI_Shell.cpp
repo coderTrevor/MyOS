@@ -524,11 +524,15 @@ int main(int argc, char* argv[])
                     //MessageBox("Here's a test message", "Test Message");
                     switch (event.key.keysym.sym)
                     {
-                        case SDLK_n:
+                        /*case SDLK_n:
                             //CreateTextWindow(lastWindowID++);
-                            break;
+                            break;*/
                         case SDLK_ESCAPE:
                             done = true;
+                            break;
+                        default:
+                            if (pStackTop)
+                                pStackTop->pWindow->SendChar(event.key.keysym.sym);
                             break;
                     };
                     break;
