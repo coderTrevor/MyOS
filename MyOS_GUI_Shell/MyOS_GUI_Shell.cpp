@@ -9,6 +9,7 @@ extern "C" {
 #ifndef WIN32
 #include "../MyOS_1/Console_VGA.h"
 #include "../MyOS_1/Interrupts/System_Calls.h"
+#include "../MyOS_1/printf.h"
 //#undef _MSVC_VER
 #undef _WIN32
 //#define HAVE_LIBC 0
@@ -322,6 +323,30 @@ void MessageBox(char *messageText, char *windowTitle)
         __halt();
 }
 
+// Display MessageBox with printf-like ability
+// TODO: don't require any memory allocation so we can show out-of-memory errors
+void MessageBoxf(char *windowTitle, char *messageFormat, ...)
+{
+    for (int i = 0; i < MAX_GUI_WINDOWS; ++i)
+    {
+        if (!windowList[i])
+        {
+            char buffer[128] = { 0 };
+            va_list va;
+            va_start(va, messageFormat);
+            const int ret = vsnprintf(buffer, 128, messageFormat, va);
+            va_end(va);
+
+            windowList[i] = new GUI_MessageBox(buffer, windowTitle);
+            AddWindowToStack(windowList[i], &windowStack[i]);
+            return;
+        }
+    }
+    printf("No free spot for window\n");
+    for (;;)
+        __halt();
+}
+
 // Called by windows when they want to be destroyed
 void Shell_Destroy_Window(GUI_Window *pWindow)
 {
@@ -531,6 +556,7 @@ int main(int argc, char* argv[])
                             done = true;
                             break;
                         default:
+                            MessageBoxf("Key pressed", "Scan code: 0x%X - %c", event.key.keysym.scancode, event.key.keysym.sym);
                             if (pStackTop)
                                 pStackTop->pWindow->SendChar(event.key.keysym.sym);
                             break;

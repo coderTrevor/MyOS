@@ -9,7 +9,6 @@ extern "C" {
 #endif
 
 #include <string.h>
-#include "../MyOS_1/Graphics/picofont.h"
 
 GUI_TerminalWindow::GUI_TerminalWindow(const char *name)
     : GUI_Window(NewWindowPosition(GUI_TERMINAL_DEFAULT_WIDTH, GUI_TERMINAL_DEFAULT_HEIGHT), name)

@@ -1,6 +1,5 @@
 #pragma once
 #include "Display_HAL.h"
-#include "picofont.h"
 
 // TODO: Support higher resolutions
 #define MAX_X_RES       800

@@ -22,6 +22,7 @@ GUI_Window *CreateTextWindow(uint32_t uniqueID, const char *windowName);
 GUI_Window *GetWindowFromID(uint32_t uniqueID);
 GUI_Rect NewWindowPosition(int x, int y);
 void MessageBox(char *messageText, char *windowTitle);
+void MessageBoxf(char *windowTitle, char *messageFormat, ...);
 void Shell_Destroy_Window(GUI_Window *pWindow);
 
 

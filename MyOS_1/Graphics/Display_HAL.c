@@ -1,6 +1,5 @@
 #include "Display_HAL.h"
 #include "../Drivers/Bochs_VGA.h"
-#include "picofont.h"
 #include "../multiboot.h"
 #include "../misc.h"
 #include "Graphical_Terminal.h"

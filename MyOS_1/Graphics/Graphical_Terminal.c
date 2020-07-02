@@ -2,6 +2,7 @@
 #include "../Terminal.h"
 #include "../misc.h"
 #include "../printf.h"
+#include "picofont.h"
 #include "Bitmap.h"
 
 // TODO: Support multiple graphical terminals

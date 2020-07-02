@@ -2,6 +2,7 @@
 #include "GUI_Object.h"
 #include "GUI_Rect.h"
 #include "GUI_Control.h"
+#include "SDL_picofont.h"
 
 #define MAX_WINDOW_NAME_LENGTH  64
 #define SYSTEM_MENU_CLOSE_BUTTON_ID (uint32_t)-1

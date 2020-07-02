@@ -33,6 +33,12 @@ extern "C" {
 #define FNT_LEFTRIGHTMARGIN     3
 #define FNT_TOPBOTTOMMARGIN     3
 
+typedef struct
+{
+    int x;
+    int y;
+}FNT_xy;
+
 SDL_Surface* FNT_Render(const char* text, SDL_Color color);
 SDL_Surface* FNT_RenderMax(const char* text, unsigned int len, SDL_Color color);
 
