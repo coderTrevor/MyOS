@@ -19,6 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 #include "../../SDL_internal.h"
+#include "SDL_myoskeyboard.h"
 
 #if SDL_VIDEO_DRIVER_MYOS
 
@@ -49,9 +50,9 @@ MYOS_PumpEvents(_THIS)
         scancode = (0x7F & scancode);
 
         if (keyRelease)
-            SDL_SendKeyboardKey(SDL_RELEASED, scancode);
+            SDL_SendKeyboardKey(SDL_RELEASED, MyOS_Keycodes[scancode]);
         else
-            SDL_SendKeyboardKey(SDL_PRESSED, scancode);
+            SDL_SendKeyboardKey(SDL_PRESSED, MyOS_Keycodes[scancode]);
     }
 
     // Check for mouse motion

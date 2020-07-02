@@ -170,6 +170,8 @@ void BringWindowToFront(GUI_WINDOW_STACK_ENTRY *pEntry)
     if (pStackTop == pEntry)
         return;
 
+    pStackTop->pWindow->LoseFocus();
+
     // bridge the hole left by this window
     RemoveWindowFromStack(pEntry);
 
@@ -215,6 +217,7 @@ void AddWindowToStack(GUI_Window *window, GUI_WINDOW_STACK_ENTRY *pStackEntry)
     {
         pStackEntry->pUnderneath = pStackTop;
         pStackTop->pAbove = pStackEntry;
+        pStackTop->pWindow->LoseFocus();
     }
     else
         pStackEntry->pUnderneath = NULL;
@@ -231,32 +234,9 @@ GUI_Window *CreateTextWindow(uint32_t uniqueID, const char *windowName)
         if (!windowList[i])
         {
             windowList[i] = new GUI_TerminalWindow(windowName);
-                //new GUI_Window(nextX, nextY, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, windowName);
             
             // TODO: Check for NULL
             windowIDs[i] = uniqueID;
-            
-            // Advance position of next window
-            /*nextX += WINDOW_X_INC;
-            nextX %= MAX_WINDOW_X;
-            nextY += WINDOW_Y_INC;
-            nextY %= MAX_WINDOW_Y;
-
-            // set bg color and change color of next window
-            SDL_Color bg;
-            bg.r = bgRed;
-            bg.b = bgBlue;
-            bg.g = bgGreen;
-
-            windowList[i]->SetBackgroundColor(bg);
-
-            bgRed += BG_RED_INC;
-            bgGreen += BG_GREEN_INC;
-            bgBlue += BG_BLUE_INC;
-
-            bgRed %= 255;
-            bgGreen %= 255;
-            bgBlue %= 255;*/
 
             AddWindowToStack(windowList[i], &windowStack[i]);
 
@@ -556,7 +536,7 @@ int main(int argc, char* argv[])
                             done = true;
                             break;
                         default:
-                            MessageBoxf("Key pressed", "Scan code: 0x%X - %c", event.key.keysym.scancode, event.key.keysym.sym);
+                            //MessageBoxf("Key pressed", "Scan code: 0x%X - %c", event.key.keysym.scancode, event.key.keysym.sym);
                             if (pStackTop)
                                 pStackTop->pWindow->SendChar(event.key.keysym.sym);
                             break;

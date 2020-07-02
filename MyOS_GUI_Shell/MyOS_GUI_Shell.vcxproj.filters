@@ -369,6 +369,9 @@
     <ClCompile Include="GUI_EditControl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\myos\SDL_myoskeyboard.c">
+      <Filter>Source Files\SDL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GUI_Object.h">

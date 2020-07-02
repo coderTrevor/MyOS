@@ -1,0 +1,66 @@
+
+#include "../../SDL_internal.h"
+#include "SDL_MyOSkeyboard.h"
+#include "../../../Drivers/Keyboard.h"
+
+SDL_Scancode MyOS_Keycodes[SDL_NUM_SCANCODES] = { SDL_SCANCODE_UNKNOWN };
+
+void MyOS_InitKeyboard(void)
+{
+    MyOS_Keycodes[A_PRESSED] = SDL_SCANCODE_A;
+    MyOS_Keycodes[B_PRESSED] = SDL_SCANCODE_B;
+    MyOS_Keycodes[C_PRESSED] = SDL_SCANCODE_C;
+    MyOS_Keycodes[D_PRESSED] = SDL_SCANCODE_D;
+    MyOS_Keycodes[E_PRESSED] = SDL_SCANCODE_E;
+    MyOS_Keycodes[F_PRESSED] = SDL_SCANCODE_F;
+    MyOS_Keycodes[G_PRESSED] = SDL_SCANCODE_G;
+    MyOS_Keycodes[H_PRESSED] = SDL_SCANCODE_H;
+    MyOS_Keycodes[I_PRESSED] = SDL_SCANCODE_I;
+    MyOS_Keycodes[J_PRESSED] = SDL_SCANCODE_J;
+    MyOS_Keycodes[K_PRESSED] = SDL_SCANCODE_K;
+    MyOS_Keycodes[L_PRESSED] = SDL_SCANCODE_L;
+    MyOS_Keycodes[M_PRESSED] = SDL_SCANCODE_M;
+    MyOS_Keycodes[N_PRESSED] = SDL_SCANCODE_N;
+    MyOS_Keycodes[O_PRESSED] = SDL_SCANCODE_O;
+    MyOS_Keycodes[P_PRESSED] = SDL_SCANCODE_P;
+    MyOS_Keycodes[Q_PRESSED] = SDL_SCANCODE_Q;
+    MyOS_Keycodes[R_PRESSED] = SDL_SCANCODE_R;
+    MyOS_Keycodes[S_PRESSED] = SDL_SCANCODE_S;
+    MyOS_Keycodes[T_PRESSED] = SDL_SCANCODE_T;
+    MyOS_Keycodes[U_PRESSED] = SDL_SCANCODE_U;
+    MyOS_Keycodes[V_PRESSED] = SDL_SCANCODE_V;
+    MyOS_Keycodes[W_PRESSED] = SDL_SCANCODE_W;
+    MyOS_Keycodes[X_PRESSED] = SDL_SCANCODE_X;
+    MyOS_Keycodes[Y_PRESSED] = SDL_SCANCODE_Y;
+    MyOS_Keycodes[Z_PRESSED] = SDL_SCANCODE_Z;
+
+    MyOS_Keycodes[LEFT_BRACKET_PRESSED] = SDL_SCANCODE_LEFTBRACKET;
+    MyOS_Keycodes[RIGHT_BRACKET_PRESSED] = SDL_SCANCODE_RIGHTBRACKET;
+    MyOS_Keycodes[ENTER_PRESSED] = SDL_SCANCODE_RETURN;
+    MyOS_Keycodes[COMMA_PRESSED] = SDL_SCANCODE_COMMA;
+    MyOS_Keycodes[SPACE_PRESSED] = SDL_SCANCODE_SPACE;
+    MyOS_Keycodes[BACKSP_PRESSED] = SDL_SCANCODE_BACKSPACE;
+    MyOS_Keycodes[TAB_PRESSED] = SDL_SCANCODE_TAB;
+    MyOS_Keycodes[PERIOD_PRESSED] = SDL_SCANCODE_PERIOD;
+    MyOS_Keycodes[FORWARD_SLASH_PRESSED] = SDL_SCANCODE_SLASH;
+    MyOS_Keycodes[BACK_SLASH_PRESSED] = SDL_SCANCODE_BACKSLASH;
+    MyOS_Keycodes[BACK_TICK_PRESSED] = SDL_SCANCODE_GRAVE;
+    MyOS_Keycodes[ONE_PRESSED] = SDL_SCANCODE_1;
+    MyOS_Keycodes[TWO_PRESSED] = SDL_SCANCODE_2;
+    MyOS_Keycodes[THREE_PRESSED] = SDL_SCANCODE_3;
+    MyOS_Keycodes[FOUR_PRESSED] = SDL_SCANCODE_4;
+    MyOS_Keycodes[FIVE_PRESSED] = SDL_SCANCODE_5;
+    MyOS_Keycodes[SIX_PRESSED] = SDL_SCANCODE_6;
+    MyOS_Keycodes[SEVEN_PRESSED] = SDL_SCANCODE_7;
+    MyOS_Keycodes[EIGHT_PRESSED] = SDL_SCANCODE_8;
+    MyOS_Keycodes[NINE_PRESSED] = SDL_SCANCODE_9;
+    MyOS_Keycodes[ZERO_PRESSED] = SDL_SCANCODE_0;
+    MyOS_Keycodes[HYPHEN_PRESSED] = '-';
+    MyOS_Keycodes[EQUALS_PRESSED] = SDL_SCANCODE_EQUALS;
+    MyOS_Keycodes[SEMI_PRESSED] = SDL_SCANCODE_SEMICOLON;
+    MyOS_Keycodes[SINGLE_QUOTE_PRESSED] = SDL_SCANCODE_APOSTROPHE;
+
+    // TODO: There are certainly more keypresses that need to be translated
+}
+
+/* vi: set ts=4 sw=4 expandtab: */
