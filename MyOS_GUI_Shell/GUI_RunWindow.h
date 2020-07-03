@@ -15,5 +15,7 @@ class GUI_RunWindow :
 public:
     GUI_RunWindow();
     ~GUI_RunWindow();
+
+    void ControlClicked(uint32_t controlID);
 };
 

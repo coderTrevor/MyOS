@@ -120,7 +120,7 @@ bool loadAndRunPE(uint8_t *executableDestination, DOS_Header *mzAddress, const c
         newPageDirectory = pageDir;
 
     // TEMPTEMP - zero out 5 0x1000 sections of memory (tailored to TestApp1.exe)
-    memset(physicalLocation, 0, 0x5000);
+    memset((void*)physicalLocation, 0, 0x5000);
 
     // Get the address of the first section
     IMAGE_SECTION_HEADER *sectionHeader = (IMAGE_SECTION_HEADER*)((uint32_t)directory + sizeof(IMAGE_DATA_DIRECTORY));
@@ -177,7 +177,6 @@ bool loadAndRunPE(uint8_t *executableDestination, DOS_Header *mzAddress, const c
 
     if (multiEnable)
     {
-        // TEMP: use kernel page directory
         DispatchNewTask((uint32_t)entryPoint, newPageDirectory, 0x20000, imageName, exclusive);
     }
     else

@@ -31,7 +31,7 @@ bool TFTP_TransactionComplete()
 // TODO: Implement timeout, error-checking
 // TODO: Fix hanging if an invalid serverIP is given
 // actualFileSize can be NULL if the caller doesn't care about the size
-bool TFTP_GetFile(uint32_t serverIP, char *filename, uint8_t *destinationBuffer, uint32_t maxFileSize, uint32_t *actualFileSize)
+bool TFTP_GetFile(uint32_t serverIP, const char *filename, uint8_t *destinationBuffer, uint32_t maxFileSize, uint32_t *actualFileSize)
 {
     if(actualFileSize)
         *actualFileSize = 0;
@@ -77,7 +77,7 @@ bool TFTP_GetFile(uint32_t serverIP, char *filename, uint8_t *destinationBuffer,
 
 // TODO: Same as above
 // Retrieves the size of a file. This can take a while for large files, because we actually have to retrieve the entire file to know its size.
-bool TFTP_GetFileSize(uint32_t serverIP, char *filename, uint32_t *pActualFileSize)
+bool TFTP_GetFileSize(uint32_t serverIP, const char *filename, uint32_t *pActualFileSize)
 {
     // Ensure pActualFileSize is a valid pointer
     if (!pActualFileSize)
@@ -111,7 +111,7 @@ bool TFTP_GetFileSize(uint32_t serverIP, char *filename, uint32_t *pActualFileSi
 }
 
 // source port is used to keep track of different transactions
-uint16_t TFTP_RequestFile(uint32_t serverIP, char *filename, char *transferMode, uint8_t *sourceMAC)
+uint16_t TFTP_RequestFile(uint32_t serverIP, const char *filename, const char *transferMode, uint8_t *sourceMAC)
 {
     TFTP_RequestHeader *tftpData;
     size_t filenameLength = strlen(filename) + 1; // length of filename plus null terminator
@@ -148,7 +148,7 @@ uint16_t TFTP_RequestFile(uint32_t serverIP, char *filename, char *transferMode,
 
 // source port is used to keep track of different transactions
 // TODO: Seems like Qemu and VirtualBox don't support writing files via TFTP so I can't finish this :(
-uint16_t TFTP_WriteFile(uint32_t serverIP, char *filename, char *transferMode, uint8_t *sourceMAC)
+uint16_t TFTP_WriteFile(uint32_t serverIP, const char *filename, const char *transferMode, uint8_t *sourceMAC)
 {
     TFTP_RequestHeader *tftpData;
     size_t filenameLength = strlen(filename) + 1; // length of filename plus null terminator

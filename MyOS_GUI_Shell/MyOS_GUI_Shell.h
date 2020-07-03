@@ -24,6 +24,7 @@ GUI_Rect NewWindowPosition(int x, int y);
 void MessageBox(char *messageText, char *windowTitle);
 void MessageBoxf(char *windowTitle, char *messageFormat, ...);
 void Shell_Destroy_Window(GUI_Window *pWindow);
+void Shell_Launch_App(const char *appName);
 
 
 #ifdef __cplusplus

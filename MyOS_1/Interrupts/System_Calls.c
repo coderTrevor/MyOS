@@ -124,6 +124,25 @@ long int SystemCallFTell(FILE * stream)
     return retVal;
 }
 
+bool SystemCallLaunchApp(const char * appFileName, bool exclusive)
+{
+    bool retVal;
+    bool *pRetVal = &retVal;
+    int exclusiveInt = exclusive;
+    const int pointerSize = sizeof(const char *) + sizeof(int) + sizeof(bool *);
+
+    __asm
+    {
+        push[pRetVal]            // push arguments onto stack
+        push[exclusiveInt]
+        push[appFileName]
+        int SYSCALL_LAUNCH_APP   // call launch_app_interrupt_handler(appFilename, exclusiveInt, pRetVal)
+        add esp, pointerSize     // restore value of stack pointer
+    }
+
+    return retVal;
+}
+
 // Get graphics info
 void SystemCallGetGraphicsInfo(bool *graphicsMode, int *width, int *height)
 {

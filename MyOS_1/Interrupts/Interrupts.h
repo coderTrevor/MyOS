@@ -49,6 +49,8 @@ void Interrupts_Init();
 
 void keyboard_interrupt_handler(void);
 
+void launch_app_interrupt_handler(int eflags, int cs, const char *appFilename, bool exclusive, bool *pRetVal);
+
 void page_allocator_interrupt_handler(int eflags, int cs, unsigned int pages, unsigned int *pPagesAllocated, uint32_t *pRetVal);
 
 void page_fault_handler(void);

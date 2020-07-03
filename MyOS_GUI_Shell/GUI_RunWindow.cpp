@@ -7,7 +7,7 @@
 GUI_RunWindow::GUI_RunWindow() : GUI_Window(0, 0, RUN_WINDOW_WIDTH, RUN_WINDOW_HEIGHT, "Run" )
 {
     // Create a button control for an "OK" button
-    pControls[0] = new GUI_Button("OK", SYSTEM_MENU_CLOSE_BUTTON_ID, this);
+    pControls[0] = new GUI_Button("OK", BUTTON_ID_OK, this);
 
     // Move button to bottom-right corner
     pControls[0]->dimensions.left = dimensions.width - pControls[0]->dimensions.width - 2;
@@ -24,4 +24,20 @@ GUI_RunWindow::GUI_RunWindow() : GUI_Window(0, 0, RUN_WINDOW_WIDTH, RUN_WINDOW_H
 GUI_RunWindow::~GUI_RunWindow()
 {
 
+}
+
+void GUI_RunWindow::ControlClicked(uint32_t controlID)
+{
+    // We only care about the OK button
+    if (controlID != BUTTON_ID_OK)
+        return;
+    
+    // Get the edit control
+    GUI_EditControl *pEdit = (GUI_EditControl*)pControls[1];
+    
+    // Launch the requested app
+    Shell_Launch_App(pEdit->stringContents);
+
+    // Tell the shell to destroy this window
+    Shell_Destroy_Window(this);
 }

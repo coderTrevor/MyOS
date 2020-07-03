@@ -30,6 +30,7 @@ extern "C" {
 #define SYSCALL_GET_MOUSE_STATE     240
 #define SYSCALL_HIDE_SHELL_DISPLAY  239
 #define SYSCALL_REGISTER_GUI_CALLBACK   238
+#define SYSCALL_LAUNCH_APP          237
 
 void SystemCallExit();
 #define exit SystemCallExit
@@ -48,6 +49,9 @@ int SystemCallFSeek(FILE * stream, long int offset, int origin);
 
 long int SystemCallFTell(FILE * stream);
 #define ftell SystemCallFTell
+
+bool SystemCallLaunchApp(const char *appFileName, bool exclusive);
+#define launchApp SystemCallLaunchApp
 
 void SystemCallPageAllocator(unsigned int pages, unsigned int *pPagesAllocated, uint32_t *pRreturnVal);
 #define pageAllocator SystemCallPageAllocator

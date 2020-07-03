@@ -6,6 +6,7 @@
 
 #define MAX_WINDOW_NAME_LENGTH  64
 #define SYSTEM_MENU_CLOSE_BUTTON_ID (uint32_t)-1
+#define BUTTON_ID_OK                (uint32_t)-2
 #define MAX_WINDOW_CONTROLS     24   /* TEMP */
 
 class GUI_Control;

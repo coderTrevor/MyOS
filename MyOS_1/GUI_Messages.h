@@ -7,13 +7,14 @@
 // END OF MESSAGES
 
 #define MAX_GUI_CONSOLE_STRING_LENGTH   512
+#define MAX_IMAGE_NAME_LENGTH   32
 
 // DATA TYPES USED BY MESSAGES
 
 // Data type used by GUI_MSG_NEW_CONSOLE_APP messages
 typedef struct GUI_NEW_CONSOLE_APP_DATA
 {
-    const char *appName;
+    char appName[MAX_IMAGE_NAME_LENGTH];
     // TODO: We may as well send the terminal contents over in the same message
 } GUI_NEW_CONSOLE_APP_DATA;
 

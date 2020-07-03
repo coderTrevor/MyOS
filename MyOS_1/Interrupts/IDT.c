@@ -97,6 +97,9 @@ void IDT_Init(void)
     // Set handler for the GUI telling the kernel how to send the GUI messages
     Set_IDT_Entry((unsigned long)gui_register_callback_interrupt_handler, SYSCALL_REGISTER_GUI_CALLBACK);
 
+    // Set handler for launching an app
+    Set_IDT_Entry((unsigned long)launch_app_interrupt_handler, SYSCALL_LAUNCH_APP);
+
     /* fill the IDT descriptor */
     IDT_ptr.base = (uint32_t)IDT;
     IDT_ptr.size = (sizeof(IDT_ENTRY) * 256);

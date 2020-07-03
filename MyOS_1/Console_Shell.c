@@ -29,6 +29,7 @@
 #include "Drivers/Virtio_GPU.h"
 #include "myos_io.h"
 #include "Drivers\Keyboard.h"
+#include "../MyOS_GUI_Shell/GUI_Kernel_Shell.h"
 
 int inputPosition = 0;
 #define COMMAND_HISTORY_SIZE        10
@@ -919,54 +920,14 @@ void Shell_Process_command(void)
             return;
         }
 
-        // TEMPTEMP we've hardcoded some memory starting at 0x800000. This was identity mapped when paging was enabled.
-        uint8_t *exeBuffer = (uint8_t*)0x800000;
+        // TEMPTEMP apps should start at 0x80 0000
+        uint32_t exeBuffer = 0x800000;
 
         // reset keyboard input buffer
         keyReadIndex = keyWriteIndex = 0;
-
-        // Get the size of the executable file
-        uint32_t fileSize;
-        if (!TFTP_GetFileSize(tftpServerIP, subCommand, &fileSize))
-        {
-            terminal_writestring("Failed to determine size of ");
-            terminal_writestring(subCommand);
-            terminal_newline();
-            return;
-        }
-
-        // Allocate a buffer for the executable file
-        uint8_t *peBuffer = malloc(fileSize);
-        if (!peBuffer)
-        {
-            terminal_writestring("Not enough memory to open executable file\n");
-            return;
-        }
-
-        //uint32_t peFileSize;
-
-        if (debugLevel)
-            terminal_dumpHex(peBuffer, 32);
-
-        // Download the executable
-        if (!TFTP_GetFile(tftpServerIP, subCommand, peBuffer, fileSize, NULL))
-        {
-            terminal_writestring("Error reading ");
-            terminal_writestring(subCommand);
-            terminal_writestring(" from server!\n");
-            return;
-        }
-
-        if (debugLevel)
-            terminal_dumpHex(peBuffer, 32);
-
-        // Run the executable
-        if (!loadAndRunPE(exeBuffer, (DOS_Header*)peBuffer, subCommand, exclusive))
-            terminal_writestring("Error running executable\n");
-
-        // Free the memory for the pe
-        free(peBuffer);
-
+        
+        LaunchApp(subCommand, exclusive, exeBuffer);
+        
         terminal_resume();
 
         if (debugLevel)
@@ -1027,56 +988,12 @@ void Shell_Process_command(void)
             return;
         }
 
-        // TEMPTEMP we've hardcoded some memory starting at 0xC00000. This was identity mapped when paging was enabled.
-        uint8_t *exeBuffer = (uint8_t*)0xC00000;
-
         // reset keyboard input buffer
         keyReadIndex = keyWriteIndex = 0;
 
-        // Get the size of the executable file
-        uint32_t fileSize;
-        if (!TFTP_GetFileSize(tftpServerIP, subCommand, &fileSize))
-        {
-            terminal_writestring("Failed to determine size of ");
-            terminal_writestring(subCommand);
-            terminal_newline();
-            return;
-        }
-
-        // Allocate a buffer for the executable file
-        uint8_t *peBuffer = malloc(fileSize);
-        if (!peBuffer)
-        {
-            terminal_writestring("Not enough memory to open executable file\n");
-            return;
-        }
-
-        //uint32_t peFileSize;
-
-        if (debugLevel)
-            terminal_dumpHex(peBuffer, 32);
-
-        // Download the executable
-        if (!TFTP_GetFile(tftpServerIP, subCommand, peBuffer, fileSize, NULL))
-        {
-            terminal_writestring("Error reading ");
-            terminal_writestring(subCommand);
-            terminal_writestring(" from server!\n");
-            return;
-        }
-
-        if (debugLevel)
-            terminal_dumpHex(peBuffer, 32);
-
-
-        // Run the executable
-        if (!loadAndRunPE(exeBuffer, (DOS_Header*)peBuffer, subCommand, exclusive))
-            terminal_writestring("Error running executable\n");
-
-
-        // Free the memory for the pe
-        free(peBuffer);
-
+        // TEMPTEMP we've hardcoded some memory starting at 0xC00000. This was identity mapped when paging was enabled.
+        LaunchApp(subCommand, exclusive, GUI_BASE_ADDRESS);
+                
         terminal_resume();
 
         if (debugLevel)

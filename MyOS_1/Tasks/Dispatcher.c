@@ -2,6 +2,8 @@
 #include "../printf.h"
 #include "../Interrupts/System_Calls.h"
 #include "../paging.h"
+#include "../Networking/TFTP.h"
+#include "../Executables/PE32.h"
 
 PROCESS_CONTROL_BLOCK tasks[64] = { 0 };
 READY_QUEUE_ENTRY *readyQueueHead = NULL;
@@ -91,7 +93,7 @@ void DispatchNewTask(uint32_t programStart, PAGE_DIRECTORY_ENTRY *newPageDirecto
             finalEntry = finalEntry->nextEntry;
 
         finalEntry->nextEntry = queueEntry;
-    }   
+    }
 
     // setup stack for the task, and copy the stack to stackPtr
     __asm
@@ -147,4 +149,48 @@ void DispatchNewTask(uint32_t programStart, PAGE_DIRECTORY_ENTRY *newPageDirecto
 endOfDispatch:
     // re-enable interrupts
     __asm sti
+}
+
+// TODO: Handle multiple error codes
+// returns true on success
+bool LaunchApp(const char *appName, int exclusive, uint32_t exeLocation)
+{
+    // Get the size of the executable file
+    uint32_t fileSize;
+    bool succeeded = true;
+
+    // we'll need to re-enable interrupts if they were disabled
+    _enable();
+
+    if (!TFTP_GetFileSize(tftpServerIP, appName, &fileSize))
+    {
+        printf("Failed to determine size of %s\n", appName);
+        return false;
+    }
+    
+    // Allocate a buffer for the executable file
+    uint8_t *peBuffer = dbg_alloc(fileSize);
+    if (!peBuffer)
+    {
+        printf("Not enough memory to open %s\n", appName);
+        return false;
+    }
+
+    // Download the executable
+    if (!TFTP_GetFile(tftpServerIP, appName, peBuffer, fileSize, NULL))
+    {
+        printf("Error reading %s from server!\n", appName);
+        return false;
+    }
+
+    // Run the executable
+    if (!loadAndRunPE((uint8_t*)exeLocation, (DOS_Header*)peBuffer, appName, exclusive))
+    {
+        printf("Error running %s\n", appName);
+        succeeded = false;
+    }
+
+    dbg_release(peBuffer);
+
+    return succeeded;    
 }

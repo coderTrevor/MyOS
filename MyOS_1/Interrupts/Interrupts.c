@@ -512,6 +512,32 @@ void _declspec(naked) hide_shell_display_interrupt_handler(int eflags, int cs)
     }
 }
 
+void _declspec(naked) launch_app_interrupt_handler(int eflags, int cs, const char *appFilename, bool exclusive, bool *pRetVal)
+{
+    // supress warning about unused parameters
+    (void)eflags, (void)cs;
+
+    // prologue
+    _asm
+    {
+        push ebp
+        mov ebp, esp
+
+        //pushad
+    }
+
+    *pRetVal = LaunchApp(appFilename, exclusive, 0x800000);
+
+    // epilogue
+    _asm
+    {
+        //popad
+
+        pop ebp
+        iretd
+    }
+}
+
 void  _declspec(naked) page_allocator_interrupt_handler(int eflags, int cs, unsigned int pages, unsigned int *pPagesAllocated, uint32_t *pRetVal)
 {
     // supress warning about unused parameters

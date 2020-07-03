@@ -1,6 +1,8 @@
 #pragma once
 #include "GUI_Control.h"
 
+#define GUI_EDIT_MAX_STRING_LENGTH  128
+
 class GUI_EditControl :
     public GUI_Control
 {
@@ -19,5 +21,8 @@ public:
 
     bool cursorBlinkOn;
     int cursorX;
+
+    char stringContents[GUI_EDIT_MAX_STRING_LENGTH];
+    int stringLength;
 };
 

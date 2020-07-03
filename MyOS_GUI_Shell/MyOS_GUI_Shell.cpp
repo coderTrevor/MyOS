@@ -362,6 +362,18 @@ void Shell_Destroy_Window(GUI_Window *pWindow)
     DeleteWindow(pWindow);
 }
 
+void Shell_Launch_App(const char * appName)
+{
+    // Only launch apps if we're running in MyOS
+#ifdef __MYOS
+
+    if (!launchApp(appName, false))
+    {
+        MessageBoxf("ERROR", "Failed to launch %s", appName);
+    }
+#endif
+}
+
 // TODO: There are memory leaks that need debugging
 int main(int argc, char* argv[])
 {

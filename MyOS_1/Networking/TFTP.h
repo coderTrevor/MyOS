@@ -84,12 +84,12 @@ extern bool tftpHideErrors;
 extern uint32_t tftpServerIP;
 
 
-bool TFTP_GetFile(uint32_t serverIP, char *filename, uint8_t *destinationBuffer, uint32_t maxFileSize, uint32_t *actualFileSize);
+bool TFTP_GetFile(uint32_t serverIP, const char *filename, uint8_t *destinationBuffer, uint32_t maxFileSize, uint32_t *actualFileSize);
 
-bool TFTP_GetFileSize(uint32_t serverIP, char *filename, uint32_t *pActualFileSize);
+bool TFTP_GetFileSize(uint32_t serverIP, const char *filename, uint32_t *pActualFileSize);
 
-uint16_t TFTP_RequestFile(uint32_t serverIP, char *filename, char *transferMode, uint8_t *sourceMAC);
+uint16_t TFTP_RequestFile(uint32_t serverIP, const char *filename, const char *transferMode, uint8_t *sourceMAC);
 
 void TFTP_ProcessPacket(TFTP_Header *packet, uint16_t sourcePort, uint16_t destinationPort, uint16_t packetLength, uint8_t *sourceMAC);
 
-uint16_t TFTP_WriteFile(uint32_t serverIP, char *filename, char *transferMode, uint8_t *sourceMAC);
+uint16_t TFTP_WriteFile(uint32_t serverIP, const char *filename, const char *transferMode, uint8_t *sourceMAC);

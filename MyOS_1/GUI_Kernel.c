@@ -3,6 +3,7 @@
 #include "GUI_Messages.h"
 #include "Tasks/Context.h"
 #include "printf.h"
+#include "misc.h"
 
 GUI_CALLBACK guiCallback = NULL;
 
@@ -37,7 +38,9 @@ void GUI_CreateConsoleWindowForApp(uint32_t taskNumber)
 {
     // Construct the message data
     GUI_NEW_CONSOLE_APP_DATA data;
-    data.appName = tasks[taskNumber].imageName;
+    //data.appName = tasks[taskNumber].imageName;
+    memset(data.appName, 0, MAX_IMAGE_NAME_LENGTH);
+    strncpy(data.appName, tasks[taskNumber].imageName, MAX_IMAGE_NAME_LENGTH - 1);
 
     (*guiCallback)(tasks[taskNumber].PID, GUI_MSG_NEW_CONSOLE_APP, &data);
 }

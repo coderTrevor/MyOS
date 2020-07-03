@@ -61,4 +61,6 @@ extern bool multiEnable; // TEMPTEMP
 
 void DispatchNewTask(uint32_t programStart, PAGE_DIRECTORY_ENTRY *newPageDirectory, uint32_t stackSize, const char *imageName, bool exclusive);
 
+bool LaunchApp(const char *appName, int exclusive, uint32_t exeLocation);
+
 void SwitchTask(uint32_t taskIndex);

@@ -15,7 +15,8 @@ void StartMenuHandler(int choice)
             new GUI_RunWindow();
             break;
         case 1:
-            MessageBox("Option 1 clicked", "Click");
+            //MessageBox("Option 1 clicked", "Click");
+            Shell_Launch_App("testapp1.exe");
             break;
         case 2:
             MessageBox("Option 2 clicked", "Click");
