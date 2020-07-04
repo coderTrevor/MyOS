@@ -25,6 +25,7 @@ public:
 
         pClickedControl = NULL;
         focusedControlIndex = -1;
+        enterClicksButtonID = -1;
     }
 
     GUI_Window(int top, int left, int width, int height, const char *name)
@@ -42,6 +43,7 @@ public:
 
         pClickedControl = NULL;
         focusedControlIndex = -1;
+        enterClicksButtonID = -1;
     }
 
     virtual void ControlClicked(uint32_t controlID);
@@ -86,4 +88,5 @@ protected:
     SDL_Color backgroundColor;
     GUI_Control *pControls[MAX_WINDOW_CONTROLS];
     int focusedControlIndex;
+    int enterClicksButtonID;        // There's probably a better way to do this
 };

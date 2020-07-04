@@ -16,6 +16,7 @@ GUI_RunWindow::GUI_RunWindow() : GUI_Window(0, 0, RUN_WINDOW_WIDTH, RUN_WINDOW_H
     pControls[1] = new GUI_EditControl(RunWindowEditBoxDimensions, this, 1);
 
     focusedControlIndex = 1;
+    enterClicksButtonID = BUTTON_ID_OK;
 
     AddNewWindow(this);
 }

@@ -60,8 +60,35 @@ void GUI_EditControl::PaintToSurface(SDL_Surface * pTargetSurface)
 // TODO: Handle horizontal scrolling
 void GUI_EditControl::SendChar(char c)
 {
+    if (c == SDLK_LSHIFT || c == SDLK_RSHIFT)
+        return;
+
     char str[2] = { 0 };
     str[0] = c;
+    
+    if (c == SDLK_BACKSPACE)
+    {
+        if (stringLength == 0)
+            return;
+
+        stringContents[stringLength--] = '\0';
+        
+        // Erase the previous cursor
+        if (cursorBlinkOn)
+            DrawVerticalLine(pSurface, cursorX, 1, dimensions.height - 2, SDL_WHITE);
+
+        cursorBlinkOn = true;
+
+        // Erase the previous character
+        cursorX -= FNT_FONTWIDTH;
+        SDL_Rect charRect = { cursorX, FNT_TOPBOTTOMMARGIN, FNT_FONTWIDTH, FNT_FONTHEIGHT };
+        SDL_FillRect(pSurface, &charRect, 0xFFFFFFFF);  // fill the space with white
+
+        // Redraw the cursor
+        DrawVerticalLine(pSurface, cursorX, 1, dimensions.height - 2, SDL_BLACK);
+
+        return;
+    }
 
     if (stringLength >= GUI_EDIT_MAX_STRING_LENGTH)
     {

@@ -5,6 +5,7 @@
 #include "RTL_8139.h"
 #include "Bochs_VGA.h"
 #include "e1000.h"
+#include "IDE.h"
 
 void VirtIO_Net_Init(uint8_t bus, uint8_t slot, uint8_t function);
 void VGPU_Init(uint8_t bus, uint8_t slot, uint8_t function);
@@ -509,7 +510,7 @@ void PCI_CheckFunction(uint8_t bus, uint8_t device, uint8_t function, uint16_t v
     terminal_newline();
 
     // try to load a driver for the device
-    PCI_DelegateToDriver(bus, device, function, vendorID, deviceID);
+    PCI_DelegateToDriver(bus, device, function, vendorID, deviceID, baseClass, subClass);
 
     /*if ((baseClass == 0x06) && (subClass == 0x04))
     {
@@ -519,7 +520,7 @@ void PCI_CheckFunction(uint8_t bus, uint8_t device, uint8_t function, uint16_t v
 }
 
 // Inelegant hack
-void PCI_DelegateToDriver(uint8_t bus, uint8_t slot, uint8_t function, uint16_t vendorID, uint16_t deviceID)
+void PCI_DelegateToDriver(uint8_t bus, uint8_t slot, uint8_t function, uint16_t vendorID, uint16_t deviceID, uint8_t baseClass, uint8_t subClass)
 {
     if (vendorID == PCI_VENDOR_REALTEK)
     {
@@ -531,15 +532,19 @@ void PCI_DelegateToDriver(uint8_t bus, uint8_t slot, uint8_t function, uint16_t 
     if (vendorID == PCI_VENDOR_QEMU)
     {
         if (deviceID == PCI_DEVICE_BGA)
+        {
             BGA_Init(bus, slot, function);
-        return;
+            return;
+        }
     }
 
     if (vendorID == PCI_VENDOR_VBOX)
     {
         if (deviceID == PCI_DEVICE_VBOX_BGA)
+        {
             BGA_Init(bus, slot, function);
-        return;
+            return;
+        }
     }
 
     if (vendorID == PCI_VENDOR_RED_HAT)
@@ -554,7 +559,15 @@ void PCI_DelegateToDriver(uint8_t bus, uint8_t slot, uint8_t function, uint16_t 
     if (vendorID == PCI_VENDOR_INTEL)
     {
         if (deviceID == PCI_DEVICE_82540EM)
+        {
             e1000_Net_Init(bus, slot, function);
+            return;
+        }
+    }
+
+    if (baseClass == PCI_BASE_CLASS_MASS_STORAGE && subClass == PCI_SUBCLASS_IDE_CONTROLLER)
+    {
+        IDE_Init(bus, slot, function);
         return;
     }
 }
@@ -708,6 +721,12 @@ uint8_t PCI_GetHeaderType(uint8_t bus, uint8_t slot, uint8_t function)
 uint8_t PCI_GetInterruptLine(uint8_t bus, uint8_t slot, uint8_t function)
 {
     return PCI_ConfigReadWord(bus, slot, function, INTERRUPT_LINE_OFFSET) & 0xFF;
+}
+
+uint8_t PCI_GetProgrammingInterface(uint8_t bus, uint8_t slot, uint8_t function)
+{
+    // PROG_IF is upper byte of 16 bits after revision ID
+    return (uint8_t)(PCI_ConfigReadWord(bus, slot, function, VENDOR_ID_OFFFSET) >> 8);
 }
 
 uint16_t PCI_GetVendorID(uint8_t bus, uint8_t slot, uint8_t function)

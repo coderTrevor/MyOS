@@ -210,6 +210,9 @@
     <ClCompile Include="GUI_Kernel.c">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
+    <ClCompile Include="Drivers\IDE.c">
+      <Filter>Source Files\Drivers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="misc.h">
@@ -355,6 +358,9 @@
     </ClInclude>
     <ClInclude Include="GUI_Messages.h">
       <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Drivers\IDE.h">
+      <Filter>Header Files\Drivers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -280,6 +280,7 @@
     <ClCompile Include="Drivers\AdLib.c" />
     <ClCompile Include="Drivers\Bochs_VGA.c" />
     <ClCompile Include="Drivers\e1000.c" />
+    <ClCompile Include="Drivers\IDE.c" />
     <ClCompile Include="Drivers\ISA_DMA.c" />
     <ClCompile Include="Drivers\Keyboard.c" />
     <ClCompile Include="Drivers\PCI_Bus.c" />
@@ -332,6 +333,7 @@
     <ClInclude Include="Drivers\AdLib.h" />
     <ClInclude Include="Drivers\Bochs_VGA.h" />
     <ClInclude Include="Drivers\e1000.h" />
+    <ClInclude Include="Drivers\IDE.h" />
     <ClInclude Include="Drivers\ISA_DMA.h" />
     <ClInclude Include="Drivers\Keyboard.h" />
     <ClInclude Include="Drivers\mouse.h" />

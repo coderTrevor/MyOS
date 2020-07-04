@@ -8,6 +8,7 @@
 #define VENDOR_ID_OFFFSET       0
 #define DEVICE_ID_OFFSET        0x02
 #define COMMAND_OFFSET          0x04
+#define REVISION_OFFSET         0x08
 #define CLASSES_OFFSET          0x0A
 #define HEADER_TYPE_OFFSET      0x0E
 #define BAR0_OFFSET             0x10
@@ -42,6 +43,9 @@
 #define PCI_VENDOR_INTEL    0x8086
 #define PCI_DEVICE_82540EM  0x100E
 
+#define PCI_BASE_CLASS_MASS_STORAGE 0x01
+#define PCI_SUBCLASS_IDE_CONTROLLER 0x01
+
 void PCI_CheckAllBuses(void);
 
 void PCI_CheckDevice(uint8_t bus, uint8_t device);
@@ -54,7 +58,7 @@ uint16_t PCI_ConfigReadWord(uint8_t bus, uint8_t slot, uint8_t func, uint8_t off
 
 void PCI_ConfigWriteWord(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset, uint16_t data);
 
-void PCI_DelegateToDriver(uint8_t bus, uint8_t slot, uint8_t function, uint16_t vendorID, uint16_t deviceID);
+void PCI_DelegateToDriver(uint8_t bus, uint8_t slot, uint8_t function, uint16_t vendorID, uint16_t deviceID, uint8_t baseClass, uint8_t subClass);
 
 void PCI_EnableBusMastering(uint8_t bus, uint8_t slot, uint8_t function);
 
@@ -80,6 +84,8 @@ uint16_t PCI_GetDeviceID(uint8_t bus, uint8_t slot, uint8_t function);
 uint8_t PCI_GetHeaderType(uint8_t bus, uint8_t slot, uint8_t function);
 
 uint8_t PCI_GetInterruptLine(uint8_t bus, uint8_t slot, uint8_t function);
+
+uint8_t PCI_GetProgrammingInterface(uint8_t bus, uint8_t slot, uint8_t function);
 
 char *PCI_GetSubclassName(uint8_t baseClass, uint8_t subClass);
 

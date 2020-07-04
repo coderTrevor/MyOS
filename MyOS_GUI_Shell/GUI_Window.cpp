@@ -151,6 +151,12 @@ void GUI_Window::SetBackgroundColor(SDL_Color color)
 
 void GUI_Window::SendChar(char c)
 {
+    if (c == SDLK_RETURN && enterClicksButtonID != -1)
+    {
+        ControlClicked(enterClicksButtonID);
+        return;
+    }
+
     if (focusedControlIndex < 0)
         return;
 
