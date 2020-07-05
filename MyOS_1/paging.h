@@ -10,8 +10,8 @@ typedef /*__declspec(align(4096))*/ uint32_t PAGE_DIRECTORY_ENTRY;
 typedef /*__declspec(align(4096))*/ uint32_t PAGE_TABLE_ENTRY;
 
 #define PAGE_ENTRY_PRESENT          1
-#define PAGE_ENTRY_USER_ACCESSIBLE  2
-#define PAGE_ENTRY_WRITABLE         4
+#define PAGE_ENTRY_WRITABLE         2
+#define PAGE_ENTRY_USER_ACCESSIBLE  4
 
 #define DIRECTORY_ENTRY_PRESENT          1
 #define DIRECTORY_ENTRY_WRITABLE         2
@@ -85,6 +85,8 @@ inline void Paging_Enable(multiboot_info *multibootInfo)
     // TEMPTEMP HACKHACK! - identity map the linear frame buffer, which on my Qemu starts at 0xFD00 0000
     uint32_t lfbAddress = 0xFD000000;
 
+// TODO: This section of code will bug out if GRUB_GRAPHICS isn't defined in VirtualBox
+// TODO: We can conditionally comment this out, but then the gfx command fails to switch modes properly
     // see if Grub gave us an lfb address and use that one if it did
     if (multibootInfo->flags &  MULTIBOOT_INFO_FRAMEBUFFER_INFO)
     {
@@ -98,6 +100,7 @@ inline void Paging_Enable(multiboot_info *multibootInfo)
     {
         videoIdentityTable[i] = (lfbAddress + i * 0x1000) | PAGE_ENTRY_PRESENT | PAGE_ENTRY_WRITABLE;   // attributes: supervisor level, read/write, present
     }
+// End buggy section
 
     // put the lfb page table in the page directory
     uint32_t page = lfbAddress / 0x400000;

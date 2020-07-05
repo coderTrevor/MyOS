@@ -320,17 +320,19 @@ BASE_ADDRESS 0xC0000000
 #define STACK_SIZE                    0x4000   
 #define CHECKSUM                      -(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS)
 
-#define GRAPHICS_MODE                 0
-#define TEXT_MODE                     1
-#define FLIP_MODE                     "Love Em"
-/*#define MODE_TYPE                     TEXT_MODE
-#define GRAPHICS_WIDTH                80
-#define GRAPHICS_HEIGHT               25
-#define GRAPHICS_DEPTH                0*/
-#define MODE_TYPE                     GRAPHICS_MODE
-#define GRAPHICS_WIDTH                800
-#define GRAPHICS_HEIGHT               600
-#define GRAPHICS_DEPTH                32
+#define GRUB_GRAPHICS               1 /* set to 1 to request GRUB to setup graphics, 0 for text-mode display (not working)*/
+#define GRAPHICS_MODE               0
+#define TEXT_MODE                   1
+#define FLIP_MODE                   "Love Em"
+
+// TODO: Text mode has regressed when booting with GRUB (see paging.h), but I don't think we really need it
+#define TEXT_WIDTH                  80
+#define TEXT_HEIGHT                 25
+#define TEXT_DEPTH                  0
+
+#define GRAPHICS_WIDTH              800
+#define GRAPHICS_HEIGHT             600
+#define GRAPHICS_DEPTH              32
 
 #endif /* ! ASM_FILE */
 

@@ -8,9 +8,9 @@
 bool graphicsPresent = false;
 bool textMode = true;
 uint32_t *linearFrameBuffer = NULL;
-unsigned int graphicsBpp;
-unsigned int graphicsWidth;
-unsigned int graphicsHeight;
+unsigned int graphicsBpp = 32;
+unsigned int graphicsWidth = GRAPHICS_WIDTH;
+unsigned int graphicsHeight = GRAPHICS_HEIGHT;
 
 // TODO: Create HAL interface and tie Bochs_VGA into it
 

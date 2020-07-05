@@ -259,10 +259,17 @@ MULTIBOOT_INFO _MultibootInfo =
     // GRUB doesn't actually copy the kernel there, so we need to do some math
     // to find the actual address of KeStartup.
     (uint32_t)KeStartup - (uint32_t)NonPagingAddressOffset,
-    (uint32_t)MODE_TYPE,
+#if GRUB_GRAPHICS
+    (uint32_t)GRAPHICS_MODE,
     (uint32_t)GRAPHICS_WIDTH,
     (uint32_t)GRAPHICS_HEIGHT,
     (uint32_t)GRAPHICS_DEPTH
+#else
+    (uint32_t)TEXT_MODE,
+    (uint32_t)TEXT_WIDTH,
+    (uint32_t)TEXT_HEIGHT,
+    (uint32_t)TEXT_DEPTH    
+#endif
 };
 
 #pragma comment(linker, "/merge:.text=.a")
