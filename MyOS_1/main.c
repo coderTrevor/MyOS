@@ -94,6 +94,9 @@ void KeStartup()
     JumpToUpperHalf();
     //kprintf("eipVal: 0x%lX\n", eipVal);
 
+    // Make sure KPageAllocator can find the kernel page directory
+    tasks[0].cr3 = (uint32_t)pageDir;
+
     // Initialize graphical mode if Grub set one for us
     GraphicsInitFromGrub(multibootInfo);
 
@@ -118,7 +121,6 @@ void KeStartupPhase2(multiboot_info *multibootInfo)
     tasks[0].inUse = true;
     strncpy(tasks[0].imageName, "KERNEL PROCESS", sizeof("KERNEL PROCESS"));
     tasks[0].PID = nextPID - 1;
-    tasks[0].cr3 = (uint32_t)pageDir;
 
     // Initialize interrupts
     Interrupts_Init();
