@@ -22,7 +22,7 @@ Mostly I wanted to make an OS for the following reasons:
 * Perhaps, possibly, to investigate SMP and 64-bit kernels. I haven't decided if I'm going in that direction or not yet.
 
 ## Long-Term Goals
-- [x]~~I'll be happy when it can run its own port of Doom.~~ Oh SNAP! It runs Doom now! In fact, I've been toying around with the idea of making the shell Doom itself. I'd call it "Shotgun Shell." That might be novel enough to get it some attention.
+- [x] ~~I'll be happy when it can run its own port of Doom.~~ Oh SNAP! It runs Doom now! In fact, I've been toying around with the idea of making the shell Doom itself. I'd call it "Shotgun Shell." That might be novel enough to get it some attention.
 - [ ] Should run SDL apps (like Doom and my NES emulator) in their own GUI windows
 - [ ] Should work on real hardware (presently only tested with Qemu and VirtualBox)
 
