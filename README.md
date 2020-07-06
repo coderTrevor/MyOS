@@ -22,15 +22,15 @@ Mostly I wanted to make an OS for the following reasons:
 * Perhaps, possibly, to investigate SMP and 64-bit kernels. I haven't decided if I'm going in that direction or not yet.
 
 ## Long-Term Goals
-~~I'll be happy when it can run its own port of Doom.~~ Oh SNAP! It runs Doom now! In fact, I've been toying around with the idea of making the shell Doom itself. I'd call it "Shotgun Shell." That might be novel enough to get it some attention.
-[] Should run SDL apps (like Doom and my NES emulator) in their own GUI windows
-[] Should work on real hardware (presently only tested with Qemu and VirtualBox)
+- [x]~~I'll be happy when it can run its own port of Doom.~~ Oh SNAP! It runs Doom now! In fact, I've been toying around with the idea of making the shell Doom itself. I'd call it "Shotgun Shell." That might be novel enough to get it some attention.
+- [ ] Should run SDL apps (like Doom and my NES emulator) in their own GUI windows
+- [ ] Should work on real hardware (presently only tested with Qemu and VirtualBox)
 
 ## Short-Term Goals
-[] Add support for reading a CD and produce an ISO which includes all relevant programs, making it very easy for someone else to check out the OS (on a Virtual Machine)
-[] Improve the MSVC files / build process and bundle all necessary libs and apps to make it relatively easy for someone else to build the OS with Visual Studio. Presently the project files take the paths of my development machine for granted.
-[] Include a debugging stub.
-[] Fix debug build
+- [ ] Add support for reading a CD and produce an ISO which includes all relevant programs, making it very easy for someone else to check out the OS (on a Virtual Machine)
+- [ ] Improve the MSVC files / build process and bundle all necessary libs and apps to make it relatively easy for someone else to build the OS with Visual Studio. Presently the project files take the paths of my development machine for granted.
+- [ ] Include a debugging stub.
+- [ ] Fix debug build
 
 ## Features, Limitations, & Quirks
 This started out as a culmination of tutorials like those from the OSDev wiki and Brokenthorn, and has grown from there. I haven't even finished all of those tutorials. The following is implemented:
