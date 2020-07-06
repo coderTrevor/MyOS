@@ -9,6 +9,8 @@ The name is temporary and will be changed when I feel this project is large enou
 
 ![Doom running on MyOS](https://github.com/coderTrevor/My-Doom/blob/c60abc6bc10bd30e733e29056e232c54e1dc283c/screenshots/Doom%20on%20MyOS.gif?raw=true "Doom!")
 
+![GUI of MyOS](https://raw.githubusercontent.com/coderTrevor/MyOS/master/Media/Screenshots/MyOS_GUI.gif "MyOS GUI")
+
 
 ## Motivation
 I have no illusions about the fact that nobody will ever use this as an operating system, but developing it is fun. :)
@@ -19,8 +21,16 @@ Mostly I wanted to make an OS for the following reasons:
 * To experiment with debugging methods that will allow for fast OS development on real hardware (again, with the goal of bringing some of these methods to ReactOS).
 * Perhaps, possibly, to investigate SMP and 64-bit kernels. I haven't decided if I'm going in that direction or not yet.
 
-## Goals
+## Long-Term Goals
 ~~I'll be happy when it can run its own port of Doom.~~ Oh SNAP! It runs Doom now! In fact, I've been toying around with the idea of making the shell Doom itself. I'd call it "Shotgun Shell." That might be novel enough to get it some attention.
+[] Should run SDL apps (like Doom and my NES emulator) in their own GUI windows
+[] Should work on real hardware (presently only tested with Qemu and VirtualBox)
+
+## Short-Term Goals
+[] Add support for reading a CD and produce an ISO which includes all relevant programs, making it very easy for someone else to check out the OS (on a Virtual Machine)
+[] Improve the MSVC files / build process and bundle all necessary libs and apps to make it relatively easy for someone else to build the OS with Visual Studio. Presently the project files take the paths of my development machine for granted.
+[] Include a debugging stub.
+[] Fix debug build
 
 ## Features, Limitations, & Quirks
 This started out as a culmination of tutorials like those from the OSDev wiki and Brokenthorn, and has grown from there. I haven't even finished all of those tutorials. The following is implemented:
@@ -41,7 +51,7 @@ This started out as a culmination of tutorials like those from the OSDev wiki an
 * The OS builds as a .dll file. This file is multiboot-compliant and can be loaded by Qemu with the -kernel option, or you can boot it with GRUB.
 * It has graphical support (if available, provided either by Grub or a Bochs Graphics Adapter) and can display a bitmap.
 * It has the ability to set a background image.
-* It has some very basic sound support and will play .voc files.
+* It has some very basic SoundBlaster 16 support and will play .voc files.
 * It can run a collection of shell commands from a batch file.
 * It totally runs Doom! Doooooooooooom!!!!
 
@@ -65,4 +75,4 @@ I would very much like to thank the following individuals and organizations who'
 Thank you all for making this available!
 
 ## Troubleshooting
-If you can't build the source with MSVC, make sure you've selected x86 as the target platform. MSVC selects x64 by default.
+If you can't build the source with MSVC, make sure you've selected x86 release as the target platform. MSVC selects x64 by default. Note that the project is in flux and it's not easy to build right now (see short-term goals).

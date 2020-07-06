@@ -71,6 +71,8 @@
 #define IDE_ATA        0x00
 #define IDE_ATAPI      0x01
 
+#define ATA_PRIMARY_CHANNEL      0
+#define ATA_SECONDARY_CHANNEL    1
 #define ATA_CHANNEL_DEVICE0      0x00
 #define ATA_CHANNEL_DEVICE1      0x01
 
@@ -93,25 +95,32 @@
 #define ATA_REG_ALTSTATUS  0x0C
 #define ATA_REG_DEVADDRESS 0x0D
 
-typedef struct IDE_CHANNEL_REGISTERS
+// defines for control register
+#define ATA_CONTROL_REG_DISABLE_INTERRUPTS  2
+#define ATA_CONTROL_REG_SOFTWARE_RESET      4
+// Other registers are reserved or 0
+
+typedef struct IDE_CHANNEL_INFO
 {
     uint16_t base;  // I/O Base.
     uint16_t ctrl;  // Control Base
     uint16_t bmide; // Bus Master IDE
     uint8_t  disableInterrupts;
     uint8_t irq;
-} IDE_CHANNEL_REGISTERS;
+} IDE_CHANNEL_INFO;
+
+#define IDE_MODEL_STRING_LENGTH 40 /* not including null-terminator */
 
 struct ide_device {
-    uint8_t  Reserved;    // 0 (Empty) or 1 (This Drive really exists).
+    uint8_t  Present;     // 0 (Empty) or 1 (This Drive really exists).
     uint8_t  Channel;     // 0 (Primary Channel) or 1 (Secondary Channel).
     uint8_t  Drive;       // 0 (Master Drive) or 1 (Slave Drive).
     uint16_t Type;        // 0: ATA, 1:ATAPI.
     uint16_t Signature;   // Drive Signature
     uint16_t Capabilities;// Features.
-    uint32_t   CommandSets; // Command Sets Supported.
-    uint32_t   Size;        // Size in Sectors.
-    char  Model[41];   // Model in string.
+    uint32_t CommandSets; // Command Sets Supported.
+    uint32_t Size;        // Size in Sectors.
+    uint8_t  Model[IDE_MODEL_STRING_LENGTH + 1];   // Model string
 } ide_devices[4];
 
 
@@ -125,8 +134,10 @@ extern bool IDE_Present;
 
 void IDE_Init(uint8_t bus, uint8_t slot, uint8_t function);
 
-uint8_t ide_polling(uint8_t channel, uint8_t advanced_check);
+uint8_t IDE_PollUntilNotBSY(uint8_t channel, uint8_t advanced_check);
 
-uint8_t ide_read(uint8_t channel, uint8_t reg);
+uint8_t IDE_ReadRegister(uint8_t channel, uint8_t reg);
 
-void ide_write(uint8_t channel, uint8_t reg, uint8_t data);
+void IDE_ReadBuffer(uint8_t channel, uint8_t reg, uint32_t *buffer, unsigned int quads);
+
+void IDE_WriteRegister(uint8_t channel, uint8_t reg, uint8_t data);

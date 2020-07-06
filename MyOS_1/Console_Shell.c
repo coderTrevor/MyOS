@@ -30,6 +30,7 @@
 #include "myos_io.h"
 #include "Drivers\Keyboard.h"
 #include "../MyOS_GUI_Shell/GUI_Kernel_Shell.h"
+#include "Drivers/IDE.h"
 
 int inputPosition = 0;
 #define COMMAND_HISTORY_SIZE        10
@@ -422,6 +423,30 @@ void Shell_Process_command(void)
     if (strcmp(currentCommand, "dhcp") == 0)
     {
         DHCP_Send_Discovery(NIC_MAC);
+        return;
+    }
+
+    // Display connected IDE drives
+    if (strcmp(currentCommand, "ide") == 0)
+    {
+        kprintf("Attached IDE devices:");
+        bool deviceFound = false;
+                
+        for (uint8_t device = 0; device < 4; ++device)
+        {
+            if (ide_devices[device].Present)
+            {
+                deviceFound = true;
+                kprintf("\n%s drive at Channel %d device %d - %s",
+                        ide_devices[device].Type == IDE_ATA ? " ATA" : " ATAPI",
+                        ide_devices[device].Channel,
+                        ide_devices[device].Drive,
+                        ide_devices[device].Model);
+            }
+        }
+        
+        kprintf(deviceFound ? "\n" : " None\n");
+
         return;
     }
 
@@ -944,9 +969,7 @@ void Shell_Process_command(void)
         return;
     }
 
-    // Temporary command to facilitate loading a program at a second memory address,
-    // which will let us get multiprogramming working with two processes without having to worry about virtual memory for now
-    // Runhi command
+    // Runhi command - used to load GUI at a different memory address than other programs, mapped into kernel space
     memset(subCommand, 0, MAX_COMMAND_LENGTH);
     strncpy(subCommand, currentCommand, strlen("runhi"));
     if (strcmp(subCommand, "runhi") == 0)
