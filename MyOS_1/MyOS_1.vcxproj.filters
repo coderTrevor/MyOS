@@ -70,6 +70,12 @@
     <Filter Include="Source Files\GUI">
       <UniqueIdentifier>{ed1bb142-e86a-48ef-85ae-82740aea315c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Debugging">
+      <UniqueIdentifier>{3b619734-27a0-45df-8fc4-302973758206}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Debugging">
+      <UniqueIdentifier>{3ff4899d-7636-427e-b059-139fe21daa2e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="paging.c">
@@ -212,6 +218,9 @@
     </ClCompile>
     <ClCompile Include="Drivers\IDE.c">
       <Filter>Source Files\Drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="Debugging\Debug.c">
+      <Filter>Source Files\Debugging</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -361,6 +370,9 @@
     </ClInclude>
     <ClInclude Include="Drivers\IDE.h">
       <Filter>Header Files\Drivers</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\Debug.h">
+      <Filter>Header Files\Debugging</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

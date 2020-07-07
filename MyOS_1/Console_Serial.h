@@ -13,4 +13,8 @@ char read_serial();
 
 int serial_received();
 
+int serial_printf(char *messageFormat, ...);
+
 void write_serial(char a);
+
+void write_serial_string(const char *str);

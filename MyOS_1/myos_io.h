@@ -27,6 +27,7 @@ typedef struct OPEN_FILES
     bool readOnly[MAX_FILES];
     bool isOpen[MAX_FILES];
     uint8_t *buffer[MAX_FILES];
+    uint32_t taskIndex[MAX_FILES];
 } OPEN_FILES;
 
 

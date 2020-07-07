@@ -137,6 +137,7 @@ void KeStartupPhase2(multiboot_info *multibootInfo)
 
     // Say Hello
     terminal_writestring("Hello world!\n");
+    write_serial_string("\nHello world!\n");
     kprintf("Welcome to My OS (working title) build %d\n", BUILD_NUMBER);
 
     if (debugLevel)

@@ -1,12 +1,15 @@
 #include "Console_Serial.h"
 #include "System_Specific.h"
+#include "printf.h"
 
 #ifndef USE_SERIAL
 void init_serial() {}
-/*int serial_received() {}
-char read_serial() {}
-int is_transmit_empty() {}*/
+int serial_received() { return false; }
+char read_serial() { return '\0'; }
+int is_transmit_empty() { return true; }
+int sprintf(char *messageFormat, ...) { return 0; }
 void write_serial(char a) {}
+void write_serial_string(const char *str) {}
 #endif
 
 #ifdef USE_SERIAL
@@ -34,9 +37,30 @@ int is_transmit_empty() {
     return inb(PORT + 5) & 0x20;
 }
 
+int serial_printf(char *messageFormat, ...)
+{
+    char buffer[128] = { 0 };
+    va_list va;
+    va_start(va, messageFormat);
+    const int ret = vsnprintf(buffer, 128, messageFormat, va);
+    
+    write_serial_string(buffer);
+    va_end(va);    
+
+    return ret;
+}
+
 void write_serial(char a) {
     while (is_transmit_empty() == 0);
 
     outb(PORT, a);
 }
+
+void write_serial_string(const char *str)
+{
+    int len = strlen(str);
+    for (int i = 0; i < len; ++i)
+        write_serial(str[i]);
+}
+
 #endif

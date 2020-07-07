@@ -120,7 +120,7 @@
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <OmitFramePointers>true</OmitFramePointers>
+      <OmitFramePointers>false</OmitFramePointers>
     </ClCompile>
     <Link>
       <SubSystem>Native</SubSystem>
@@ -136,6 +136,8 @@
       <StackReserveSize>0x100000</StackReserveSize>
       <StackCommitSize>0x100000</StackCommitSize>
       <FixedBaseAddress>true</FixedBaseAddress>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapExports>true</MapExports>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(TargetDir)$(TargetFileName)" C:\Users\Administrator\.VirtualBox\TFTP\$(TargetFileName)</Command>

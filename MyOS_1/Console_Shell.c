@@ -31,6 +31,7 @@
 #include "Drivers\Keyboard.h"
 #include "../MyOS_GUI_Shell/GUI_Kernel_Shell.h"
 #include "Drivers/IDE.h"
+#include "Debugging/Debug.h"
 
 int inputPosition = 0;
 #define COMMAND_HISTORY_SIZE        10
@@ -499,6 +500,13 @@ void Shell_Process_command(void)
     if (strcmp(currentCommand, "allocations") == 0)
     {
         showAllocations();
+        return;
+    }
+
+    // Test stack trace
+    if (strcmp(currentCommand, "bt") == 0)
+    {
+        DebugStackTrace(6);
         return;
     }
 

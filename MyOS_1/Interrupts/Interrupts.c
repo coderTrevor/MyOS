@@ -15,6 +15,7 @@
 #include "../Tasks/Context.h"
 #include "../Drivers/PS2_Mouse.h"
 #include "../GUI_Kernel.h"
+#include "../Debugging/Debug.h"
 
 unsigned long interrupts_fired;
 
@@ -608,6 +609,8 @@ void _declspec(naked) page_fault_handler(void)
     kprintf("Value of ebp: 0x%lX\n", regvar);
 
     kprintf("Memory address accessed: 0x%lX\n", __readcr2());
+
+    DebugStackTrace(10);
 
     terminal_writestring("System halted.\n");
 
