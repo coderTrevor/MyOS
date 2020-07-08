@@ -79,7 +79,6 @@ public:
 
     void UpdateCursor();
 
-
     SDL_Surface *pSurface;
     GUI_Control *pClickedControl;
     char windowName[MAX_WINDOW_NAME_LENGTH];

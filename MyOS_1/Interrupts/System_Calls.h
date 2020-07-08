@@ -31,6 +31,10 @@ extern "C" {
 #define SYSCALL_HIDE_SHELL_DISPLAY  239
 #define SYSCALL_REGISTER_GUI_CALLBACK   238
 #define SYSCALL_LAUNCH_APP          237
+#define SYSCALL_CLOSE_APP           236
+
+void SystemCallCloseApp(uint32_t PID);
+#define closeApp SystemCallCloseApp
 
 void SystemCallExit(int returnCode);
 #define exit SystemCallExit

@@ -100,6 +100,9 @@ void IDT_Init(void)
     // Set handler for launching an app
     Set_IDT_Entry((unsigned long)launch_app_interrupt_handler, SYSCALL_LAUNCH_APP);
 
+    // Set handler for closing an app
+    Set_IDT_Entry((unsigned long)close_app_interrupt_handler, SYSCALL_CLOSE_APP);
+
     /* fill the IDT descriptor */
     IDT_ptr.base = (uint32_t)IDT;
     IDT_ptr.size = (sizeof(IDT_ENTRY) * 256);

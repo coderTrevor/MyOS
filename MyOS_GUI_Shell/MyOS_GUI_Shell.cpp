@@ -59,7 +59,7 @@ GUI_Taskbar *pTaskbar;
 #define DELETION_QUEUE_SIZE 16
 GUI_Window *pDeletionQueue[DELETION_QUEUE_SIZE]; // UGLY HACK
 int nextDeletionQueueIndex = 0;
-int lastWindowID = 1;
+int lastWindowID = WINDOW_ID_IS_NOT_PID;
 
 #define CURSOR_X        16
 #define CURSOR_Y        16
@@ -338,6 +338,14 @@ void Shell_Destroy_Window(GUI_Window *pWindow)
     {
         if (windowList[i] == pWindow)
         {
+            // Is there an application associated with this window?
+            if ((windowIDs[i] & WINDOW_ID_IS_NOT_PID) == 0)
+            {
+#ifdef __MYOS
+                closeApp(windowIDs[i]);
+#endif
+            }
+
             windowList[i] = NULL;
 
             RemoveWindowFromStack(&windowStack[i]);

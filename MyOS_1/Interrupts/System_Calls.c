@@ -9,6 +9,18 @@
 #include "../Drivers/Keyboard.h"
 
 
+void SystemCallCloseApp(uint32_t PID)
+{
+    const int pointerSize = sizeof(uint32_t);
+
+    __asm
+    {
+        push[PID]               // push arguments onto stack
+        int SYSCALL_CLOSE_APP   // call close_app_interrupt_handler(PID)
+        add esp, pointerSize    // restore value of stack pointer
+    }
+}
+
 void SystemCallExit(int returnCode)
 {
     // returnCode is ignored for now

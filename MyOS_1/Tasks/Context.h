@@ -59,6 +59,8 @@ extern uint32_t nextPID;
 
 extern bool multiEnable; // TEMPTEMP
 
+void CloseApp(uint32_t PID);
+
 void DispatchNewTask(uint32_t programStart, PAGE_DIRECTORY_ENTRY *newPageDirectory, uint32_t stackSize, const char *imageName, bool exclusive);
 
 void ExitApp();

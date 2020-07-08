@@ -13,6 +13,8 @@
 
 extern unsigned long interrupts_fired;
 
+void close_app_interrupt_handler(int eflags, int cs, uint32_t PID);
+
 void default_exception_handler(void);
 
 void exit_interrupt_handler(int eflags, int cs);

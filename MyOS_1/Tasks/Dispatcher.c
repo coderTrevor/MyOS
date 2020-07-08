@@ -4,6 +4,7 @@
 #include "../paging.h"
 #include "../Networking/TFTP.h"
 #include "../Executables/PE32.h"
+#include "../Console_Serial.h"
 
 PROCESS_CONTROL_BLOCK tasks[64] = { 0 };
 READY_QUEUE_ENTRY *readyQueueHead = NULL;
@@ -14,6 +15,78 @@ uint32_t nextPID = 1000;
 
 // This must be global so we can access it while playing with the stack in ways the compiler can't predict
 uint32_t stackPtr;
+
+// TODO: rewrite when we have waiting queues
+// Interrupts are disabled by interrupt handler for system call.
+void CloseApp(uint32_t PID)
+{
+    // If this task is running, let ExitApp() close it
+    if (tasks[currentTask].PID == PID)
+        ExitApp();
+
+    serial_printf("closing %d", PID);
+
+    // Find the index of the app that will be closed
+    int taskIndex;
+    for (taskIndex = 0; taskIndex < MAX_TASKS; ++taskIndex)
+    {
+        if (tasks[taskIndex].PID == PID)
+            break;
+    }
+    if (taskIndex >= MAX_TASKS)
+    {
+        kprintf("ERROR! CloseApp() called with invalid PID, %d!", PID);
+        return;
+    }
+
+    serial_printf(" - %s\n", tasks[taskIndex].imageName);
+
+    // Has the task been closed already?
+    if (!tasks[taskIndex].inUse)
+        return;
+
+    if (!readyQueueHead)
+    {
+        kprintf("Attempted to close a task with an empty ready queue!\n");
+        return;
+    }
+
+    // Find the ready queue entry associated with the task (and the one that preceeds it)
+    READY_QUEUE_ENTRY *pPreviousEntry = NULL;
+    READY_QUEUE_ENTRY *pCurrent = readyQueueHead;
+
+    while (pCurrent && pCurrent->taskIndex != taskIndex)
+    {
+        pPreviousEntry = pCurrent;
+        pCurrent = pCurrent->nextEntry;
+    }
+    
+    if (!pCurrent)
+    {
+        kprintf("ERROR! CloseApp() called with PID %d, but couldn't find it in the queue!\n", PID);
+        serial_printf("ERROR! CloseApp() called with PID %d, but couldn't find it in the queue\n", PID);
+        return;
+    }
+
+    // Was the app to close listed in the first entry?
+    if (!pPreviousEntry)
+    {
+        dbg_release(readyQueueHead);
+        readyQueueHead = pCurrent;
+    }
+    else
+    {
+        // Remove the ready queue entry and delete it
+        pPreviousEntry->nextEntry = pCurrent->nextEntry;
+        dbg_release(pCurrent);
+    }
+
+
+    // TODO: Free all memory associated with the app, including its stack
+    
+    // Mark the index as being free to use
+    tasks[taskIndex].inUse = false;
+}
 
 void DispatchNewTask(uint32_t programStart, PAGE_DIRECTORY_ENTRY *newPageDirectory, uint32_t stackSize, const char *imageName, bool exclusive)
 {

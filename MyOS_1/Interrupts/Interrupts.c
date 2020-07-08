@@ -97,6 +97,33 @@ void _declspec(naked) irq9_shared_interrupt_handler(void)
     }
 }
 
+void _declspec(naked) close_app_interrupt_handler(int eflags, int cs, uint32_t PID)
+{
+    (void)eflags, (void)cs;
+
+    __asm
+    {
+        // prologue
+        push ebp
+        mov ebp, esp
+
+        // disable interrupts
+        cli
+    }
+
+    ++interrupts_fired;
+
+    CloseApp(PID);
+
+    __asm
+    {
+        // epilogue
+        pop ebp
+
+        iretd
+    }
+}
+
 void _declspec(naked) default_exception_handler(void)
 {
     //_asm pushad;
