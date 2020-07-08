@@ -15,6 +15,8 @@ void DebugStackTrace(unsigned int MaxFrames)
     {
         // Unwind to previous stack frame
         serial_printf("0x%X\n", pStackFrame->eip);
+        if (pStackFrame->eip == 0)
+            break;
         pStackFrame = pStackFrame->ebp;
     }
 }

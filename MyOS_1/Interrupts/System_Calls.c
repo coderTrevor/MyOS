@@ -9,8 +9,11 @@
 #include "../Drivers/Keyboard.h"
 
 
-void SystemCallExit()
+void SystemCallExit(int returnCode)
 {
+    // returnCode is ignored for now
+    (void)returnCode;
+
     //printf("exit called\n");
 
     __asm

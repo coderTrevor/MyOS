@@ -89,13 +89,13 @@ int main()
     timeDelayMS(500);
 
     printf("Hello World from an .exe using a system call%s\nDid you know that the answer to life, the universe, and everything is %d?\n", " and printf()!", 42);
-   // exit();
+    
 
     //printf("This code will never be executed because of the call to exit()\n");
 
     printf("Now printing a series of b's to test multitasking...\n");
 
-    while (true)
+    for(int i = 0; i < 20; ++i)
     {
         printf("b");
 
@@ -107,6 +107,8 @@ int main()
 
         timeDelayMS(300);
     }
+
+    exit(0);
 
     return 0;
 }

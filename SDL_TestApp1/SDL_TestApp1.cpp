@@ -103,6 +103,8 @@ int __cdecl main(int argc, char* argv[])
     TestClass *pTesty = new TestClass();
     pTesty->PrintMessage();
 
+    exit(0);
+
     return 0;
 }
 

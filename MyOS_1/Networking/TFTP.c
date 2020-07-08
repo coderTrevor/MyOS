@@ -3,6 +3,7 @@
 #include "../Terminal.h"
 #include "Ethernet.h"
 #include "../Drivers/Virtio_Net.h"
+#include "../Tasks/Context.h"
 
 // TODO: Support multiple transactions
 uint16_t transactionID;
@@ -16,6 +17,7 @@ uint8_t *nextFilePointer;
 uint16_t currentBlockNumber;
 uint16_t virtualBoxBlockNumber; // workaround for VirtualBox's bullshit
 uint32_t tftpFileSize;
+uint32_t tftpTaskIndex; // TEMPTEMP HACKHACK
 
 uint32_t tftpServerIP; // TODO, maybe, support more than one server
 
@@ -30,9 +32,16 @@ bool TFTP_TransactionComplete()
 // will block until the file is transacted
 // TODO: Implement timeout, error-checking
 // TODO: Fix hanging if an invalid serverIP is given
+// TODO: We'll need mutexes or some other sync method to support multiple tasks
+// And / Or we'll need to replace globals with per-task variables
 // actualFileSize can be NULL if the caller doesn't care about the size
 bool TFTP_GetFile(uint32_t serverIP, const char *filename, uint8_t *destinationBuffer, uint32_t maxFileSize, uint32_t *actualFileSize)
 {
+    // TEMPTEMP HACKHACK block until any existing transfers have completed
+    while (transferInProgress)
+    {
+    }
+
     if(actualFileSize)
         *actualFileSize = 0;
 
@@ -41,6 +50,7 @@ bool TFTP_GetFile(uint32_t serverIP, const char *filename, uint8_t *destinationB
 
     tftpFileBuffer = destinationBuffer;
     tftpFileBufferSize = maxFileSize;
+    tftpTaskIndex = currentTask;
 
     if (debugLevel)
     {
@@ -79,6 +89,11 @@ bool TFTP_GetFile(uint32_t serverIP, const char *filename, uint8_t *destinationB
 // Retrieves the size of a file. This can take a while for large files, because we actually have to retrieve the entire file to know its size.
 bool TFTP_GetFileSize(uint32_t serverIP, const char *filename, uint32_t *pActualFileSize)
 {
+    // TEMPTEMP HACKHACK block until any existing transfers have completed
+    while (transferInProgress)
+    {
+    }
+
     // Ensure pActualFileSize is a valid pointer
     if (!pActualFileSize)
         return false;
@@ -88,6 +103,7 @@ bool TFTP_GetFileSize(uint32_t serverIP, const char *filename, uint32_t *pActual
 
     // TFTP doesn't support retreiving a file's size, so we request the file from the server, but don't store the file returned
     determiningFileSize = true;
+    tftpTaskIndex = currentTask;
 
     // Request the file from the server
     TFTP_RequestFile(serverIP, filename, TFTP_TYPE_BINARY, NIC_MAC);
@@ -247,9 +263,44 @@ void TFTP_ProcessDataPacket(TFTP_DataHeader *dataPacket, uint16_t sourcePort, ui
 
     if (!determiningFileSize)
     {
-        // copy received data to the file buffer
-        memcpy(nextFilePointer, dataPacket->data, dataSize);
-        nextFilePointer += dataSize;
+		// TEMPTEMP HACKHACK
+        // Now we've received some data, but we have to be careful because the task that's currently active
+        // may not have the same virtual memory space as the task that gave us the destination buffer.
+        // We need to ensure interrupts are disabled because we can't allow a context switch while we play with page tables.
+        __asm
+        {
+            // TODO: Are interrupts already disabled when we reach this code? Need to check on that.
+            pushf
+            cli
+        }
+
+        // Ensure we have the proper page directory loaded for nextFilePointer for the task which requested the file
+        if (currentTask == tftpTaskIndex || tasks[currentTask].cr3 == tasks[tftpTaskIndex].cr3)
+        {
+            // We don't need to do anything with paging
+
+            // copy received data to the file buffer
+            memcpy(nextFilePointer, dataPacket->data, dataSize);
+            nextFilePointer += dataSize;
+        }
+        else
+        {
+            // We need to swap out the page directory with the one for the task that requested the file
+            __writecr3(tasks[tftpTaskIndex].cr3);
+
+            // copy received data to the file buffer
+            memcpy(nextFilePointer, dataPacket->data, dataSize);
+            nextFilePointer += dataSize;
+
+            // restore the page directory of the current task
+            __writecr3(tasks[currentTask].cr3);
+        }
+
+        // Restore interrupt state
+        __asm
+        {
+            popf
+        }
     }
 
     tftpFileSize += dataSize;

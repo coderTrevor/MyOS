@@ -9,45 +9,89 @@ using System.IO.Pipes;
 
 namespace SimpleDebugger
 {
-class Program
-{
-    static void Main(string[] args)
+    class Program
     {
-        MapFile mf = new MapFile("../../../../Release/MyOS_1.map");
-            mf.ParseFile();
-        //return;
-
-        while (true)
+        static void Main(string[] args)
         {
-            using (NamedPipeClientStream pipeClient =
-                new NamedPipeClientStream(".", "MyOS_PIPE", PipeDirection.InOut))
+            MapFile mf = new MapFile("../../../../Release/MyOS_1.map");
+                mf.ParseFile();
+            //return;
+
+            while (true)
             {
-
-                // Connect to the pipe or wait until the pipe is available.
-                Console.Write("Attempting to connect to pipe...");
-                pipeClient.Connect();
-
-                Console.WriteLine("Connected to pipe.");
-                Console.WriteLine("There are currently {0} pipe server instances open.",
-                   pipeClient.NumberOfServerInstances);
-                using (StreamReader sr = new StreamReader(pipeClient))
+                using (NamedPipeClientStream pipeClient =
+                    new NamedPipeClientStream(".", "MyOS_PIPE", PipeDirection.InOut))
                 {
-                    // Display the read text to the console
-                    string temp;
-                    while ((temp = sr.ReadLine()) != null)
+
+                    // Connect to the pipe or wait until the pipe is available.
+                    Console.Write("Attempting to connect to pipe...");
+                    pipeClient.Connect();
+
+                    Console.WriteLine("Connected to pipe.");
+                    Console.WriteLine("There are currently {0} pipe server instances open.",
+                       pipeClient.NumberOfServerInstances);
+                    using (StreamReader sr = new StreamReader(pipeClient))
                     {
-                        if(temp.Contains("0x"))
+                        // Display the read text to the console
+                        string temp;
+                        bool awaitingModuleName = false;
+                        bool canMap = false;
+                        while ((temp = sr.ReadLine()) != null)
                         {
-                            Console.WriteLine(mf.FindFunction(temp));
+                            // If we see "Hello world!" we know the kernel restarted, and we should reload all map files
+                            if(temp.Contains("Hello world!"))
+                            {
+                                Console.WriteLine("Reloading map files");
+                                mf.ParseFile();
+                                awaitingModuleName = false;
+                                continue;
+                            }
+                                               
+                            if(temp == "Stack trace:")
+                            {
+                                awaitingModuleName = true;
+                                continue;
+                            }
+                                                        
+                            if(awaitingModuleName)
+                            {
+                                awaitingModuleName = false;
+
+                                // module name will be stored in temp
+                                if (temp == "KERNEL PROCESS")
+                                {
+                                    System.Console.WriteLine(temp);
+                                    System.Console.WriteLine("Using map file " + mf.filename + "\n");
+                                    canMap = true;
+                                    continue;
+                                }
+                                else
+                                {
+                                    System.Console.WriteLine("Don't know where to find map file for " + temp);
+                                    canMap = false;
+                                }
+                            }
+
+                            if (temp.Contains("0x") && canMap)
+                            {
+                                Console.WriteLine(mf.FindFunction(temp));
+                            }
+                            else
+                            {
+                                // if address was in kernel space
+                                if (temp.Contains("0x") && Convert.ToUInt32(temp, 16) >= 0xC0000000)
+                                {
+                                    Console.WriteLine(mf.FindFunction(temp));
+                                }
+                                else
+                                    Console.WriteLine("{0}", temp);
+                            }
                         }
-                        else
-                            Console.WriteLine("{0}", temp);
                     }
                 }
+                Console.Write("\nPipe closed, Reopening...");
             }
-            Console.Write("\nPipe closed, Reopening...");
+            //Console.ReadLine();
         }
-        //Console.ReadLine();
     }
-}
 }

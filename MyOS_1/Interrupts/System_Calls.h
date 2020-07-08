@@ -32,7 +32,7 @@ extern "C" {
 #define SYSCALL_REGISTER_GUI_CALLBACK   238
 #define SYSCALL_LAUNCH_APP          237
 
-void SystemCallExit();
+void SystemCallExit(int returnCode);
 #define exit SystemCallExit
 
 int SystemCallFClose(FILE *fp);

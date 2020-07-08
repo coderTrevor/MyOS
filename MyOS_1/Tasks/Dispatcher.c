@@ -69,7 +69,7 @@ void DispatchNewTask(uint32_t programStart, PAGE_DIRECTORY_ENTRY *newPageDirecto
 
     // Create ready queue entry
     READY_QUEUE_ENTRY *queueEntry;
-    queueEntry = malloc(sizeof(READY_QUEUE_ENTRY));
+    queueEntry = dbg_alloc(sizeof(READY_QUEUE_ENTRY));
     // TODO: Exitting programs will need to be cleaned up somehow
     if (!queueEntry)
     {
@@ -193,4 +193,43 @@ bool LaunchApp(const char *appName, int exclusive, uint32_t exeLocation)
     dbg_release(peBuffer);
 
     return succeeded;    
+}
+
+// This is where a running program will "return" to. We can also call it with the exit system call
+void ExitApp()
+{
+    // Make sure interrupts are disabled
+    _disable();
+
+    // TODO: handle multiEnable = false
+    // If the ready-queue is empty or contains only this task, 
+    // or if we're not running in multitasking mode, there's nothing we can do here
+    if (!readyQueueHead || (!readyQueueHead->nextEntry && readyQueueHead->taskIndex == currentTask))
+    {
+        kprintf("ExitApp called on only running app. System halted");
+        for (;;)
+            __halt();
+    }
+        
+    // Allow the task index to be reused
+    tasks[currentTask].inUse = false;
+    
+    // TODO: Free all memory associated with this task
+    // TODO: Free the stack or mark it as reusable (not sure how to do this right now)
+    
+    // Make sure this task can be swapped out ASAP
+    tasks[currentTask].exclusive = false;
+    ticksLeftInTask = 0;
+
+    printf("\n%s has exited.\n", tasks[currentTask].imageName);
+
+    // TODO: Tell the GUI the program has quit
+
+    // Enable interrupts
+    _enable();
+
+    // TODO: Is there a better way to switch contexts from here?
+    // Now we'll just wait for the timer interrupt to fire and this task will never be revisitted
+    for (;;)
+        __halt();
 }

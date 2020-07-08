@@ -5,6 +5,8 @@
 
 OPEN_FILES openFiles = { 0 };
 
+extern uint32_t currentTask;
+
 int file_close(int fp)
 {
     if (fp >= MAX_FILES || fp < 0)
@@ -58,9 +60,14 @@ int file_open(const char * filename, const char * mode)
         return -1;
     }
 
+    openFiles.buffer[index] = buffer;
+    openFiles.taskIndex[index] = currentTask;
+    openFiles.isOpen[index] = true;
+
     if (!TFTP_GetFile(tftpServerIP, (char *)filename, buffer, fileSize, NULL))
     {
         kprintf("Not able to open %s", filename);
+        openFiles.isOpen[index] = false;
         return -1;
     }
 
@@ -68,8 +75,7 @@ int file_open(const char * filename, const char * mode)
     openFiles.filePos[index] = 0;
     openFiles.fileSize[index] = fileSize;
     openFiles.readOnly[index] = true;
-    openFiles.isOpen[index] = true;
-    openFiles.buffer[index] = buffer;
+    
 
     kprintf("opened %s in slot %d\n", filename, index);
 

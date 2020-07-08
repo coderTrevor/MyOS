@@ -126,7 +126,7 @@ namespace SimpleDebugger
             return publicNames[i] + "  in  " + objectNames[i];
         }
 
-        string filename;
+        public string filename;
         List<string> publicNames = new List<string>();
         List<UInt32> addresses = new List<UInt32>();
         List<string> objectNames = new List<string>();

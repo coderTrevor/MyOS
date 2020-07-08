@@ -102,19 +102,41 @@ void _declspec(naked) timer_interrupt_handler(void)
             // Pull info from the front of the ready queue
             currentTask = readyQueueHead->taskIndex;
 
-            // Move the current task to the end of the ready queue
-            // Are there more than two ready queue entries?
-            if (readyQueueHead != finalReadyQueueEntry)
+            // Is the old task still running?
+            if (tasks[oldTaskIndex].inUse)
             {
-                readyQueueHead->taskIndex = oldTaskIndex;
-                finalReadyQueueEntry->nextEntry = readyQueueHead;
-                oldHead = readyQueueHead;
-                readyQueueHead = readyQueueHead->nextEntry;
-                oldHead->nextEntry = NULL;
+                // Move the current task to the end of the ready queue
+                // Are there more than two ready queue entries?
+                if (readyQueueHead != finalReadyQueueEntry)
+                {
+                    readyQueueHead->taskIndex = oldTaskIndex;
+                    finalReadyQueueEntry->nextEntry = readyQueueHead;
+                    oldHead = readyQueueHead;
+                    readyQueueHead = readyQueueHead->nextEntry;
+                    oldHead->nextEntry = NULL;
+                }
+                else
+                {
+                    readyQueueHead->taskIndex = oldTaskIndex;
+                }
             }
             else
             {
-                readyQueueHead->taskIndex = oldTaskIndex;
+                // The old task has quit, so we shouldn't add it to the ready queue and we have to
+                // free a ready queue entry or else we'll have one too many
+
+                // Is there more than one ready queue entry?
+                if (readyQueueHead->nextEntry)
+                {
+                    oldHead = readyQueueHead;
+                    readyQueueHead = readyQueueHead->nextEntry;
+                    dbg_release(oldHead);
+                }
+                else
+                {
+                    dbg_release(readyQueueHead);
+                    readyQueueHead = NULL;
+                }
             }
 
             if(debugLevel)
@@ -122,11 +144,11 @@ void _declspec(naked) timer_interrupt_handler(void)
 
             ticksLeftInTask = TICKS_PER_TASK;
 
-            // switch to the new task's page tables
+            // Switch to the new task's page tables
             if(tasks[currentTask].cr3 != __readcr3())
                 __writecr3(tasks[currentTask].cr3);
 
-            // Get the stack pointer of the next waiting task and make that the stack
+            // Set the stack pointer to the stack pointer of the new task
             espVal = tasks[currentTask].ESP;
 
             if(debugLevel)

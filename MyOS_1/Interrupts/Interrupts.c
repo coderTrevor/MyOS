@@ -183,7 +183,8 @@ void _declspec(naked) exit_interrupt_handler(int eflags, int cs)
     // supress warning about unused parameters
     (void)eflags, (void)cs;
 
-    longjmp(peReturnBuf, 42);
+    //longjmp(peReturnBuf, 42); // Not only do I not like this way of exitting, it doesn't work right now
+    ExitApp();
 
     // No need for iretd because we'll never return here
 }
@@ -637,10 +638,13 @@ void _declspec(naked) invalid_opcode_handler(void)
     {
         pop [address]
     }
-    
+
     terminal_fill(' ', VGA_COLOR_WHITE, VGA_COLOR_BLUE);
     terminal_writestring("Invalid opcode handler fired.\nEncountered invalid opcode at ");
     terminal_print_ulong_hex(address);
+    
+    DebugStackTrace(10);
+
     terminal_writestring(".\nMemory looks like:\n");
     terminal_dumpHexAround((uint8_t *)address, 128, 128);
     terminal_writestring("System halted.\n");
@@ -787,7 +791,6 @@ void _declspec(naked) printf_interrupt_handler(int eflags, int cs, const char *f
         GUI_printf(fmt, va);
     else
         vprintf_(fmt, va);
-
     
     _asm
     {
