@@ -131,6 +131,15 @@ void DispatchNewTask(uint32_t programStart, PAGE_DIRECTORY_ENTRY *newPageDirecto
 
     if (debugLevel)
         kprintf("0x%lX\n", stackPtr);
+    
+    // To the top of our new stack, we'll "push" a 0 (end of stack frame) followed by the "return" address of ExitApp()
+    // This will allow apps returning from main() to terminate gracefully
+    uint32_t *dummyESP = (uint32_t *)stackPtr;
+    --dummyESP;
+    *dummyESP = 0;
+    --dummyESP;
+    *dummyESP = (uint32_t)ExitApp;
+    stackPtr = (uint32_t)dummyESP;
 
     // Add task to PCB
     tasks[taskSlot].stackSize = stackSize;

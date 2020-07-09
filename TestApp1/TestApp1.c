@@ -108,7 +108,7 @@ int main()
         timeDelayMS(300);
     }
 
-    exit(0);
+    //exit(0);
 
     return 0;
 }
