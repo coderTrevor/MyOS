@@ -63,7 +63,7 @@ void PIT_Set_Interval(uint32_t hz)
 uint32_t espVal;
 uint32_t oldTaskIndex;
 READY_QUEUE_ENTRY *oldHead;
-bool multiEnable = false;   // TEMPTEMP HACKHACK
+
 // Interrupt handler for the PIT
 void _declspec(naked) timer_interrupt_handler(void)
 {
@@ -82,7 +82,7 @@ void _declspec(naked) timer_interrupt_handler(void)
     if (!tasks[currentTask].exclusive && readyQueueHead)
     {
         --ticksLeftInTask;
-        if (ticksLeftInTask <= 0 && multiEnable)
+        if (ticksLeftInTask <= 0)
         {
             if(debugLevel)
                 kprintf("Saving %s.", tasks[currentTask].imageName);

@@ -175,33 +175,8 @@ bool loadAndRunPE(uint8_t *executableDestination, DOS_Header *mzAddress, const c
         terminal_newline();
     }
 
-    if (multiEnable)
-    {
-        DispatchNewTask((uint32_t)entryPoint, newPageDirectory, 0x20000, imageName, exclusive);
-    }
-    else
-    {   
-        // Re-enable interrupts
-        _enable();
-
-        /*_asm {
-            // Setup the program's stack
-            mov [espVal], esp
-            mov esp, 0x440000
-            pushad
-        }*/
-        // This is where the exit() system call will return to. If setjmp() doesn't return 0, then the executable used exit().
-        if (setjmp(peReturnBuf) == 0)
-        {
-            // run the program
-            (*entryPoint)();
-        }
-        /*_asm
-        {
-            popad
-            mov esp, [espVal]
-        }*/
-    }
+    // Run it!
+    DispatchNewTask((uint32_t)entryPoint, newPageDirectory, 0x20000, imageName, exclusive);
 
     if (debugLevel)
     {

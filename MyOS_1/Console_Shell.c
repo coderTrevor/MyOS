@@ -969,14 +969,6 @@ void Shell_Process_command(void)
         return;
     }
 
-    // Temporary command to enable multi-tasking
-    if (strcmp(currentCommand, "multi") == 0)
-    {
-        kprintf("Enabling multi-tasking...\n");
-        multiEnable = true;
-        return;
-    }
-
     // Runhi command - used to load GUI at a different memory address than other programs, mapped into kernel space
     memset(subCommand, 0, MAX_COMMAND_LENGTH);
     strncpy(subCommand, currentCommand, strlen("runhi"));

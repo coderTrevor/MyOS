@@ -283,7 +283,6 @@ void ExitApp()
     // Make sure interrupts are disabled
     _disable();
 
-    // TODO: handle multiEnable = false
     // If the ready-queue is empty or contains only this task, 
     // or if we're not running in multitasking mode, there's nothing we can do here
     if (!readyQueueHead || (!readyQueueHead->nextEntry && readyQueueHead->taskIndex == currentTask))
