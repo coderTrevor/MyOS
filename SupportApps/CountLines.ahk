@@ -7,7 +7,7 @@ TotalDirectories := 0
 SourceFiles := 0
 SourceFilesCounted := 0
 NonSourceExts = dll
-ExtensionsToParse = cs,c,cpp,h,ahk,hpp,cc
+ExtensionsToParse = cs,c,cpp,h,ahk,hpp,cc,py,sh
 ;ExcludeFolders = SDL,My-Doom
 SourceOnlyLines := 0
 CommentOnlyLines := 0
@@ -17,15 +17,50 @@ BracesOnlyLines := 0
 SkippedLines := 0
 TODOs := 0
 HACKs := 0
+
 Directories :=
 SourceFileList :=
 Comments := 
 
 SetWorkingDir, %A_ScriptDir%\..
 
+; Let the user know that we're doing something
+Progress, M2, (1 / 3), Counting Directories,  Counting...
+
+; Just determine how many directories there are, for really big source trees (like ReactOS and Linux)
+JustDirectories := 0
+Loop, Files, *, DR
+{	
+	; Even though this code isn't really meant for MyOS, I'll skip these directories for consistency:
+	IfInString, A_LoopFileFullPath,SDL\
+		continue
+	IfInString A_LoopFileFullPath,My-Doom\
+		continue
+	IfInString A_LoopFileFullPath,.git
+		continue
+	IfInString A_LoopFileFullPath,.vs
+		continue
+	IfInString A_LoopFileFullPath,font
+		continue
+	IfInString A_LoopFileFullPath,spf
+		continue
+	IfInString A_LoopFileFullPath,Debug
+		continue
+	IfInString A_LoopFileFullPath,Release
+		continue
+	IfInString A_LoopFileFullPath,x64
+		continue
+	
+	JustDirectories += 1
+}
+
+Progress, R0-%JustDirectories% M2, (2 / 3), Counting Numer of Files, Counting...
+
 ; Determine how many files and directories we need to scan
 Loop, Files, *, DFR
 {
+	Progress, %TotalDirectories%, (2 / 3), Counting Numer of Files, Counting...
+	
 	; Don't include files or folders which mostly contain source I didn't write
 	IfInString, A_LoopFileFullPath,SDL\
 		continue
@@ -78,7 +113,7 @@ Loop, Files, *, DFR
 
 ; Display a window with a progress bar
 ;totalEverything := TotalFiles + TotalDirectories
-Progress, R0-%SourceFiles%, %a_index%, %a_loopfilename%, Counting..., Counting Lines
+Progress, R0-%SourceFiles% M2, %a_index%, %a_loopfilename%, Counting..., Counting Lines
 Loop, Files, *, DFR
 {
 	Progress, %SourceFilesCounted%, %a_loopfilename%, Counting..., Counting Lines
@@ -133,19 +168,19 @@ StringTrimRight, StringLines, StringLines, 3
 
 ;MsgBox %Directories%
 CountSummary :=
-CountSummary .= NumericalFormat(SourceOnlyLines + SourceLinesWithComments + CommentOnlyLines) . " Total Unique and meaningful lines`r`r"
+CountSummary .= NumericalFormat(SourceOnlyLines + SourceLinesWithComments + CommentOnlyLines) . " Total unique and meaningful lines`r`r"
 CountSummary .= NumericalFormat(SourceOnlyLines + SourceLinesWithComments) . " Total lines with code`r"
 CountSummary .= NumericalFormat(CommentOnlyLines + SourceLinesWithComments) . " Total lines with comments`r`r"
 CountSummary .= NumericalFormat(SourceOnlyLines) . " lines with only code`r"
 CountSummary .= NumericalFormat(SourceLinesWithComments) . " lines with comments and code`r"
 CountSummary .= NumericalFormat(CommentOnlyLines) . " lines with only comments`r"
 CountSummary .= NumericalFormat(BracesOnlyLines) . " lines with only braces`r"
-CountSummary .= NumericalFormat(BlankLines) . " blank lines"
-
-CommentOnlyLines := 0
-SourceLinesWithComments := 0
-BlankLines := 0
-BracesOnlyLines := 0
+CountSummary .= NumericalFormat(BlankLines) . " blank lines`r"
+CountSummary .= NumericalFormat(TODOs) . " TODOs`r"
+CountSummary .= NumericalFormat(HACKs) . " HACKs`r"
+CountSummary .= "`rCounted in`r"
+CountSummary .= NumericalFormat(SourceFiles) . " source files in`r"
+CountSummary .= NumericalFormat(TotalDirectories) . " directories"
 
 ; This can be used for debugging. Here I've set it out to show me lines with comments and code:
 ;Gui, Add, Edit, R50 w900 Multi vListingBox
@@ -153,7 +188,10 @@ BracesOnlyLines := 0
 ;GuiControl,, ListingBox, %Directories%
 ;Gui, Show
 
-MsgBox Results of scanning %A_WorkingDir%:`r`r%CountSummary%`r%TODOs% TODOs`r%HACKs% HACKs`r`rCounted in `r%TotalDirectories% directories`r%SourceFiles% source files
+; Isolate the OS name from the working dir
+StringGetPos, NameStart, A_WorkingDir,\,R
+OSName := SubStr(A_WorkingDir, NameStart + 2)
+MsgBox Results of scanning %OSName%:`r`r%CountSummary%
 ;`rNon-Source files with extensions of %NonSourceExts%
 ExitApp ; Replace this with return during development
 
