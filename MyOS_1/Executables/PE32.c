@@ -82,7 +82,7 @@ bool loadAndRunPE(uint8_t *executableDestination, DOS_Header *mzAddress, const c
         }
     }
 
-    // Disable interrupts
+    // Disable interrupts while we mess with page tables
     _disable();
 
     // Get a new page directory for the new task
@@ -118,6 +118,9 @@ bool loadAndRunPE(uint8_t *executableDestination, DOS_Header *mzAddress, const c
     }
     else
         newPageDirectory = pageDir;
+
+    // It's safe for interrupts to run again; we're done messing with the page tables
+    _enable();
 
     // TEMPTEMP - zero out 5 0x1000 sections of memory (tailored to TestApp1.exe)
     memset((void*)physicalLocation, 0, 0x5000);

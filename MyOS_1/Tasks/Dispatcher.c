@@ -90,14 +90,14 @@ void CloseApp(uint32_t PID)
 
 void DispatchNewTask(uint32_t programStart, PAGE_DIRECTORY_ENTRY *newPageDirectory, uint32_t stackSize, const char *imageName, bool exclusive)
 {
-    // disable interrupts
-    __asm cli
-
     if (debugLevel)
     {
         kprintf("Dispatching %s\n", imageName);
         kprintf("program starts at 0x%lX\n", programStart);
     }
+
+    // disable interrupts while we mess with task slots
+    _disable();
 
     // Find a free task slot
     uint16_t taskSlot;
@@ -180,10 +180,12 @@ void DispatchNewTask(uint32_t programStart, PAGE_DIRECTORY_ENTRY *newPageDirecto
     // setup stack for the task, and copy the stack to stackPtr
     __asm
     {
+        sti
         push esp
         push [stackPtr]
         int SYSCALL_DISPATCH_NEW_TASK   // call dispatch_new_task_interrupt_handler(eflags, cs, stackPtr, esp)
         add esp, 8
+        cli
     }
 
     // Update the task's "stack image" to represent values appropriate for the new task
