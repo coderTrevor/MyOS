@@ -228,6 +228,7 @@ void VirtIO_Net_Init(uint8_t bus, uint8_t slot, uint8_t function)
 
 void _declspec(naked) VirtIO_Net_InterruptHandler()
 {
+    _disable();
     _asm pushad;
 
     ++interrupts_fired;
@@ -369,7 +370,7 @@ void VirtIO_Net_SetupReceiveBuffers()
     // Allocate and add 16 buffers to receive queue
     for (uint16_t i = 0; i < 16; ++i)
     {
-        uint8_t *buffer = dbg_alloc(bufferSize);
+        uint8_t *buffer = Paging_Get_Physical_Address(dbg_alloc(bufferSize));
 
         // Add buffer to the descriptor table
         receiveQueue.descriptors[i].address = (uint64_t)buffer;
@@ -426,7 +427,7 @@ void VirtIO_Net_SendPacket(Ethernet_Header *packet, uint16_t dataSize)
    uint16_t bufferSize = sizeof(virtio_net_hdr);
 
     // Allocate a buffer for the header
-    virtio_net_hdr *netBuffer = dbg_alloc(bufferSize);
+    virtio_net_hdr *netBuffer = Paging_Get_Physical_Address(dbg_alloc(bufferSize));
 
     if (!netBuffer)
     {
@@ -473,7 +474,7 @@ void VirtIO_Net_SendPacket(Ethernet_Header *packet, uint16_t dataSize)
     // (TODO: malloc returns identity-mapped addresses for now but later we'll need a function to convert virtual to physical)
 
     // fill descriptor with ethernet packet
-    transmitQueue.descriptors[descIndex2].address = (uint64_t)packetBuffer;
+    transmitQueue.descriptors[descIndex2].address = (uint64_t)Paging_Get_Physical_Address(packetBuffer);
     if (transmitQueue.descriptors[descIndex2].address == 0xdeadbeef || transmitQueue.descriptors[descIndex].address == 0xdeadbeefdeadbeef)
         kprintf("Very bad\n");
     transmitQueue.descriptors[descIndex2].flags = 0;
@@ -546,7 +547,7 @@ void VirtIO_Net_ReceivePacket()
                 bufferSize += receiveQueue.descriptors[(descIndex + i) % receiveQueue.elements].length;
             }
 
-            rxBegin = dbg_alloc(bufferSize);
+            rxBegin = Paging_Get_Physical_Address(dbg_alloc(bufferSize));
             if (!rxBegin)
             {
                 kprintf("Not enough memory to allocate rxBegin\n");

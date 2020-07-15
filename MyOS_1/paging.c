@@ -111,3 +111,20 @@ bool Paging_Print_Page_Table(PAGE_DIRECTORY_ENTRY *thePageDir)
     }
     return done;
 }
+
+uint32_t Paging_Get_Physical_Address(void *address)
+{
+    uint32_t vAddr = (uint32_t)address;
+
+    // TODO: don't always assume 4M entries
+
+    uint32_t index = vAddr / FOUR_MEGABYTES;
+    uint32_t offset = vAddr - (index * FOUR_MEGABYTES);
+
+    // Get page directory
+    PAGE_DIRECTORY_ENTRY *pDir = tasks[currentTask].cr3;
+
+    uint32_t pAddr = pDir[index] & PAGING_ADDRESS_BITS;
+
+    return pAddr + offset;
+}

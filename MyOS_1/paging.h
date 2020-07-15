@@ -19,6 +19,7 @@ typedef /*__declspec(align(4096))*/ uint32_t PAGE_TABLE_ENTRY;
 #define DIRECTORY_ENTRY_4MB              0x80
 
 #define FOUR_MEGABYTES              0x400000
+#define PAGING_ADDRESS_BITS         0xFFFFF000
 
 extern uint32_t paging_space[0x3FFF];
 extern uint32_t *pageDir;
@@ -128,3 +129,5 @@ inline void Paging_Enable(multiboot_info *multibootInfo)
 }
 
 bool Paging_Print_Page_Table(PAGE_DIRECTORY_ENTRY *thePageDir);
+
+uint32_t Paging_Get_Physical_Address(void *address);
