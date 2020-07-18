@@ -156,6 +156,7 @@
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_PopupMenu.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_Rect.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_RunWindow.h" />
+    <ClInclude Include="..\MyOS_GUI_Shell\GUI_SystemMenuControl.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_Taskbar.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\GUI_Window.h" />
     <ClInclude Include="..\MyOS_GUI_Shell\MyOS_GUI_Shell.h" />
@@ -172,6 +173,7 @@
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_Object.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_PopupMenu.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_RunWindow.cpp" />
+    <ClCompile Include="..\MyOS_GUI_Shell\GUI_SystemMenuControl.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_Taskbar.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_TerminalWindow.cpp" />
     <ClCompile Include="..\MyOS_GUI_Shell\GUI_Window.cpp" />

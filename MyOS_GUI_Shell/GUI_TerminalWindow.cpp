@@ -11,7 +11,7 @@ extern "C" {
 #include <string.h>
 
 GUI_TerminalWindow::GUI_TerminalWindow(const char *name)
-    : GUI_Window(NewWindowPosition(GUI_TERMINAL_DEFAULT_WIDTH, GUI_TERMINAL_DEFAULT_HEIGHT), name)
+    : GUI_Window(NewWindowPosition(GUI_TERMINAL_DEFAULT_WIDTH, GUI_TERMINAL_DEFAULT_HEIGHT), name, WINDOW_STYLE_NORMAL)
 {
     // TODO: Check for out of memory error
     characterBuffer = new char(characterBufferSize);

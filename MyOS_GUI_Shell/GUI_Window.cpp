@@ -4,6 +4,7 @@ extern "C" {
 
 #include "GUI_Window.h"
 #include "MyOS_GUI_Shell.h"
+#include "GUI_SystemMenuControl.h"
 
 #ifdef __MYOS
 #include "../MyOS_1/Interrupts/System_Calls.h"
@@ -11,6 +12,43 @@ extern "C" {
 #include <stdio.h>
 #endif
 
+
+GUI_Window::GUI_Window(GUI_Rect size, const char *name, int style) : GUI_Window(size.top, size.left, size.width, size.height, name, style)
+{
+}
+
+GUI_Window::GUI_Window(int top, int left, int width, int height, const char *name, int windowStyle)
+{
+    dimensions.top = top;
+    dimensions.left = left;
+    dimensions.width = width;
+    dimensions.height = height;
+
+    SDL_strlcpy(windowName, name, MAX_WINDOW_NAME_LENGTH);
+    CreateSurface();
+
+    style = windowStyle;
+
+    for (int i = 0; i < MAX_WINDOW_CONTROLS; ++i)
+        pControls[i] = NULL;
+
+    // Should we create a system menu control?
+    if (!(style & WINDOW_STYLE_NO_SYSTEM_MENU))
+    {
+        // create system menu
+        pControls[MAX_WINDOW_CONTROLS - 1] = new GUI_SystemMenuControl(this);
+    }
+
+    pClickedControl = NULL;
+    focusedControlIndex = -1;
+    enterClicksButtonID = -1;
+}
+
+GUI_Window::~GUI_Window()
+{
+    if (!pSurface)
+        SDL_FreeSurface(pSurface);
+}
 
 void GUI_Window::CreateSurface()
 {
@@ -169,7 +207,7 @@ void GUI_Window::DrawWindow()
     FillSurface(backgroundColor);
 
     // Draw the system menu at the top
-    DrawSystemMenu(pSurface, windowName);
+    //DrawSystemMenu(pSurface, windowName);
 
     // Draw a black outline around the background
     Draw3D_Box(pSurface, 0, 0, dimensions.width, dimensions.height);

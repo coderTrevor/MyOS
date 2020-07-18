@@ -7,44 +7,22 @@
 #define MAX_WINDOW_NAME_LENGTH  64
 #define SYSTEM_MENU_CLOSE_BUTTON_ID (uint32_t)-1
 #define BUTTON_ID_OK                (uint32_t)-2
+#define SYSTEM_MENU_CONTROL_ID      (uint32_t)-3
 #define MAX_WINDOW_CONTROLS     24   /* TEMP */
+
+#define WINDOW_STYLE_NORMAL         0
+#define WINDOW_STYLE_NO_SYSTEM_MENU 1
 
 class GUI_Control;
 
 class GUI_Window : public GUI_Object
 {
 public:
-    GUI_Window(GUI_Rect size, const char *name)
-    {
-        dimensions = size;
-        SDL_strlcpy(windowName, name, MAX_WINDOW_NAME_LENGTH - 1);
-        CreateSurface();
+    GUI_Window(GUI_Rect size, const char *name, int windowStyle);
 
-        for (int i = 0; i < MAX_WINDOW_CONTROLS; ++i)
-            pControls[i] = NULL;
+    GUI_Window(int top, int left, int width, int height, const char *name, int windowStyle);
 
-        pClickedControl = NULL;
-        focusedControlIndex = -1;
-        enterClicksButtonID = -1;
-    }
-
-    GUI_Window(int top, int left, int width, int height, const char *name)
-    {
-        dimensions.top = top;
-        dimensions.left = left;
-        dimensions.width = width;
-        dimensions.height = height;
-
-        SDL_strlcpy(windowName, name, MAX_WINDOW_NAME_LENGTH);
-        CreateSurface();
-
-        for (int i = 0; i < MAX_WINDOW_CONTROLS; ++i)
-            pControls[i] = NULL;
-
-        pClickedControl = NULL;
-        focusedControlIndex = -1;
-        enterClicksButtonID = -1;
-    }
+    ~GUI_Window();
 
     virtual void ControlClicked(uint32_t controlID);
 
@@ -88,4 +66,5 @@ protected:
     GUI_Control *pControls[MAX_WINDOW_CONTROLS];
     int focusedControlIndex;
     int enterClicksButtonID;        // There's probably a better way to do this
+    int style;
 };

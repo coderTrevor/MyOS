@@ -4,7 +4,7 @@
 #include "MyOS_GUI_Shell.h"
 
 GUI_MessageBox::GUI_MessageBox(char * messageText, char * windowTitle)
-    :   GUI_Window( NewWindowPosition(MESSAGE_BOX_WIDTH, MESSAGE_BOX_HEIGHT), windowTitle)
+    :   GUI_Window( NewWindowPosition(MESSAGE_BOX_WIDTH, MESSAGE_BOX_HEIGHT), windowTitle, WINDOW_STYLE_NORMAL)
 {
     // TODO: Use static memory so we can display out of memory messages
     SDL_Surface *pFont = FNT_Render(messageText, SDL_BLACK);

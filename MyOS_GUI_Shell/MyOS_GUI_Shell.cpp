@@ -549,9 +549,9 @@ int main(int argc, char* argv[])
                     //MessageBox("Here's a test message", "Test Message");
                     switch (event.key.keysym.sym)
                     {
-                        /*case SDLK_n:
-                            //CreateTextWindow(lastWindowID++);
-                            break;*/
+                        case SDLK_n:
+                            CreateTextWindow(lastWindowID++, "Test Window");
+                            break;
                         case SDLK_ESCAPE:
                             done = true;
                             break;

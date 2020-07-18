@@ -25,7 +25,7 @@ void StartMenuHandler(int choice)
 }
 
 GUI_Taskbar::GUI_Taskbar(uint32_t desktopWidth, uint32_t desktopHeight) : 
-    GUI_Window(desktopHeight - GUI_TASKBAR_HEIGHT, 0, desktopWidth, GUI_TASKBAR_HEIGHT, "Taskbar")
+    GUI_Window(desktopHeight - GUI_TASKBAR_HEIGHT, 0, desktopWidth, GUI_TASKBAR_HEIGHT, "Taskbar", WINDOW_STYLE_NO_SYSTEM_MENU)
 {
     // taskbar has no system menu or "standard window controls
 

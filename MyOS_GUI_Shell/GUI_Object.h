@@ -17,6 +17,11 @@ extern "C" {
 #define SYSTEM_MENU_COLOR_G 160
 #define SYSTEM_MENU_COLOR_B 255
 
+#define SDL_R_MASK          0xFF000000
+#define SDL_G_MASK          0x00FF0000
+#define SDL_B_MASK          0x0000FF00
+#define SDL_A_MASK          0x000000FF
+
 const SDL_Color SDL_BLACK       = { 0,   0,  0, 255 };
 const SDL_Color SDL_DARKGRAY    = { 40, 40, 40, 255 };
 const uint32_t  RGB_BLACK = 0x000000;
@@ -41,7 +46,6 @@ public:
     GUI_Rect dimensions;
 
 protected:
-    void DrawSystemMenu(SDL_Surface *pSurface, char *windowName);
     void DrawVerticalLine(SDL_Surface *pSurface, int x, int startY, int endY, SDL_Color lineColor);
     void DrawHorizontalLine(SDL_Surface *pSurface, int startX, int endX, int y, SDL_Color lineColor);
     void Draw3D_Box(SDL_Surface *pSurface, int x, int y, int width, int height);

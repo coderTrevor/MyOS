@@ -372,6 +372,9 @@
     <ClCompile Include="..\MyOS_1\Libs\SDL\src\video\myos\SDL_myoskeyboard.c">
       <Filter>Source Files\SDL</Filter>
     </ClCompile>
+    <ClCompile Include="GUI_SystemMenuControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GUI_Object.h">
@@ -408,6 +411,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GUI_EditControl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI_SystemMenuControl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

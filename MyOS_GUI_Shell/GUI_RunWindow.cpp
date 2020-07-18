@@ -4,7 +4,7 @@
 #include "GUI_EditControl.h"
 
 // TODO: place window relative to bottom-left
-GUI_RunWindow::GUI_RunWindow() : GUI_Window(0, 0, RUN_WINDOW_WIDTH, RUN_WINDOW_HEIGHT, "Run" )
+GUI_RunWindow::GUI_RunWindow() : GUI_Window(0, 0, RUN_WINDOW_WIDTH, RUN_WINDOW_HEIGHT, "Run", WINDOW_STYLE_NORMAL)
 {
     // Create a button control for an "OK" button
     pControls[0] = new GUI_Button("OK", BUTTON_ID_OK, this);
