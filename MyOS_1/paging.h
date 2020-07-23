@@ -126,6 +126,32 @@ inline void Paging_Enable(multiboot_info *multibootInfo)
 
     // TEMPTEMP: put page directories between 16 - 20 megs
     nextPageDirectory = FOUR_MEGABYTES * 4;
+
+    // Walk through the mem map grub gave us
+    // TODO: Assert that grub gave us a memory map
+    // TODO: Don't assume we have memory at the beginning of RAM
+    // TODO: Use all the entries we get from GRUB
+    multiboot_mmap_entry *entry = (multiboot_mmap_entry *)multibootInfo->mmap_addr;
+    
+    // examine each mmap entry
+    for (uint32_t offset = 0; offset <= multibootInfo->mmap_length && entry->size; offset += entry->size + 4)
+    {
+        if (entry->type == MULTIBOOT_MEMORY_AVAILABLE)
+        {
+            // If the next page of memory we're assuming we can use resides here
+            if (pagingNextAvailableMemory >= entry->addr && pagingNextAvailableMemory < (entry->addr + entry->len))
+            {
+                // determine how many pages we really have available
+                uint64_t addrEnd = entry->addr + entry->len;
+                uint64_t bytesAvailable = addrEnd - pagingNextAvailableMemory;
+                paging4MPagesAvailable = bytesAvailable / FOUR_MEGABYTES;
+                return;
+            }
+        }        
+
+        // advance pointer to next entry
+        entry = (multiboot_mmap_entry*)((uint32_t)entry + entry->size + 4);
+    }
 }
 
 bool Paging_Print_Page_Table(PAGE_DIRECTORY_ENTRY *thePageDir);
