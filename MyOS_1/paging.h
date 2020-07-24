@@ -21,10 +21,13 @@ typedef /*__declspec(align(4096))*/ uint32_t PAGE_TABLE_ENTRY;
 #define FOUR_MEGABYTES              0x400000
 #define PAGING_ADDRESS_BITS         0xFFFFF000
 
+#define PAGING_ADDRESS_BITS         0xFFFFF000
+
 extern uint32_t paging_space[0x3FFF];
 extern uint32_t *pageDir;
 
 extern uint32_t pagingNextAvailableMemory;
+extern uint32_t pagingNextAvailableKernelPage;
 extern uint32_t paging4MPagesAvailable;
 extern uint32_t nextPageDirectory; // TEMPTEMP
 
@@ -82,6 +85,9 @@ inline void Paging_Enable(multiboot_info *multibootInfo)
 
     // put the kernel page table in the page directory into entry 768, which will map it to 0xC000 0000
     pageDirectory[768] = (PAGE_DIRECTORY_ENTRY)((uint32_t)initialKernelTable | DIRECTORY_ENTRY_PRESENT | DIRECTORY_ENTRY_WRITABLE);
+
+    // The next kernel page we allocate can go to this index in the page directory
+    pagingNextAvailableKernelPage = 769;
 
     // TEMPTEMP HACKHACK! - identity map the linear frame buffer, which on my Qemu starts at 0xFD00 0000
     uint32_t lfbAddress = 0xFD000000;

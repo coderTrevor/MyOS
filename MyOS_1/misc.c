@@ -5,6 +5,7 @@
 #include "printf.h"
 #include "Interrupts\System_Calls.h"
 #include "Interrupts/Interrupts.h"
+#include "Console_Serial.h"
 #include <float.h>
 
 uint32_t pagedMemoryAvailable = 0;
@@ -70,6 +71,10 @@ void dbg_free(void *ptr, char *filename, int lineNumber)
 // TODO: Make thread-safe
 void free(void *ptr)
 {
+#ifdef MYOS_KERNEL
+    kfree(ptr);
+    return;
+#else
     // Find this pointer in the allocation array
     for (size_t i = 0; i < nextAllocationSlot; ++i)
     {
@@ -110,6 +115,8 @@ void free(void *ptr)
 #else
     printf("\n");
 #endif
+
+#endif // MYOS_KERNEL
 }
 
 char intToChar(int i)
@@ -121,6 +128,7 @@ char intToChar(int i)
 }
 
 // TODO: Test
+// TODO: Handle kernel-mode
 void* realloc(void* ptr, size_t size)
 {
     if (!ptr)
@@ -382,6 +390,9 @@ void *dbg_malloc(size_t size, char *filename, int lineNumber)
 unsigned int reuses = 0;
 void* malloc(size_t size)
 {
+#ifdef MYOS_KERNEL
+    return kmalloc(size);
+#else
     if (nextAllocationSlot >= MAX_ALLOCATIONS)
     {
         printf("Maximum memory allocations exceeded!\n");
@@ -397,7 +408,8 @@ void* malloc(size_t size)
 
 
     // See if there's freed memory available to reallocate (first fit algorithm; memory will end up wasted)
-    for(size_t i = 0; i < nextFreeMemorySlot; ++i)
+    // TODO: We have to guarantee that if we're calling this from the kernel, we don't try to reuse memory mapped to user space
+    for (size_t i = 0; i < nextFreeMemorySlot; ++i)
     {
         if (freeMemoryArray.size[i] >= size)
         {
@@ -464,9 +476,9 @@ void* malloc(size_t size)
         // So we can guarantee the pages will be allocated in order. (TODO: Now that I think of it, this logic should maybe be in PageAllocator?)
         /*while (pagesToAllocate)
         {
-            unsigned int pagesAllocated;
-            PageAllocator(pagesToAllocate, &pagesAllocated);
-            pagesToAllocate -= pagesAllocated;
+        unsigned int pagesAllocated;
+        PageAllocator(pagesToAllocate, &pagesAllocated);
+        pagesToAllocate -= pagesAllocated;
         }*/
 
         unsigned int pagesAllocated;
@@ -503,6 +515,8 @@ void* malloc(size_t size)
     allocationArray.inUse[nextAllocationSlot++] = true;
 
     return (void *)availableAddress;
+
+#endif // MYOS_KERNEL
 }
 
 #pragma function(memcmp)

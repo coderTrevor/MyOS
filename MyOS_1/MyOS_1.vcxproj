@@ -307,6 +307,7 @@
     <ClCompile Include="Interrupts\Interrupts.c" />
     <ClCompile Include="Interrupts\PIC.c" />
     <ClCompile Include="Interrupts\System_Calls.c" />
+    <ClCompile Include="kmisc.c" />
     <ClCompile Include="main.c">
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">UninitializedLocalUsageCheck</BasicRuntimeChecks>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">UninitializedLocalUsageCheck</BasicRuntimeChecks>
@@ -362,6 +363,7 @@
     <ClInclude Include="Interrupts\Interrupts.h" />
     <ClInclude Include="Interrupts\PIC.h" />
     <ClInclude Include="Interrupts\System_Calls.h" />
+    <ClInclude Include="kmisc.h" />
     <ClInclude Include="misc.h" />
     <ClInclude Include="multiboot.h" />
     <ClInclude Include="myos_io.h" />

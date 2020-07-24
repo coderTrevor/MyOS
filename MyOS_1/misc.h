@@ -7,6 +7,10 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef MYOS_KERNEL
+#include "kmisc.h"
+#endif
+
 //#define DEBUG_MEM
 
 #ifdef DEBUG_MEM
@@ -82,13 +86,23 @@ int strcasecmp(const char *s1, const char *s2);
 int __cdecl strcmp(const char *str1, const char *str2);
 #pragma intrinsic(strcmp)
 
-#ifdef DEBUG_MEM
-// TODO: Not thread safe, but it probably doesn't matter
-#define dbg_alloc(sz)    dbg_malloc(sz, __FILE__, __LINE__)
-#define dbg_release(ptr) dbg_free(ptr,  __FILE__, __LINE__)
+#ifdef MYOS_KERNEL
+    #ifdef DEBUG_MEM
+        // TODO: Not thread safe, but it probably doesn't matter
+        #define dbg_alloc(sz)    dbg_kmalloc(sz, __FILE__, __LINE__)
+        #define dbg_release(ptr) dbg_kfree(ptr,  __FILE__, __LINE__)
+    #else
+        #define dbg_alloc(sz)      kmalloc(sz)
+        #define dbg_release(ptr)   kfree(ptr)
+    #endif
 #else
-#define dbg_alloc(sz)      malloc(sz)
-#define dbg_release(ptr)   free(ptr)
+    #ifdef DEBUG_MEM
+        #define dbg_alloc(sz)    dbg_malloc(sz, __FILE__, __LINE__)
+        #define dbg_release(ptr) dbg_free(ptr,  __FILE__, __LINE__)
+    #else
+        #define dbg_alloc(sz)      malloc(sz)
+        #define dbg_release(ptr)   free(ptr)
+    #endif    
 #endif
 
 void *malloc(size_t size);

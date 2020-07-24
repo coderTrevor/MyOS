@@ -12,6 +12,9 @@
 #include "../Networking/IPv4.h"
 #include "Virtio.h"
 #include "../Timers/System_Clock.h"
+#include "../Console_Serial.h"
+#include "../paging.h"
+#include "../Tasks/Context.h"
 
 // TODO: Support multiple NIC's
 
@@ -301,6 +304,8 @@ void _declspec(naked) VirtIO_Net_InterruptHandler()
 
 bool VirtIO_Net_SharedInterruptHandler(void)
 {
+    _disable();
+
     if (debugLevel)
         terminal_writestring(" --------- virtio-net interrupt fired! -------\n");
 
@@ -468,6 +473,14 @@ void VirtIO_Net_SendPacket(Ethernet_Header *packet, uint16_t dataSize)
     {
         kprintf("Not enough memory to allocate packetBuffer\n");
         return;
+    }
+
+
+    if (/*(uint32_t)(&transmitQueue.descriptors[descIndex2]) == 0x2800000 || (uint32_t)(&transmitQueue.descriptors[descIndex2].address) == 0x2800000
+        ||*/ (uint32_t)packetBuffer == 0x2800000)
+    {
+        //serial_printf("Got em - %s\n", tasks[currentTask].imageName);
+        //Paging_Print_Page_Table(tasks[currentTask].cr3);
     }
 
     memcpy(packetBuffer, packet, dataSize);

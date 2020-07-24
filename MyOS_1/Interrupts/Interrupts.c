@@ -47,6 +47,7 @@ void _declspec(naked) default_interrupt_handler(void)
 
 void _declspec(naked) irq11_shared_interrupt_handler(void)
 {
+    _disable();
     _asm pushad;
 
     ++interrupts_fired;
@@ -73,6 +74,7 @@ void _declspec(naked) irq11_shared_interrupt_handler(void)
 
 void _declspec(naked) irq9_shared_interrupt_handler(void)
 {
+    _disable();
     _asm pushad;
 
     ++interrupts_fired;

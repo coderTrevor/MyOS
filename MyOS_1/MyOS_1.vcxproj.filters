@@ -222,6 +222,9 @@
     <ClCompile Include="Debugging\Debug.c">
       <Filter>Source Files\Debugging</Filter>
     </ClCompile>
+    <ClCompile Include="kmisc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="misc.h">
@@ -373,6 +376,9 @@
     </ClInclude>
     <ClInclude Include="Debugging\Debug.h">
       <Filter>Header Files\Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="kmisc.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

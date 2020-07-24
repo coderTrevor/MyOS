@@ -4,6 +4,7 @@
 #include "Ethernet.h"
 #include "../Drivers/Virtio_Net.h"
 #include "../Tasks/Context.h"
+#include "../Console_Serial.h"
 
 // TODO: Support multiple transactions
 uint16_t transactionID;
@@ -166,6 +167,7 @@ uint16_t TFTP_RequestFile(uint32_t serverIP, const char *filename, const char *t
 // TODO: Seems like Qemu and VirtualBox don't support writing files via TFTP so I can't finish this :(
 uint16_t TFTP_WriteFile(uint32_t serverIP, const char *filename, const char *transferMode, uint8_t *sourceMAC)
 {
+    return 1235; // Don't even bother
     TFTP_RequestHeader *tftpData;
     size_t filenameLength = strlen(filename) + 1; // length of filename plus null terminator
     size_t transferModeLength = strlen(transferMode) + 1;
@@ -285,6 +287,7 @@ void TFTP_ProcessDataPacket(TFTP_DataHeader *dataPacket, uint16_t sourcePort, ui
         }
         else
         {
+            //serial_printf("tftpTaskIndex: %d, currentTask: %d\n", tftpTaskIndex, currentTask);
             // We need to swap out the page directory with the one for the task that requested the file
             __writecr3(tasks[tftpTaskIndex].cr3);
 

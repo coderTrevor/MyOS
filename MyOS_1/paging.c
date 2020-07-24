@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "Interrupts/System_Calls.h"
 #include "Tasks/Context.h"
+#include "Console_Serial.h"
 
 // Allocate space for paging structures. We need enough space for three arrays with 0x1000 32-bit entries each.
 // Each array must be aligned on a 0x1000-byte boundary.
@@ -14,8 +15,9 @@ uint32_t paging_space[0x3FFF];
 
 uint32_t *pageDir;
 
-uint32_t pagingNextAvailableMemory; // physical address of the next available page
-uint32_t paging4MPagesAvailable;    // number of 4M physical memory pages available to be mapped
+uint32_t pagingNextAvailableMemory;     // physical address of the next available page
+uint32_t pagingNextAvailableKernelPage; // The index into the page directory where the next kernel page can go
+uint32_t paging4MPagesAvailable;        // number of 4M physical memory pages available to be mapped
 
 uint32_t nextPageDirectory; // TEMPTEMP where the next created page directory will be stored
 
@@ -49,13 +51,27 @@ void KPageAllocator(unsigned int pages, unsigned int *pPagesAllocated, uint32_t 
 
     // limit the number of pages to allocate to the number available.
     if (pages > paging4MPagesAvailable)
-        pages = paging4MPagesAvailable;
+    {
+        //    pages = paging4MPagesAvailable;
+        // NOPE: kmalloc expects all pages to be allocated
+        kprintf("Too few pages available to satisfy request\n");
+        return;
+    }
 
     /*terminal_writestring("Need to allocate ");
     terminal_print_int(pages);
     terminal_writestring(" pages.\n");*/
 
-    uint32_t nextPage = pagingNextAvailableMemory / FOUR_MEGABYTES;
+    uint32_t nextPage = /*pagingNextAvailableKernelPage;// */pagingNextAvailableMemory / FOUR_MEGABYTES;
+    uint32_t physicalAddress = pagingNextAvailableMemory;
+
+    // sanity check
+    if ((physicalAddress & PAGING_ADDRESS_BITS) != physicalAddress)
+    {
+        kprintf("Physical address does not lie on a 4M boundary!\nSystem halted.\n");
+        for (;;)
+            __halt();
+    }
 
     // Get the page directory we'll be using
     PAGE_DIRECTORY_ENTRY *pageDirectory = (PAGE_DIRECTORY_ENTRY *)tasks[currentTask].cr3;
@@ -64,26 +80,36 @@ void KPageAllocator(unsigned int pages, unsigned int *pPagesAllocated, uint32_t 
     for (size_t allocated = 0; allocated < pages; ++allocated)
     {
         // Add the current page to the page directory
-        pageDirectory[nextPage] = ((nextPage * FOUR_MEGABYTES)
+        pageDirectory[nextPage] = ((physicalAddress)
             | DIRECTORY_ENTRY_PRESENT | DIRECTORY_ENTRY_USER_ACCESSIBLE | DIRECTORY_ENTRY_WRITABLE | DIRECTORY_ENTRY_4MB);
 
-        // If we're mapping this into the kernel space, we need to copy that mapping into every running task
-        if (pageDirectory == pageDir)
+        // Since we're mapping this into the kernel space, we need to copy that mapping into every running task
+        //if (pageDirectory == pageDir)
         {
             for (int i = 0; i < MAX_TASKS; ++i)
             {
-                if (!tasks[i].inUse || tasks[i].cr3 == (uint32_t)pageDir)
+                if (!tasks[i].inUse || tasks[i].cr3 == (uint32_t)pageDirectory)
                     continue;
 
                 PAGE_DIRECTORY_ENTRY *otherPageDir = (PAGE_DIRECTORY_ENTRY *)tasks[i].cr3;
 
-                otherPageDir[nextPage] = ((nextPage * FOUR_MEGABYTES)
+                // make sure we aren't overwriting the app's mapping (TODO: not sure how we are guaranteeing that we won't)
+                if ((otherPageDir[nextPage] & DIRECTORY_ENTRY_PRESENT) == DIRECTORY_ENTRY_PRESENT)
+                {
+                    kprintf("Tried to overwrite page mapping of %s at 0x%X\nSystem halted.\n", tasks[i].imageName, nextPage * FOUR_MEGABYTES);
+                    for (;;)
+                        __halt();
+                    // TODO: How should this be handled?
+                }
+
+                otherPageDir[nextPage] = ((physicalAddress)
                                            | DIRECTORY_ENTRY_PRESENT | DIRECTORY_ENTRY_USER_ACCESSIBLE | DIRECTORY_ENTRY_WRITABLE | DIRECTORY_ENTRY_4MB);
             }
         }
         
         // update pointers and stuff
         ++nextPage;
+        ++pagingNextAvailableKernelPage;
         --paging4MPagesAvailable;
         pagingNextAvailableMemory += FOUR_MEGABYTES;
         ++(*pPagesAllocated);
@@ -101,13 +127,14 @@ bool Paging_Print_Page_Table(PAGE_DIRECTORY_ENTRY *thePageDir)
     done = true;
 
     kprintf("Page table entries:\nLogical -> Physical  -- flags\n");
-    kprintf("continuing\n");
+    //serial_printf("Page table entries:\nLogical -> Physical  -- flags\n");
     for (int i = 0; i < 1024; ++i)
     {
         if (!(thePageDir[i] & PAGE_ENTRY_PRESENT))
             continue;
         done = false;
         kprintf("0x%X -> 0x%X   - 0x%X\n", i * FOUR_MEGABYTES, thePageDir[i] & 0xFFFFF000, thePageDir[i] & 0xFFF);
+        //serial_printf("0x%X -> 0x%X   - 0x%X\n", i * FOUR_MEGABYTES, thePageDir[i] & 0xFFFFF000, thePageDir[i] & 0xFFF);
     }
     return done;
 }
