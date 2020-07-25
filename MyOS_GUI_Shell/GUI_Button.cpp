@@ -18,11 +18,8 @@ GUI_Button::GUI_Button(const char * buttonText, uint32_t controlID, GUI_Window *
                                     0x000000FF);    // alpha mask
 
     // Fill Surface with the default button color
-    uint32_t buttonColor = SDL_MapRGB(pSurface->format,
-                                      SDL_DEFAULT_BUTTON_COLOR.r,
-                                      SDL_DEFAULT_BUTTON_COLOR.g,
-                                      SDL_DEFAULT_BUTTON_COLOR.b);
-    SDL_FillRect(pSurface, NULL, buttonColor);
+    backgroundColor = SDL_DEFAULT_BUTTON_COLOR;
+    FillSurface(pSurface, SDL_DEFAULT_BUTTON_COLOR);
 
     // Draw font on button    
     SDL_Rect dstRect = { GUI_BUTTON_TEXT_MARGIN, GUI_BUTTON_TEXT_MARGIN, pFontSurface->w, pFontSurface->h };
@@ -47,6 +44,7 @@ GUI_Button::GUI_Button(const char * buttonText, uint32_t controlID, GUI_Window *
     this->controlID = controlID;
     this->dimensions = dimensions;
 
+    backgroundColor = SDL_DEFAULT_BUTTON_COLOR;
     pSurface = CreateSurface();
 }
 
@@ -98,15 +96,11 @@ SDL_Surface *GUI_Button::CreateSurface()
                                     0, 0, 0, // R, G, and B masks (default)
                                     0x000000FF);    // alpha mask
 
-    // Fill Surface with the default button color    
-    uint32_t buttonColor = SDL_MapRGB(pNewSurface->format,
-                                      SDL_DEFAULT_BUTTON_COLOR.r,
-                                      SDL_DEFAULT_BUTTON_COLOR.g,
-                                      SDL_DEFAULT_BUTTON_COLOR.b);
-    SDL_FillRect(pNewSurface, NULL, buttonColor);
+    // Fill Surface with the default button color
+    FillSurface(pNewSurface, backgroundColor);
 
-    // Draw font on button    
-    SDL_Rect dstRect = { GUI_BUTTON_TEXT_MARGIN, GUI_BUTTON_TEXT_MARGIN, pFontSurface->w, pFontSurface->h };
+    // Draw font on button. For now, center text on button
+    SDL_Rect dstRect = { (dimensions.width / 2) - (pFontSurface->w / 2), (dimensions.height / 2) - (pFontSurface->h / 2), pFontSurface->w, pFontSurface->h };
     SDL_BlitSurface(pFontSurface, NULL, pNewSurface, &dstRect);
 
     SDL_FreeSurface(pFontSurface);

@@ -13,6 +13,12 @@ GUI_Object::~GUI_Object()
 {
 }
 
+void GUI_Object::GetRelativePoint(int & x, int & y)
+{
+    x -= dimensions.left;
+    y -= dimensions.top;
+}
+
 bool GUI_Object::PointInBounds(int x, int y)
 {
     if (x < dimensions.left

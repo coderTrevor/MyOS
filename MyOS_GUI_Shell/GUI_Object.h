@@ -35,6 +35,9 @@ public:
     GUI_Object();
     ~GUI_Object();
 
+    virtual void GetRelativePoint(int &x, int &y);
+    int GetRelX(int x) { return x - dimensions.left; }
+    int GetRelY(int y) { return y - dimensions.top;  }
     virtual void PaintToSurface(SDL_Surface *pTargetSurface) {}
     virtual bool MouseOver(int relX, int relY) { return false; }
     virtual void OnClick(int relX, int relY) {}

@@ -20,6 +20,8 @@ public:
     virtual void OnMouseUp(int relX, int relY);
     void Resize(GUI_Rect newDimensions);    // TODO: Make dimensions a private variable
 
+    SDL_Color backgroundColor;
+
 protected:
     SDL_Surface *CreateSurface();
 

@@ -1,7 +1,9 @@
 #include "GUI_SystemMenuControl.h"
+#include "GUI_Window.h"
 
 
-GUI_SystemMenuControl::GUI_SystemMenuControl(GUI_Window *pOwner) : GUI_Control(pOwner, SYSTEM_MENU_CONTROL_ID)
+GUI_SystemMenuControl::GUI_SystemMenuControl(GUI_Window *pOwner) : GUI_Control(pOwner, SYSTEM_MENU_CONTROL_ID), 
+                                                                    closeButton("X", SYSTEM_MENU_CLOSE_BUTTON_ID, pOwner)
 {
     dimensions.top = 1;
     dimensions.left = 1;
@@ -10,6 +12,19 @@ GUI_SystemMenuControl::GUI_SystemMenuControl(GUI_Window *pOwner) : GUI_Control(p
 
     pSurface = NULL;
     CreateSurface();
+
+    // Make close button red
+    closeButton.backgroundColor = { 255, 120, 120, 255 };
+
+    // Calculate close button dimensions
+    int margin = 4;
+    int boxHeight = SYSTEM_MENU_HEIGHT - margin + 1;
+    int boxWidth = boxHeight;
+    int boxTop = (margin / 2);
+    int boxLeft = dimensions.width - boxWidth - margin + 2;
+    SDL_Rect boxRect = { boxLeft, boxTop, boxWidth, boxHeight };
+    
+    closeButton.Resize({ boxTop, boxLeft, boxWidth, boxHeight });
 }
 
 GUI_SystemMenuControl::~GUI_SystemMenuControl()
@@ -54,15 +69,6 @@ void GUI_SystemMenuControl::CreateSurface()
     int boxTop = (margin / 2);
     int boxLeft = dimensions.width - boxWidth - margin + 2;
     SDL_Rect boxRect = { boxLeft, boxTop, boxWidth, boxHeight };
-    uint32_t red = SDL_MapRGB(pSurface->format, 255, 120, 120);
-    SDL_FillRect(pSurface, &boxRect, red);
-    Draw3D_Box(pSurface, boxLeft, boxTop, boxWidth, boxHeight);
-
-    pFont = FNT_Render("X", SDL_BLACK);
-    boxRect.x += 7;
-    boxRect.y += 7;
-    SDL_BlitSurface(pFont, NULL, pSurface, &boxRect);
-    SDL_FreeSurface(pFont);
 
     boxLeft = boxLeft - boxWidth - 2;
     boxRect = { boxLeft, boxTop, boxWidth, boxHeight };
@@ -91,7 +97,15 @@ void GUI_SystemMenuControl::CreateSurface()
     SDL_FreeSurface(pFont);
 }
 
+void GUI_SystemMenuControl::OnClick(int relX, int relY)
+{
+    // Pass click on to button controls
+    if (closeButton.PointInBounds(relX, relY))
+        closeButton.OnClick(closeButton.GetRelX(relX), closeButton.GetRelY(relY));
+}
+
 void GUI_SystemMenuControl::PaintToSurface(SDL_Surface * pTargetSurface)
 {
+    closeButton.PaintToSurface(pSurface);
     SDL_BlitSurface(pSurface, NULL, pTargetSurface, dimensions.GetSDL_Rect());
 }
