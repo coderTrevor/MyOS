@@ -11,7 +11,7 @@ extern "C" {
 #include "kmisc.h"
 #endif
 
-//#define DEBUG_MEM
+#define DEBUG_MEM
 
 #ifdef DEBUG_MEM
 #define MAX_DEBUG_FILENAME_LENGTH 24

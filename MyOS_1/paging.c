@@ -17,6 +17,7 @@ uint32_t *pageDir;
 
 uint32_t pagingNextAvailableMemory;     // physical address of the next available page
 uint32_t pagingNextAvailableKernelPage; // The index into the page directory where the next kernel page can go
+uint32_t pagingKernelNonPagedArea;      // A page (4MiB) of non-paged, identity-mapped memory drivers can use (non-paged pool)
 uint32_t paging4MPagesAvailable;        // number of 4M physical memory pages available to be mapped
 
 uint32_t nextPageDirectory; // TEMPTEMP where the next created page directory will be stored

@@ -7,6 +7,7 @@
 #include "Interrupts/Interrupts.h"
 #include "Console_Serial.h"
 #include <float.h>
+#include "Tasks/Context.h"
 
 uint32_t pagedMemoryAvailable = 0;
 uint32_t memoryNextAvailableAddress = 0;
@@ -64,6 +65,7 @@ void dbg_free(void *ptr, char *filename, int lineNumber)
 {
     dbgFreeFilename = filename;
     dbgFreeLineNumber = lineNumber;
+    serial_printf("Freeing mem from %s, line %d for %s\n", filename, lineNumber, tasks[currentTask].imageName);
     free(ptr);
 }
 #endif
@@ -135,6 +137,10 @@ void* realloc(void* ptr, size_t size)
         return malloc(size);
 
     void *ptrNew = malloc(size);
+
+#ifdef MYOS_KERNEL
+    serial_printf("realloc called\n");
+#endif
 
     // Find ptr in allocation array
     int index;
@@ -383,6 +389,7 @@ void *dbg_malloc(size_t size, char *filename, int lineNumber)
 {
     dbgMemFilename = filename;
     dbgMemLineNumber = lineNumber;
+    serial_printf("Allocating %d bytes from %s, line %d for %s\n", size, filename, lineNumber, tasks[currentTask].imageName);
     return malloc(size);
 }
 #endif

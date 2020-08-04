@@ -1,7 +1,10 @@
 #include "paging.h"
 #include "printf.h"
+#include "Interrupts\System_Calls.h"
 #include "kmisc.h"
 #include "misc.h"
+#include "Console_Serial.h"
+#include "Tasks/Context.h"
 
 // Functions used by the kernel & drivers
 
@@ -20,10 +23,10 @@ unsigned int knextFreeMemorySlot = 0;
 
 #ifdef DEBUG_MEM
 #define noFileName "FILENAME NOT SET";
-char *dbgMemFilename = noFileName;
-int   dbgMemLineNumber = 0;
-char *dbgFreeFilename = noFileName;
-int   dbgFreeLineNumber = 0;
+char *dbgkMemFilename = noFileName;
+int   dbgkMemLineNumber = 0;
+char *dbgkFreeFilename = noFileName;
+int   dbgkFreeLineNumber = 0;
 #endif 
 
 inline void addAllocationToKFreeMemoryArray(int allocationIndex)
@@ -40,6 +43,16 @@ inline void addAllocationToKFreeMemoryArray(int allocationIndex)
     kfreeMemoryArray.inUse[knextFreeMemorySlot++] = true;
 }
 
+#ifdef DEBUG_MEM
+void *dbg_kmalloc(size_t size, char *filename, int lineNumber)
+{
+    dbgkMemFilename = filename;
+    dbgkMemLineNumber = lineNumber;
+    serial_printf("Allocating %d bytes from %s, line %d for %s\n", size, filename, lineNumber, tasks[currentTask].imageName);
+    return kmalloc(size);
+}
+#endif
+
 // Allocate some kernel memory. Mostly this is meant to be used by drivers.
 // This will be mapped into every tasks page space and will be allocated contiguously
 // TODO: Is it better to have this crazy scheme with the two functions, or just modify malloc to make sure
@@ -54,10 +67,10 @@ void* kmalloc(size_t size)
     }
 
 #ifdef DEBUG_MEM
-    kallocationArray.lineNumber[knextAllocationSlot] = dbgMemLineNumber;
-    strncpy(kallocationArray.filename[knextAllocationSlot], dbgMemFilename, MAX_DEBUG_FILENAME_LENGTH);
-    dbgMemFilename = noFileName;
-    dbgMemLineNumber = 0;
+    kallocationArray.lineNumber[knextAllocationSlot] = dbgkMemLineNumber;
+    strncpy(kallocationArray.filename[knextAllocationSlot], dbgkMemFilename, MAX_DEBUG_FILENAME_LENGTH);
+    dbgkMemFilename = noFileName;
+    dbgkMemLineNumber = 0;
 #endif
 
     // See if there's freed memory available to reallocate (first fit algorithm; memory will end up wasted)
@@ -145,6 +158,16 @@ void* kmalloc(size_t size)
     return (void *)availableAddress;
 }
 
+#ifdef DEBUG_MEM
+void dbg_kfree(void *ptr, char *filename, int lineNumber)
+{
+    dbgkFreeFilename = filename;
+    dbgkFreeLineNumber = lineNumber;
+    serial_printf("Freeing mem from %s, line %d for %s\n", filename, lineNumber, tasks[currentTask].imageName);
+    kfree(ptr);
+}
+#endif
+
 void kfree(void *ptr)
 {
     // Find this pointer in the allocation array
@@ -179,9 +202,9 @@ void kfree(void *ptr)
 
     kprintf("free() called with invalid pointer: 0x%lX", ptr);
 #ifdef DEBUG_MEM
-    printf("   from %s, line %d\n", dbgFreeFilename, dbgFreeLineNumber);
-    dbgFreeFilename = noFileName;
-    dbgFreeLineNumber = 0;
+    printf("   from %s, line %d\n", dbgkFreeFilename, dbgkFreeLineNumber);
+    dbgkFreeFilename = noFileName;
+    dbgkFreeLineNumber = 0;
     //for (;;)
     //    __halt();
 #else
